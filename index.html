@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ExcelMathWithLucas - Additional Mathematics Portal</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+    }
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -39,11 +44,64 @@
       pointer-events: none;
     }
 
+    #formulaDrawer, #scratchpadDrawer {
+      width: 0px;
+      transition: width 0.3s ease, min-width 0.3s ease, border-left-width 0.2s ease;
+      overflow: hidden;
+    }
+    #formulaDrawer.open {
+      width: 440px;
+      min-width: 440px;
+    }
+    #scratchpadDrawer.open {
+      width: 500px;
+      min-width: 500px;
+    }
+    @media (max-width: 768px) {
+      #formulaDrawer.open, #scratchpadDrawer.open {
+        width: 100vw;
+        min-width: 100vw;
+        position: fixed;
+        right: 0;
+        top: 3.5rem;
+        bottom: 0;
+        z-index: 45;
+      }
+    }
+
+    #scratchpadCanvas, #splitScratchCanvas {
+      touch-action: none;
+      cursor: crosshair;
+    }
+
     #mediaContainer:fullscreen,
-    #mediaContainer:-webkit-full-screen {
+    #mediaContainer:-webkit-full-screen,
+    #mediaContainer:-moz-full-screen,
+    #mediaContainer:-ms-fullscreen {
       width: 100vw !important;
       height: 100vh !important;
+      max-height: 100vh !important;
+      display: flex !important;
+      flex-direction: column !important;
+      background-color: #000 !important;
+      margin: 0 !important;
+      padding: 0 !important;
       border: none !important;
+      z-index: 99999 !important;
+    }
+
+    #mediaContainer:fullscreen .aspect-video,
+    #mediaContainer:-webkit-full-screen .aspect-video {
+      flex: 1 1 auto !important;
+      height: 100% !important;
+      max-height: 100% !important;
+      aspect-ratio: auto !important;
+    }
+
+    .a4-portrait-sheet {
+      width: 100%;
+      max-width: 380px;
+      aspect-ratio: 210 / 297;
     }
 
     ::-webkit-scrollbar {
@@ -51,41 +109,144 @@
       height: 6px;
     }
     ::-webkit-scrollbar-track {
-      background: #f1f1f1;
+      background: rgba(0,0,0,0.05);
+    }
+    .dark ::-webkit-scrollbar-track {
+      background: #1f2937;
     }
     ::-webkit-scrollbar-thumb {
-      background: #c5c5c5;
+      background: #9ca3af;
       border-radius: 3px;
     }
   </style>
 </head>
-<body class="bg-gray-100 text-gray-900 min-h-screen flex flex-col antialiased">
+<body class="bg-gray-100 dark:bg-neutral-950 text-gray-900 dark:text-neutral-100 min-h-screen flex flex-col antialiased transition-colors duration-200">
+
+  <!-- ================= 8-DIGIT STUDENT LOGIN GATE ================= -->
+  <div id="authGateOverlay" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-neutral-900 border-4 border-black dark:border-neutral-200 w-full max-w-sm p-6 sm:p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,0.9)] text-center flex flex-col font-mono-code">
+      <div class="w-14 h-14 mx-auto rounded-full border-2 border-black dark:border-neutral-200 bg-emerald-100 dark:bg-emerald-950/60 flex items-center justify-center text-2xl mb-4 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+        🔑
+      </div>
+      <h2 class="text-xl font-black uppercase tracking-tight mb-1 text-black dark:text-white">STUDENT LOGIN</h2>
+      <p class="text-xs text-gray-600 dark:text-neutral-400 mb-6">Enter your 8-digit access code to enter your personalized portal.</p>
+      <div class="space-y-4 text-left">
+        <div>
+          <label class="block text-[11px] font-bold uppercase mb-1 dark:text-neutral-300">8-Digit Access Code</label>
+          <input 
+            type="password" 
+            id="studentPasscodeInput" 
+            maxlength="8"
+            placeholder="••••••••" 
+            class="w-full border-2 border-black dark:border-neutral-400 p-3 text-center text-lg tracking-[0.3em] font-bold bg-gray-50 dark:bg-neutral-800 text-black dark:text-white focus:bg-white dark:focus:bg-neutral-700 focus:outline-none"
+            onkeydown="if(event.key === 'Enter') verifyStudentPin()"
+            autocomplete="off"
+          />
+        </div>
+        <button 
+          type="button" 
+          onclick="verifyStudentPin()" 
+          class="w-full py-3 border-2 border-black dark:border-white bg-black dark:bg-white text-white dark:text-black text-xs font-bold uppercase tracking-wider shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:bg-neutral-800 dark:hover:bg-neutral-200 cursor-pointer"
+        >
+          Unlock Portal →
+        </button>
+      </div>
+      <div id="authErrorBox" class="hidden w-full border-2 border-red-600 bg-red-50 dark:bg-red-950/40 p-2.5 mt-4 text-left">
+        <p class="text-[11px] text-red-600 dark:text-red-400 font-bold" id="authErrorMsg">Invalid 8-digit code. Please verify or WhatsApp Lucas.</p>
+      </div>
+      <div class="mt-6 border-t-2 border-gray-200 dark:border-neutral-800 pt-3 text-center">
+        <p class="text-[10px] text-gray-500 dark:text-neutral-400 uppercase">
+          Need your code? WhatsApp Lucas: <a href="https://wa.me/6581980012?text=Hi%20Lucas,%20I%20need%20my%208-digit%20portal%20access%20code." target="_blank" class="font-bold underline text-emerald-700 dark:text-emerald-400">81980012</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= FOCUS LOCKDOWN SETUP MODAL ================= -->
+  <div id="focusSetupModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-neutral-900 border-4 border-black dark:border-neutral-200 w-full max-w-md p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] font-mono-code">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-2xl">🎯</span>
+        <h3 class="text-base font-black uppercase text-black dark:text-white">FULL FOCUS LOCKDOWN MODE</h3>
+      </div>
+      <p class="text-xs text-gray-600 dark:text-neutral-400 mb-4">
+        Set your study sprint. You can freely explore every chapter, worksheet, and split screen inside this portal with an active countdown tracking your focus.
+      </p>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-[11px] font-bold uppercase mb-1 dark:text-neutral-300">Choose Duration</label>
+          <div class="grid grid-cols-4 gap-2">
+            <button type="button" onclick="selectFocusPreset(15)" class="focus-preset-btn px-2 py-2 border-2 border-black dark:border-neutral-400 bg-white dark:bg-neutral-800 text-xs font-black uppercase">15m</button>
+            <button type="button" onclick="selectFocusPreset(25)" class="focus-preset-btn px-2 py-2 border-2 border-black dark:border-neutral-400 bg-emerald-400 text-black text-xs font-black uppercase">25m</button>
+            <button type="button" onclick="selectFocusPreset(45)" class="focus-preset-btn px-2 py-2 border-2 border-black dark:border-neutral-400 bg-white dark:bg-neutral-800 text-xs font-black uppercase">45m</button>
+            <button type="button" onclick="selectFocusPreset(60)" class="focus-preset-btn px-2 py-2 border-2 border-black dark:border-neutral-400 bg-white dark:bg-neutral-800 text-xs font-black uppercase">60m</button>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-bold uppercase mb-1 dark:text-neutral-300">Or Custom Minutes (1 - 180)</label>
+          <input 
+            type="number" 
+            id="customFocusInput" 
+            min="1" 
+            max="180" 
+            value="25" 
+            class="w-full border-2 border-black dark:border-neutral-400 p-2.5 text-sm font-bold bg-gray-50 dark:bg-neutral-800 text-black dark:text-white focus:outline-none"
+          />
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeFocusSetupModal()" class="px-4 py-2 border-2 border-black dark:border-neutral-400 bg-white dark:bg-neutral-800 text-xs font-bold uppercase">Cancel</button>
+          <button type="button" onclick="startFocusLockdown()" class="px-5 py-2 border-2 border-black dark:border-white bg-black dark:bg-white text-white dark:text-black text-xs font-black uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">Start Lockdown 🔒</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= LOCKDOWN ACTIVE FLOATING TOP BAR ================= -->
+  <div id="focusLockdownBar" class="hidden sticky top-0 inset-x-0 z-40 bg-black text-white border-b-2 border-emerald-400 px-4 py-2 flex items-center justify-between font-mono-code shadow-md">
+    <div class="flex items-center gap-2">
+      <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+      <span class="text-xs font-black uppercase tracking-wider text-emerald-400">LOCKDOWN SPRINT IN PROGRESS</span>
+      <span class="hidden sm:inline text-[11px] text-neutral-400">| Full portal access enabled</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <span id="focusTimeRemainingDisplay" class="text-xs sm:text-sm font-black tracking-widest text-amber-300 bg-neutral-900 px-3 py-0.5 border border-neutral-700">25:00</span>
+      <button 
+        type="button" 
+        onclick="confirmExitFocusLockdown()" 
+        class="text-[10px] font-bold bg-neutral-800 hover:bg-neutral-700 text-neutral-300 hover:text-white px-2 py-0.5 border border-neutral-600 uppercase"
+      >
+        End Early
+      </button>
+    </div>
+  </div>
 
   <!-- Top Sticky Navigation Bar -->
-  <header class="h-14 sm:h-16 bg-white border-b-2 border-black flex items-center justify-between px-3 sm:px-6 sticky top-0 z-30 shrink-0">
-    <div class="flex items-center gap-3 min-w-0">
+  <header id="mainHeader" class="h-14 sm:h-16 bg-white dark:bg-neutral-900 border-b-2 border-black dark:border-neutral-700 flex items-center justify-between px-3 sm:px-6 sticky top-0 z-30 shrink-0">
+    <div class="flex items-center gap-2 sm:gap-3 min-w-0">
       <button 
         type="button" 
         id="toggleSidebarBtn" 
         onclick="toggleSidebar()"
-        class="px-3 py-1.5 border-2 border-black font-mono-code text-xs sm:text-sm font-bold uppercase tracking-wider bg-white hover:bg-black hover:text-white transition-colors flex items-center gap-1.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px] shrink-0 cursor-pointer"
+        class="px-2.5 sm:px-3 py-1.5 border-2 border-black dark:border-neutral-300 font-mono-code text-xs sm:text-sm font-bold uppercase tracking-wider bg-white dark:bg-neutral-800 dark:text-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors flex items-center gap-1.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] shrink-0 cursor-pointer"
       >
         <span>☰</span>
         <span id="sidebarBtnText">HIDE MENU</span>
       </button>
 
-      <!-- Brand & Section Status -->
       <div class="flex items-center gap-2.5 min-w-0 cursor-pointer" onclick="selectHomeView()">
         <div class="min-w-0 flex flex-col justify-center">
           <div class="flex items-center gap-2">
-            <span id="pinnedChapterBadge" class="text-[10px] font-mono-code font-bold bg-black text-white px-1.5 py-0.5 uppercase tracking-wider shrink-0">
+            <span id="pinnedChapterBadge" class="text-[10px] font-mono-code font-bold bg-black text-white dark:bg-white dark:text-black px-1.5 py-0.5 uppercase tracking-wider shrink-0">
               HOME
             </span>
             <h1 id="pinnedChapterTitle" class="text-xs sm:text-base font-extrabold uppercase tracking-tight truncate font-mono-code">
               WELCOME
             </h1>
           </div>
-          <p class="text-[9px] sm:text-[10px] font-semibold text-gray-500 uppercase tracking-widest truncate hidden sm:block">
+          <p class="text-[9px] sm:text-[10px] font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-widest truncate hidden sm:block">
             EXCELMATHWITHLUCAS PORTAL
           </p>
         </div>
@@ -93,12 +254,64 @@
     </div>
 
     <!-- Header Actions -->
-    <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+    <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+      <button 
+        type="button" 
+        id="focusLockdownBtn"
+        onclick="openFocusSetupModal()" 
+        title="Start Lockdown Study Mode"
+        class="flex items-center gap-1 bg-red-500 hover:bg-red-400 text-white px-2 sm:px-3 py-1 sm:py-1.5 border-2 border-black font-mono-code text-xs font-black uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px] cursor-pointer"
+      >
+        <span>🔒</span>
+        <span class="hidden md:inline">LOCKDOWN</span>
+      </button>
+
+      <div id="streakBadge" title="Your Daily Study Streak!" class="flex items-center gap-1 bg-orange-400 text-black px-2 sm:px-2.5 py-1 border-2 border-black font-mono-code text-xs font-black uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+        <span class="animate-bounce">🔥</span>
+        <span id="streakCountText">1 DAY</span>
+      </div>
+
+      <button 
+        type="button" 
+        id="scratchpadToggleBtn"
+        onclick="toggleScratchpadDrawer()" 
+        class="flex items-center gap-1 bg-cyan-300 hover:bg-cyan-400 text-black px-2 sm:px-2.5 py-1 sm:py-1.5 border-2 border-black font-mono-code text-xs font-bold uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer"
+      >
+        <span>✏️</span>
+        <span class="hidden lg:inline">SCRATCHPAD</span>
+      </button>
+      
+      <button 
+        type="button" 
+        id="darkModeToggleBtn"
+        onclick="toggleDarkMode()" 
+        class="flex items-center gap-1 bg-neutral-200 dark:bg-neutral-800 text-black dark:text-neutral-100 px-2 py-1 sm:py-1.5 border-2 border-black dark:border-neutral-300 font-mono-code text-xs font-bold uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer"
+      >
+        <span id="darkModeIcon">🌙</span>
+        <span id="darkModeText" class="hidden xl:inline">NIGHT</span>
+      </button>
+
+      <button 
+        type="button" 
+        id="formulaToggleBtn"
+        onclick="toggleFormulaDrawer()" 
+        class="flex items-center gap-1 bg-amber-300 hover:bg-amber-400 text-black px-2 py-1 sm:py-1.5 border-2 border-black font-mono-code text-xs font-bold uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer"
+      >
+        <span>📐</span>
+        <span class="hidden lg:inline">A4 FORMULAS</span>
+      </button>
+
+      <div id="studentChip" class="hidden items-center gap-1 border-2 border-black dark:border-neutral-400 px-2 py-1 bg-gray-50 dark:bg-neutral-800 font-mono-code text-xs shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span id="studentChipName" class="font-bold text-[11px] truncate max-w-[70px]">STUDENT</span>
+        <button type="button" onclick="studentSignOut()" class="text-[10px] text-red-600 dark:text-red-400 font-bold uppercase underline ml-1 cursor-pointer">Lock</button>
+      </div>
+
       <button 
         type="button" 
         id="editTextToggle" 
         onclick="toggleEditTextMode()" 
-        class="hidden text-xs font-mono-code font-bold uppercase border-2 border-black px-2.5 sm:px-3 py-1 sm:py-1.5 bg-white text-black hover:bg-gray-100 transition shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px] cursor-pointer"
+        class="hidden text-xs font-mono-code font-bold uppercase border-2 border-black dark:border-white px-2 py-1 bg-white dark:bg-neutral-800 text-black dark:text-white cursor-pointer"
       >
         EDIT: <span id="editTextStatus" class="text-red-600">OFF</span>
       </button>
@@ -107,8 +320,7 @@
         type="button" 
         id="expandMediaBtn" 
         onclick="toggleMediaFullscreen()" 
-        title="Toggle Fullscreen"
-        class="hidden sm:flex items-center gap-1 text-xs font-mono-code font-bold uppercase border-2 border-black px-2.5 sm:px-3 py-1 sm:py-1.5 bg-white hover:bg-gray-100 transition shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px] cursor-pointer"
+        class="hidden text-xs font-mono-code font-bold uppercase border-2 border-black dark:border-neutral-300 px-2 py-1 bg-white dark:bg-neutral-800 text-black dark:text-white cursor-pointer"
       >
         <span>EXPAND</span>
       </button>
@@ -117,7 +329,7 @@
         type="button" 
         id="teacherAuthBtn" 
         onclick="handleTeacherAuthClick()" 
-        class="text-xs font-mono-code font-bold uppercase bg-black text-white px-3 sm:px-4 py-1 sm:py-1.5 border-2 border-black hover:bg-gray-800 transition shadow-[2px_2px_0px_0px_rgba(0,0,0,0.4)] active:translate-x-[1px] active:translate-y-[1px] cursor-pointer"
+        class="text-xs font-mono-code font-bold uppercase bg-black text-white dark:bg-white dark:text-black px-2.5 py-1 sm:py-1.5 border-2 border-black cursor-pointer"
       >
         TEACHER LOGIN
       </button>
@@ -130,63 +342,98 @@
     <!-- Collapsible Sidebar -->
     <aside 
       id="sidebar" 
-      class="bg-white border-r-2 border-black flex flex-col shrink-0 z-20 sticky top-14 sm:top-16 h-[calc(100vh-3.5rem)] sm:h-[calc(100vh-4rem)]"
+      class="bg-white dark:bg-neutral-900 border-r-2 border-black dark:border-neutral-700 flex flex-col shrink-0 z-20 sticky top-14 sm:top-16 h-[calc(100vh-3.5rem)] sm:h-[calc(100vh-4rem)]"
     >
       <button 
         type="button" 
         id="sidebarHomeBtn" 
         onclick="selectHomeView()" 
-        class="w-full text-left p-3.5 flex items-center justify-between text-xs sm:text-sm font-mono-code font-bold border-b-2 border-black bg-black text-white transition-colors shrink-0 cursor-pointer"
+        class="w-full text-left p-3.5 flex items-center justify-between text-xs sm:text-sm font-mono-code font-bold border-b-2 border-black dark:border-neutral-700 bg-black text-white dark:bg-white dark:text-black transition-colors shrink-0 cursor-pointer"
       >
         <div class="flex items-center gap-2">
           <span>🏠</span>
-          <span>HOME &amp; INTRODUCTION</span>
+          <span>HOME &amp; DASHBOARD</span>
         </div>
         <span class="text-xs">→</span>
       </button>
 
-      <div class="p-3 border-b-2 border-black bg-gray-50 flex items-center gap-2 shrink-0">
+      <div class="p-3 border-b-2 border-black dark:border-neutral-700 bg-emerald-50 dark:bg-emerald-950/40 shrink-0 font-mono-code">
+        <div class="flex items-center gap-1.5 text-xs font-black uppercase text-emerald-950 dark:text-emerald-300 mb-1">
+          <span>🚨</span>
+          <span>SUBMIT WORK TO MARK</span>
+        </div>
+        <p class="text-[10px] leading-tight text-gray-700 dark:text-emerald-200/80 mb-2 whitespace-normal">
+          Send photos of completed worksheets or doubts right to Lucas:
+        </p>
+        <a 
+          href="https://wa.me/6581980012?text=Hi%20Lucas,%20sending%20my%20work%20to%20be%20marked!" 
+          target="_blank" 
+          class="w-full py-1.5 px-2 bg-black dark:bg-emerald-400 hover:bg-emerald-700 dark:hover:bg-emerald-300 text-white dark:text-black text-[11px] font-bold uppercase border border-black flex items-center justify-center gap-1 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition"
+        >
+          <span>📲</span>
+          <span>WHATSAPP 81980012</span>
+        </a>
+      </div>
+
+      <div class="p-3 border-b-2 border-black dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800 flex items-center gap-2 shrink-0">
         <input 
           type="text" 
           id="chapterSearchInput" 
           oninput="filterChapters(this.value)" 
           placeholder="Search chapters..." 
-          class="w-full bg-white border border-gray-300 px-2 py-1 text-xs sm:text-sm focus:outline-none font-mono-code rounded"
+          class="w-full bg-white dark:bg-neutral-900 border border-gray-300 dark:border-neutral-600 text-gray-900 dark:text-white px-2 py-1 text-xs sm:text-sm focus:outline-none font-mono-code rounded"
         />
       </div>
 
-      <!-- Add Chapter Button (Visible when Teacher is Unlocked) -->
-      <div id="teacherAddChapterBar" class="p-2 border-b-2 border-black bg-emerald-100 hidden shrink-0">
+      <div id="teacherAddChapterBar" class="p-2 border-b-2 border-black dark:border-neutral-700 bg-emerald-100 dark:bg-emerald-950 hidden shrink-0">
         <button 
           type="button" 
           onclick="addNewChapter()" 
-          class="w-full py-1.5 px-2 border-2 border-black bg-emerald-400 hover:bg-emerald-300 text-black font-mono-code text-xs font-bold uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px] cursor-pointer flex items-center justify-center gap-1"
+          class="w-full py-1.5 px-2 border-2 border-black dark:border-neutral-200 bg-emerald-400 text-black font-mono-code text-xs font-bold uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer flex items-center justify-center gap-1"
         >
           <span>➕</span>
           <span>ADD NEW CHAPTER / TOPIC</span>
         </button>
       </div>
 
-      <nav id="chapterList" class="flex-1 overflow-y-auto divide-y divide-gray-100">
-        <!-- Chapters rendered here -->
-      </nav>
+      <nav id="chapterList" class="flex-1 overflow-y-auto divide-y divide-gray-100 dark:divide-neutral-800"></nav>
 
-      <div class="p-3 border-t-2 border-black bg-gray-50 text-[11px] font-mono-code text-gray-600 flex justify-between items-center shrink-0">
+      <div class="p-3 border-t-2 border-black dark:border-neutral-700 bg-gray-50 dark:bg-neutral-900 text-[11px] font-mono-code text-gray-600 dark:text-neutral-400 flex justify-between items-center shrink-0">
         <span>O LEVEL AMATHS</span>
-        <span class="font-bold text-black" id="activeChapterCount">17 TOPICS</span>
+        <span class="font-bold text-black dark:text-white" id="activeChapterCount">17 TOPICS</span>
       </div>
     </aside>
 
-    <!-- Main Viewport Content Area -->
-    <main id="mainContainer" class="flex-1 bg-gray-100 flex flex-col min-w-0 overflow-y-auto">
+    <!-- Main Viewport -->
+    <main id="mainContainer" class="flex-1 bg-gray-100 dark:bg-neutral-950 flex flex-col min-w-0 overflow-y-auto">
       
       <!-- VIEW 1: HOME PAGE -->
       <section id="homeViewContainer" class="w-full max-w-4xl mx-auto p-4 sm:p-8 flex flex-col gap-6 pb-40">
-        <div class="bg-white border-4 border-black p-6 sm:p-10 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] text-center flex flex-col items-center">
-          
-          <!-- CIRCULAR LOGO CONTAINER -->
-          <div class="w-full mb-8 flex justify-center">
-            <div class="w-48 h-48 sm:w-60 sm:h-60 rounded-full border-4 border-black bg-gray-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden flex items-center justify-center relative">
+        <div class="bg-white dark:bg-neutral-900 border-4 border-black dark:border-neutral-700 p-6 sm:p-10 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] text-center flex flex-col items-center">
+
+          <div class="w-full border-4 border-black dark:border-amber-400 bg-amber-200 dark:bg-neutral-800 p-4 sm:p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-left font-mono-code mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="text-3xl animate-pulse">💡</span>
+              <div class="min-w-0">
+                <span class="text-[10px] font-black uppercase text-amber-900 dark:text-amber-400 block tracking-widest">
+                  LUCAS'S DAILY A1 MINDSET SHIFT
+                </span>
+                <p id="dailyMotivationQuote" class="text-xs sm:text-sm font-black text-black dark:text-neutral-100 leading-snug">
+                  "Speed in A-Math is a byproduct of precision. Master every algebraic foundation, and speed follows."
+                </p>
+              </div>
+            </div>
+            <button 
+              type="button" 
+              onclick="generateNewMotivationQuote()" 
+              class="px-2.5 py-1.5 border-2 border-black dark:border-neutral-300 bg-white dark:bg-neutral-900 text-[10px] font-bold uppercase hover:bg-neutral-200 dark:hover:bg-neutral-700 cursor-pointer shrink-0 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+            >
+              🔄 Next Boost
+            </button>
+          </div>
+
+          <div class="w-full mb-6 flex justify-center">
+            <div class="w-36 h-36 sm:w-48 sm:h-48 rounded-full border-4 border-black dark:border-neutral-300 bg-gray-50 dark:bg-neutral-800 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden flex items-center justify-center relative">
               <img 
                 id="portalLogoImage" 
                 src="1793377076129_edit_6603537396491.jpg" 
@@ -196,49 +443,71 @@
               />
               <div id="logoPlaceholderBox" class="hidden absolute inset-0 flex-col items-center justify-center p-4 text-center text-gray-400 font-mono-code text-xs">
                 <span class="text-2xl mb-1">🖼️</span>
-                <span class="font-bold text-black uppercase text-[11px]">Logo Circle</span>
-                <span class="text-[9px] mt-0.5 text-gray-500">Put URL in src=""</span>
+                <span class="font-bold text-black dark:text-white uppercase text-[11px]">Logo Circle</span>
               </div>
             </div>
           </div>
 
-          <h1 class="text-2xl sm:text-4xl lg:text-5xl font-black uppercase tracking-tight font-mono-code mb-2">
-            EXCELMATH<span class="text-emerald-700">WITHLUCAS</span>
-          </h1>
-          <p class="text-xs sm:text-sm font-mono-code font-bold uppercase tracking-widest text-gray-500 mb-8 border-b-2 border-black pb-3 w-full max-w-md mx-auto">
-            GCE O-Level Additional Mathematics Portal
-          </p>
+          <div class="w-full bg-emerald-50 dark:bg-emerald-950/40 border-2 border-black dark:border-neutral-700 p-4 mb-4 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+            <span class="text-[10px] font-mono-code font-bold uppercase tracking-widest text-emerald-800 dark:text-emerald-400 block mb-1">
+              STUDENT LEARNING DASHBOARD
+            </span>
+            <h1 id="personalizedWelcomeHeader" class="text-xl sm:text-3xl font-black uppercase tracking-tight font-mono-code text-black dark:text-white">
+              WELCOME <span class="text-emerald-700 dark:text-emerald-400">TO EXCELMATHWITHLUCAS</span>
+            </h1>
+          </div>
 
-          <!-- Intro Section -->
-          <div class="w-full text-left border-2 border-black p-5 sm:p-7 bg-gray-50 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
-            <div class="flex items-center justify-between border-b-2 border-black pb-3 mb-4">
-              <h2 class="text-base sm:text-lg font-black font-mono-code uppercase tracking-tight flex items-center gap-2">
-                <span class="w-3 h-3 bg-black"></span>
-                ABOUT THE INSTRUCTOR &amp; MASTERCLASS
-              </h2>
-              <span class="text-xs font-mono-code text-gray-500">INTRODUCTION</span>
-            </div>
-
-            <div id="homeIntroText" class="text-sm sm:text-base leading-relaxed text-gray-800 space-y-4" contenteditable="false">
-              <p>
-                Hello students! I am Lucas, your dedicated Additional Mathematics mentor. This portal has been meticulously engineered to give you everything you need to master O-Level A-Maths: from comprehensive whiteboard tutorial videos and rigorous practice worksheets to step-by-step walkthroughs and fully worked handwritten solutions.
-              </p>
-              <p>
-                Use the sidebar menu to navigate through all chapters of the syllabus, track your mastery, and review core concepts anytime, anywhere. Let's achieve excellence together!
-              </p>
-              <div class="bg-black text-white p-4 font-mono-code font-bold text-xs sm:text-sm uppercase tracking-wide border-2 border-black space-y-2">
-                <p class="text-emerald-400">🔥 MAKE SURE THAT YOU ARE 100% FOCUSED. NO DISTRACTIONS ALLOWED.</p>
-                <p>With your hard work combined with my expertise, your A1 is guaranteed.</p>
-                <p class="text-gray-300 text-xs">Please submit your work to be marked or if you have any questions, feel free to WhatsApp me at <a href="https://wa.me/6581980012" target="_blank" class="underline text-emerald-400 font-bold hover:text-white">81980012</a>.</p>
-                <p class="text-emerald-300 font-black pt-1">GO STUDY NOW !!!</p>
+          <div id="resumeLessonCard" class="hidden w-full border-2 border-black dark:border-neutral-700 bg-yellow-100 dark:bg-yellow-950/50 p-4 mb-4 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] font-mono-code text-left flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5">
+              <span class="text-2xl">⚡</span>
+              <div>
+                <span class="text-[10px] font-bold text-gray-600 dark:text-yellow-300 uppercase block">PICK UP WHERE YOU LEFT OFF</span>
+                <span id="resumeLessonLabel" class="text-xs sm:text-sm font-black text-black dark:text-yellow-100 uppercase">CHAPTER 01</span>
               </div>
             </div>
+            <button type="button" onclick="resumeLastLesson()" class="w-full sm:w-auto px-4 py-2 border-2 border-black dark:border-neutral-200 bg-black text-white dark:bg-white dark:text-black text-xs font-bold uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer">
+              Resume Lesson →
+            </button>
+          </div>
+
+          <div class="w-full border-2 border-black dark:border-neutral-700 p-5 bg-white dark:bg-neutral-800/80 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] mb-4 text-left font-mono-code">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold uppercase flex items-center gap-1.5 text-black dark:text-white">
+                <span>🎯</span> <span id="progressStudentTitle">YOUR SYLLABUS PROGRESS</span>
+              </span>
+              <span id="overallPercentageText" class="text-xs font-black bg-black text-white dark:bg-white dark:text-black px-2 py-0.5">0% COMPLETE</span>
+            </div>
+            <div class="w-full bg-gray-200 dark:bg-neutral-700 border-2 border-black dark:border-neutral-600 h-4 overflow-hidden mb-2">
+              <div id="overallProgressBar" class="bg-emerald-500 h-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+            <div class="flex justify-between text-[11px] text-gray-600 dark:text-neutral-400 font-bold">
+              <span id="completedItemsCountText">0 of 68 lessons completed</span>
+              <span class="text-emerald-700 dark:text-emerald-400">TARGET: GRADE A1</span>
+            </div>
+          </div>
+
+          <div class="w-full border-4 border-black dark:border-neutral-700 bg-amber-300 dark:bg-amber-400 text-black p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-left font-mono-code mb-6">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-2xl animate-bounce">⚡</span>
+              <h3 class="text-base sm:text-lg font-black uppercase tracking-tight">MANDATORY HOMEWORK SUBMISSION &amp; Q&amp;A</h3>
+            </div>
+            <p class="text-xs sm:text-sm font-semibold text-gray-900 mb-3 leading-relaxed">
+              Every time you finish a worksheet or get stuck on a question, snap a photo and WhatsApp it to me immediately. Do not keep doubts to yourself!
+            </p>
+            <a 
+              href="https://wa.me/6581980012?text=Hi%20Lucas!%20I'm%20submitting%20my%20worksheet%20to%20be%20marked." 
+              target="_blank" 
+              class="inline-flex items-center gap-2 px-5 py-2.5 bg-black text-white text-xs sm:text-sm font-black uppercase tracking-wider border-2 border-black hover:bg-neutral-800 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition"
+            >
+              <span>📲 WhatsApp Lucas at 81980012 Now</span>
+              <span>→</span>
+            </a>
           </div>
 
           <button 
             type="button" 
             onclick="selectChapter(0)" 
-            class="mt-8 px-6 py-3 border-2 border-black bg-black text-white font-mono-code text-sm font-bold uppercase tracking-wider shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:bg-gray-800 active:translate-x-[1px] active:translate-y-[1px] cursor-pointer"
+            class="mt-4 px-6 py-3 border-2 border-black dark:border-white bg-black dark:bg-white text-white dark:text-black font-mono-code text-sm font-bold uppercase tracking-wider shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:bg-neutral-800 dark:hover:bg-neutral-200 cursor-pointer"
           >
             Start Chapter 01: Quadratic Functions →
           </button>
@@ -248,385 +517,1521 @@
       <!-- VIEW 2: CHAPTER VIEW -->
       <section id="chapterViewContainer" class="hidden w-full max-w-6xl mx-auto p-3 sm:p-6 lg:p-8 flex-col gap-4 sm:gap-6 pb-40">
 
-        <!-- Chapter Title Card -->
-        <div class="bg-white border-2 border-black p-4 sm:p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div class="bg-white dark:bg-neutral-900 border-2 border-black dark:border-neutral-700 p-4 sm:p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <span id="currentChapterIndexText" class="text-xs font-mono-code font-bold uppercase tracking-wider text-gray-500 block mb-1">
+            <span id="currentChapterIndexText" class="text-xs font-mono-code font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400 block mb-1">
               CHAPTER 01
             </span>
-            <h2 id="currentChapterTitle" class="text-xl sm:text-2xl font-black uppercase tracking-tight" contenteditable="false">
+            <h2 id="currentChapterTitle" class="text-xl sm:text-2xl font-black uppercase tracking-tight text-black dark:text-white" contenteditable="false">
               Quadratic Functions
             </h2>
           </div>
-          <!-- Teacher Tab Manage Button -->
-          <div id="teacherTabActionContainer" class="hidden">
+          <div class="flex items-center gap-2">
+            <!-- SPLIT SCREEN TOGGLE BUTTON -->
             <button 
               type="button" 
-              onclick="openStudioModal()" 
-              class="px-3 py-1.5 border-2 border-black bg-emerald-400 text-black font-mono-code text-xs font-bold uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-emerald-300 active:translate-x-[1px] active:translate-y-[1px] cursor-pointer flex items-center gap-1.5"
+              id="splitScreenToggleBtn" 
+              onclick="toggleSplitScreenMode()" 
+              class="px-3 py-1.5 border-2 border-black dark:border-neutral-300 bg-cyan-300 dark:bg-cyan-500 text-black font-mono-code text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-cyan-200 cursor-pointer flex items-center gap-1.5"
             >
-              <span>⚙️</span>
-              <span>MANAGE TABS &amp; CONTENT</span>
+              <span>◫</span>
+              <span id="splitScreenBtnText">SPLIT SCREEN</span>
             </button>
           </div>
         </div>
 
-        <!-- Section Dynamic Navigation Tabs Bar -->
-        <div class="flex flex-wrap items-center gap-2" id="tabsBar">
-          <!-- Dynamically rendered tabs for this specific chapter -->
-        </div>
+        <!-- STANDARD SINGLE-PANE VIEW CONTROLS -->
+        <div id="singlePaneControls" class="space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2.5">
+            <div class="flex flex-wrap items-center gap-2" id="tabsBar"></div>
 
-        <!-- Media Display Area -->
-        <section id="mediaContainer" class="bg-black border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden flex flex-col">
-          <div class="bg-gray-900 border-b border-gray-700 px-3 py-2 flex items-center justify-between text-white text-xs font-mono-code shrink-0">
-            <span id="mediaStatusLabel" class="flex items-center gap-2">
-              <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              MEDIA PLAYER
+            <a 
+              id="quickWorksheetDownloadBtn"
+              href="#"
+              download
+              target="_blank"
+              class="hidden items-center gap-2 bg-emerald-400 hover:bg-emerald-300 text-black border-2 border-black font-mono-code font-black text-xs sm:text-sm px-4 py-2 uppercase shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition cursor-pointer"
+            >
+              <span>📥</span>
+              <span>DOWNLOAD WORKSHEET (PDF)</span>
+            </a>
+          </div>
+
+          <div id="worksheetActionToolbar" class="hidden bg-amber-100 dark:bg-amber-950/40 border-2 border-black dark:border-neutral-700 p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex-wrap items-center justify-between gap-3 font-mono-code">
+            <div class="flex items-center gap-2.5">
+              <span class="text-2xl">🖨️</span>
+              <div>
+                <span class="text-xs font-black uppercase text-black dark:text-amber-200 block" id="worksheetToolbarTitle">
+                  PRACTICE WORKSHEET READY
+                </span>
+                <span class="text-[11px] text-gray-700 dark:text-neutral-300">
+                  Download or open in external apps to print and mark up.
+                </span>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 flex-wrap">
+              <a 
+                id="worksheetDownloadBtn" 
+                href="#" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                download
+                class="px-3 py-1.5 bg-black hover:bg-neutral-800 text-white dark:bg-white dark:text-black border-2 border-black text-xs font-bold uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center gap-1.5 cursor-pointer"
+              >
+                <span>📥</span>
+                <span>DOWNLOAD FILE</span>
+              </a>
+
+              <a 
+                id="worksheetOpenPrintBtn" 
+                href="#" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                class="px-3 py-1.5 bg-white hover:bg-gray-100 text-black dark:bg-neutral-800 dark:text-white border-2 border-black text-xs font-bold uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center gap-1.5 cursor-pointer"
+              >
+                <span>↗️</span>
+                <span>OPEN / PRINT</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="bg-white dark:bg-neutral-900 border-2 border-black dark:border-neutral-700 p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-between font-mono-code text-xs">
+            <div class="flex items-center gap-2">
+              <input 
+                type="checkbox" 
+                id="tabCompletionCheckbox" 
+                onchange="toggleCurrentTabCompletion(this.checked)"
+                class="w-4 h-4 text-emerald-600 border-2 border-black cursor-pointer accent-black dark:accent-emerald-500"
+              />
+              <label for="tabCompletionCheckbox" class="font-bold cursor-pointer uppercase select-none text-black dark:text-neutral-200">
+                Mark this lesson / worksheet as completed
+              </label>
+            </div>
+            <span id="tabCompletionStatusTag" class="text-[10px] font-bold px-2 py-0.5 border border-black bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-neutral-400 uppercase">
+              NOT COMPLETED
             </span>
-            <button type="button" onclick="toggleMediaFullscreen()" class="hover:text-emerald-400 underline font-mono-code cursor-pointer">
-              Full Screen
-            </button>
           </div>
 
-          <div class="w-full aspect-video min-h-[260px] sm:min-h-[440px] max-h-[70vh] bg-black flex items-center justify-center relative">
-            <iframe 
-              id="activeMediaIframe" 
-              class="w-full h-full border-0 hidden" 
-              src="" 
-              title="Media Display" 
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-              allowfullscreen
-            ></iframe>
+          <!-- Single Pane Media Area -->
+          <section id="mediaContainer" class="bg-black border-2 border-black dark:border-neutral-700 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden flex flex-col">
+            <div class="bg-gray-900 border-b border-gray-700 px-3 py-2 flex flex-wrap items-center justify-between gap-2 text-white text-xs font-mono-code shrink-0">
+              <span id="mediaStatusLabel" class="flex items-center gap-2">
+                <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                MEDIA PLAYER
+              </span>
+              
+              <div class="flex items-center gap-3">
+                <div id="videoSpeedControls" class="flex items-center gap-1 text-[11px]">
+                  <span class="text-gray-400 font-bold mr-1">SPEED:</span>
+                  <button type="button" onclick="setVideoSpeed(1)" class="px-1.5 py-0.5 border border-gray-600 bg-gray-800">1x</button>
+                  <button type="button" onclick="setVideoSpeed(1.25)" class="px-1.5 py-0.5 border border-gray-600 bg-gray-800">1.25x</button>
+                  <button type="button" onclick="setVideoSpeed(1.5)" class="px-1.5 py-0.5 border border-gray-600 bg-gray-800">1.5x</button>
+                  <button type="button" onclick="setVideoSpeed(2)" class="px-1.5 py-0.5 border border-gray-600 bg-gray-800">2x</button>
+                </div>
 
-            <video 
-              id="activeMediaVideo" 
-              class="w-full h-full object-contain hidden" 
-              controls 
-              playsinline
-            ></video>
+                <button type="button" onclick="toggleMediaFullscreen()" class="hover:text-emerald-400 underline font-mono-code cursor-pointer">
+                  Full Screen
+                </button>
+              </div>
+            </div>
+
+            <div class="w-full aspect-video min-h-[260px] sm:min-h-[440px] max-h-[70vh] bg-black flex items-center justify-center relative">
+              <iframe 
+                id="activeMediaIframe" 
+                class="w-full h-full border-0 hidden" 
+                src="" 
+                title="Media Display" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen
+              ></iframe>
+
+              <video 
+                id="activeMediaVideo" 
+                class="w-full h-full object-contain hidden" 
+                controls 
+                playsinline
+              ></video>
+              
+              <div id="mediaPlaceholder" class="hidden absolute inset-0 bg-neutral-900 text-white flex flex-col items-center justify-center p-6 text-center">
+                <h3 class="text-sm sm:text-base font-bold font-mono-code uppercase mb-1">No File Name Configured</h3>
+                <p class="text-xs text-gray-400 max-w-sm mb-4">Set your video or PDF file in the teacher panel or code!</p>
+              </div>
+            </div>
+
+            <!-- Quick Jump Timestamps -->
+            <div id="videoTimestampsBar" class="bg-neutral-950 border-t border-neutral-800 px-3 py-2.5 font-mono-code">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] font-bold text-gray-400 uppercase flex items-center gap-1.5">
+                  <span>⏱️</span>
+                  <span>QUICK JUMP TO TIMESTAMPS:</span>
+                </span>
+                <span class="text-[10px] text-gray-500 uppercase">Click to seek</span>
+              </div>
+              <div id="timestampsContainer" class="flex flex-wrap gap-2 items-center"></div>
+            </div>
+          </section>
+        </div>
+
+        <!-- ================= SPLIT SCREEN VIEW CONTAINER ================= -->
+        <div id="splitScreenContainer" class="hidden flex-col gap-3 font-mono-code">
+          <div class="bg-cyan-100 dark:bg-cyan-950/40 border-2 border-black dark:border-neutral-700 p-2.5 flex items-center justify-between text-xs font-bold text-black dark:text-cyan-200">
+            <span class="flex items-center gap-1.5">
+              <span>◫</span>
+              <span>TWO-PANE STUDY MODE ACTIVE</span>
+            </span>
+            <span class="text-[10px] text-neutral-600 dark:text-neutral-400">Left: Reference Material | Right: Notepad or Any Lesson Tab</span>
+          </div>
+
+          <!-- Split Workspace Layout -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
             
-            <div id="mediaPlaceholder" class="hidden absolute inset-0 bg-neutral-900 text-white flex flex-col items-center justify-center p-6 text-center">
-              <h3 class="text-sm sm:text-base font-bold font-mono-code uppercase mb-1">No File Name Configured</h3>
-              <p class="text-xs text-gray-400 max-w-sm mb-4">Type your exact file name (e.g. <code class="text-emerald-400">SVID_20261028_012045_1.mp4</code>) into the <code class="text-emerald-400">url: ''</code> field in your code for this chapter!</p>
+            <!-- LEFT PANE: Reference Material (Worksheets, Tutorials, Solutions) -->
+            <div class="bg-white dark:bg-neutral-900 border-2 border-black dark:border-neutral-700 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex flex-col h-[700px] overflow-hidden">
+              <div class="p-2.5 bg-neutral-800 text-white flex items-center justify-between text-xs font-bold shrink-0">
+                <div class="flex items-center gap-2 min-w-0">
+                  <span class="shrink-0">📄 LEFT:</span>
+                  <select id="splitLeftTabSelect" onchange="switchSplitLeftTab(this.value)" class="bg-neutral-900 text-white border border-neutral-700 px-2 py-0.5 text-xs font-bold uppercase rounded truncate max-w-[200px] sm:max-w-none">
+                    <!-- Populated dynamically -->
+                  </select>
+                </div>
+                <a id="splitLeftOpenBtn" href="#" target="_blank" class="text-[10px] text-cyan-300 underline shrink-0">Open Full ↗</a>
+              </div>
+              <div class="flex-1 bg-neutral-950 relative overflow-hidden">
+                <iframe id="splitLeftIframe" class="w-full h-full border-0 hidden" src="" title="Left Pane Document"></iframe>
+                <video id="splitLeftVideo" class="w-full h-full object-contain hidden" controls playsinline></video>
+                <div id="splitLeftPlaceholder" class="hidden absolute inset-0 flex flex-col items-center justify-center p-4 text-center text-gray-400 text-xs">
+                  <span>📄</span>
+                  <p class="font-bold mt-1">No Resource Configured for This Tab</p>
+                </div>
+              </div>
             </div>
-          </div>
-        </section>
 
-        <!-- Whiteboard Notes Overview -->
-        <section class="bg-white border-2 border-black p-5 sm:p-7 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-          <div class="flex items-center justify-between border-b-2 border-black pb-3 mb-4">
-            <h3 class="text-sm sm:text-lg font-black font-mono-code uppercase tracking-tight flex items-center gap-2">
-              <span class="w-2.5 h-2.5 bg-black"></span>
-              WHITEBOARD LESSON OVERVIEW
-            </h3>
-            <span class="text-[11px] font-mono-code text-gray-500">EXAM SUMMARY</span>
-          </div>
+            <!-- RIGHT PANE: Flexible Tab Switcher (Notepad / Tutorial / Walkthrough / Worksheet / Solutions) -->
+            <div class="bg-white dark:bg-neutral-900 border-2 border-black dark:border-neutral-700 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex flex-col h-[700px] overflow-hidden">
+              <div class="p-2.5 bg-neutral-800 text-white flex items-center justify-between text-xs font-bold shrink-0">
+                <div class="flex items-center gap-2 min-w-0">
+                  <span class="shrink-0">⚙️ RIGHT:</span>
+                  <select id="splitRightTabSelect" onchange="switchSplitRightTab(this.value)" class="bg-neutral-900 text-white border border-neutral-700 px-2 py-0.5 text-xs font-bold uppercase rounded truncate max-w-[220px] sm:max-w-none">
+                    <option value="notepad">📝 NOTEPAD (DIGITAL CANVAS)</option>
+                    <!-- Other chapter tabs injected dynamically -->
+                  </select>
+                </div>
+                <div class="flex items-center gap-1 shrink-0">
+                  <button type="button" id="splitCanvasClearBtn" onclick="clearSplitCanvas()" class="text-[10px] bg-red-600 hover:bg-red-700 px-2 py-0.5 text-white font-bold uppercase rounded">Clear Canvas</button>
+                </div>
+              </div>
 
-          <div id="chapterOverviewText" class="text-sm sm:text-base leading-relaxed text-gray-800 space-y-3" contenteditable="false">
-            <p id="overviewParagraph">
-              Watch the full whiteboard explanation, theorem derivations, key exam formulas, and step-by-step examination layout for this chapter.
-            </p>
-            <div class="bg-gray-50 border-l-4 border-black p-3.5 font-mono-code text-xs sm:text-sm text-gray-700">
-              💡 <strong>Pro Tip:</strong> Ensure all intermediate values retain exact radical / surd values before final rounding.
+              <!-- Right Pane: Digital Scratchpad Canvas -->
+              <div id="splitRightCanvasView" class="flex-1 bg-neutral-950 relative flex flex-col overflow-hidden">
+                
+                <!-- Enhanced Canvas Controls Bar: Colors, Stylus Only, Pen/Eraser & Thickness Sliders -->
+                <div class="p-2.5 bg-neutral-900 border-b border-neutral-800 flex flex-wrap items-center justify-between gap-2 text-xs text-white shrink-0">
+                  <!-- Ink Colors -->
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[10px] text-gray-400 font-bold uppercase">INK:</span>
+                    <button type="button" onclick="setSplitCanvasColor('#10b981')" class="w-4 h-4 rounded-full bg-emerald-500 border border-white hover:scale-110 transition"></button>
+                    <button type="button" onclick="setSplitCanvasColor('#38bdf8')" class="w-4 h-4 rounded-full bg-sky-400 border border-white hover:scale-110 transition"></button>
+                    <button type="button" onclick="setSplitCanvasColor('#facc15')" class="w-4 h-4 rounded-full bg-yellow-400 border border-white hover:scale-110 transition"></button>
+                    <button type="button" onclick="setSplitCanvasColor('#ffffff')" class="w-4 h-4 rounded-full bg-white border border-neutral-400 hover:scale-110 transition"></button>
+                    <button type="button" onclick="setSplitCanvasColor('#f87171')" class="w-4 h-4 rounded-full bg-red-400 border border-white hover:scale-110 transition"></button>
+                  </div>
+
+                  <!-- Stylus Only / Palm Rejection Toggle for Split Screen Canvas -->
+                  <button 
+                    type="button" 
+                    id="splitStylusOnlyToggleBtn" 
+                    onclick="toggleStylusOnlyMode()" 
+                    class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-neutral-200 border border-neutral-500 font-bold text-[10px] uppercase rounded flex items-center gap-1 transition"
+                    title="Blocks palm/finger touches. Only Apple Pencil or active stylus draws."
+                  >
+                    <span>✍️</span>
+                    <span>STYLUS ONLY:</span>
+                    <span id="splitStylusOnlyStatusText" class="text-gray-400 font-black">OFF</span>
+                  </button>
+
+                  <!-- Tool Mode: Pen vs Eraser -->
+                  <div class="flex items-center gap-1 text-[10px]">
+                    <button type="button" onclick="setSplitCanvasMode('pen')" id="splitPenModeBtn" class="px-2 py-0.5 bg-emerald-500 text-black font-bold uppercase rounded">PEN</button>
+                    <button type="button" onclick="setSplitCanvasMode('eraser')" id="splitEraserModeBtn" class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-bold uppercase rounded">ERASER</button>
+                  </div>
+
+                  <!-- Thickness Controls -->
+                  <div class="flex items-center gap-2 bg-neutral-800 px-2 py-1 rounded border border-neutral-700 text-[10px]">
+                    <span class="text-neutral-400 font-bold uppercase">SIZE:</span>
+                    <input 
+                      type="range" 
+                      id="splitSizeSlider" 
+                      min="1" 
+                      max="40" 
+                      value="3" 
+                      oninput="updateSplitThickness(this.value)" 
+                      class="w-20 accent-emerald-400 cursor-pointer"
+                    />
+                    <span id="splitSizeValueLabel" class="w-7 text-right font-bold text-emerald-400">3px</span>
+                  </div>
+                </div>
+
+                <!-- Canvas Wrapper -->
+                <div class="flex-1 relative overflow-hidden" id="splitCanvasWrapper">
+                  <canvas id="splitScratchCanvas" class="w-full h-full bg-neutral-900"></canvas>
+                </div>
+              </div>
+
+              <!-- Right Pane: Lesson Content (Video / PDF) -->
+              <div id="splitRightContentView" class="hidden flex-1 bg-black relative flex flex-col overflow-hidden">
+                <video id="splitRightVideo" class="w-full h-full object-contain hidden" controls playsinline></video>
+                <iframe id="splitRightIframe" class="w-full h-full border-0 hidden" src="" title="Split Right Content"></iframe>
+                <div id="splitRightPlaceholder" class="hidden absolute inset-0 flex flex-col items-center justify-center p-4 text-center text-gray-400 text-xs font-mono-code">
+                  <span>📹</span>
+                  <p class="font-bold mt-1">No File Name Configured for This Tab</p>
+                </div>
+              </div>
+
             </div>
+
           </div>
-        </section>
+        </div>
 
       </section>
     </main>
+
+    <!-- ================= DIGITAL WORKING SCRATCHPAD DRAWER ================= -->
+    <aside 
+      id="scratchpadDrawer" 
+      class="bg-neutral-900 border-l-2 border-black dark:border-neutral-700 flex flex-col shrink-0 z-30 sticky top-14 sm:top-16 h-[calc(100vh-3.5rem)] sm:h-[calc(100vh-4rem)] transition-all"
+    >
+      <div class="p-3 bg-cyan-300 text-black border-b-2 border-black flex items-center justify-between shrink-0 font-mono-code">
+        <div class="flex items-center gap-1.5 min-w-0">
+          <span class="text-base">✏️</span>
+          <div class="truncate">
+            <h3 class="font-black text-xs uppercase tracking-tight truncate">DIGITAL WORKING CANVAS</h3>
+            <span class="text-[9px] font-bold uppercase block text-neutral-800">PALM REJECTION &amp; STYLUS</span>
+          </div>
+        </div>
+        <button type="button" onclick="toggleScratchpadDrawer()" class="font-black px-2 py-0.5 bg-black text-white hover:bg-neutral-800 text-xs transition cursor-pointer shrink-0 ml-2">
+          ✕ CLOSE
+        </button>
+      </div>
+
+      <!-- Canvas Toolbar & Controls -->
+      <div class="p-2.5 bg-neutral-800 border-b border-neutral-700 flex flex-wrap items-center justify-between gap-2 font-mono-code text-xs text-white shrink-0">
+        <div class="flex items-center gap-1.5">
+          <span class="text-[10px] text-gray-400 font-bold uppercase">INK:</span>
+          <button type="button" onclick="setCanvasColor('#10b981')" class="w-5 h-5 rounded-full bg-emerald-500 border border-white hover:scale-110 transition"></button>
+          <button type="button" onclick="setCanvasColor('#38bdf8')" class="w-5 h-5 rounded-full bg-sky-400 border border-white hover:scale-110 transition"></button>
+          <button type="button" onclick="setCanvasColor('#facc15')" class="w-5 h-5 rounded-full bg-yellow-400 border border-white hover:scale-110 transition"></button>
+          <button type="button" onclick="setCanvasColor('#ffffff')" class="w-5 h-5 rounded-full bg-white border border-neutral-400 hover:scale-110 transition"></button>
+        </div>
+
+        <button 
+          type="button" 
+          id="stylusOnlyToggleBtn" 
+          onclick="toggleStylusOnlyMode()" 
+          class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-neutral-200 border border-neutral-500 font-bold text-[10px] uppercase rounded flex items-center gap-1 transition"
+          title="Blocks palm/finger touches. Only Apple Pencil or active stylus draws."
+        >
+          <span>✍️</span>
+          <span>STYLUS ONLY:</span>
+          <span id="stylusOnlyStatusText" class="text-gray-400 font-black">OFF</span>
+        </button>
+
+        <!-- Thickness Slider for Drawer Canvas -->
+        <div class="flex items-center gap-1.5 bg-neutral-900 px-2 py-0.5 rounded border border-neutral-700 text-[10px]">
+          <span class="text-neutral-400 uppercase font-bold">SIZE:</span>
+          <input 
+            type="range" 
+            id="drawerSizeSlider" 
+            min="1" 
+            max="40" 
+            value="3" 
+            oninput="updateDrawerThickness(this.value)" 
+            class="w-16 accent-emerald-400 cursor-pointer"
+          />
+          <span id="drawerSizeValueLabel" class="w-6 text-right font-bold text-emerald-400">3px</span>
+        </div>
+
+        <div class="flex items-center gap-1 text-[11px]">
+          <button type="button" onclick="setCanvasMode('pen')" id="penModeBtn" class="px-2 py-0.5 bg-emerald-500 text-black font-bold uppercase rounded">PEN</button>
+          <button type="button" onclick="setCanvasMode('eraser')" id="eraserModeBtn" class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-bold uppercase rounded">ERASER</button>
+          <button type="button" onclick="clearScratchpadCanvas()" class="px-2 py-0.5 bg-red-600 hover:bg-red-700 text-white font-bold uppercase rounded ml-1">CLEAR</button>
+        </div>
+      </div>
+
+      <div class="flex-1 bg-neutral-950 p-2 relative overflow-hidden flex flex-col justify-between" id="scratchpadCanvasWrapper">
+        <div class="flex-1 relative overflow-hidden flex items-center justify-center">
+          <canvas id="scratchpadCanvas" class="w-full h-full bg-neutral-900 border border-neutral-700 rounded shadow-inner"></canvas>
+        </div>
+        <!-- Smart Question Prompt Helper inside Scratchpad -->
+        <div class="bg-amber-100 dark:bg-amber-950/60 border-t-2 border-black p-2.5 text-[11px] font-mono-code text-black dark:text-amber-200 shrink-0 mt-2">
+          <p class="font-black uppercase mb-1">💡 How to ask a winning question:</p>
+          <p class="text-[10px] text-gray-700 dark:text-neutral-300 leading-tight">
+            Don't just send a blank page! Circle where you got stuck, write down your first step, and ask: <span class="italic font-bold">"Lucas, I got up to step 2 here, but why did the sign flip when expanding the bracket?"</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="p-2.5 border-t border-neutral-800 bg-neutral-900 flex items-center justify-between text-xs font-mono-code shrink-0">
+        <button type="button" onclick="downloadScratchpadPNG()" class="px-2.5 py-1 bg-neutral-800 hover:bg-neutral-700 text-white font-bold uppercase border border-neutral-600 text-[11px] rounded">
+          💾 SAVE WORK
+        </button>
+        <button type="button" onclick="sendScratchpadToLucas()" class="px-3 py-1 bg-emerald-400 hover:bg-emerald-300 text-black font-black uppercase text-[11px] rounded flex items-center gap-1 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+          <span>📲</span>
+          <span>WHATSAPP TO LUCAS</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- ================= FORMULA SHEET DRAWER ================= -->
+    <aside 
+      id="formulaDrawer" 
+      class="bg-neutral-900 border-l-2 border-black dark:border-neutral-700 flex flex-col shrink-0 z-30 sticky top-14 sm:top-16 h-[calc(100vh-3.5rem)] sm:h-[calc(100vh-4rem)] transition-all"
+    >
+      <div class="p-3 bg-amber-300 text-black border-b-2 border-black flex items-center justify-between shrink-0 font-mono-code">
+        <div class="flex items-center gap-1.5 min-w-0">
+          <span class="text-base">📄</span>
+          <div class="truncate">
+            <h3 class="font-black text-xs uppercase tracking-tight truncate">SEAB A-MATH FORMULA SHEET</h3>
+            <span class="text-[9px] font-bold uppercase block text-neutral-800">SIDE-BY-SIDE REFERENCE</span>
+          </div>
+        </div>
+        <button type="button" onclick="toggleFormulaDrawer()" class="font-black px-2 py-0.5 bg-black text-white hover:bg-neutral-800 text-xs transition cursor-pointer shrink-0 ml-2">
+          ✕ CLOSE
+        </button>
+      </div>
+
+      <div class="p-4 overflow-y-auto flex-1 bg-neutral-950 flex flex-col items-center justify-start">
+        <div class="a4-portrait-sheet bg-white border-2 border-neutral-700 shadow-xl overflow-hidden relative flex flex-col items-center justify-center shrink-0">
+          <img 
+            id="formulaSheetImg" 
+            src="formula_sheet.jpg" 
+            alt="Official SEAB A-Math Formula Sheet A4 Vertical" 
+            class="w-full h-full object-contain block select-none"
+            onerror="this.style.display='none'; document.getElementById('formulaSheetPlaceholder').style.display='flex';"
+          />
+          <div id="formulaSheetPlaceholder" class="hidden absolute inset-0 flex-col items-center justify-center p-6 text-center text-gray-500 bg-white font-mono-code">
+            <span class="text-4xl mb-2">📄</span>
+            <h4 class="font-bold text-xs text-black uppercase mb-1">Formula Sheet Not Found</h4>
+            <p class="text-[10px] text-gray-600">Place <code class="text-emerald-700 font-bold">formula_sheet.jpg</code> in your root folder.</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- FLOATING WHATSAPP BUTTON -->
+  <div id="floatingWhatsAppContainer" class="fixed bottom-4 right-4 z-40">
+    <a 
+      id="floatingWhatsAppBtn"
+      href="https://wa.me/6581980012?text=Hi%20Lucas!%20I'm%20submitting%20my%20work%20to%20be%20marked%20or%20I%20have%20a%20question." 
+      target="_blank" 
+      class="bg-emerald-400 hover:bg-emerald-300 text-black border-2 border-black px-4 py-2.5 rounded-full font-mono-code font-black text-xs uppercase tracking-wider shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center gap-2 active:translate-x-[1px] active:translate-y-[1px] transition"
+    >
+      <span class="text-base">💬</span>
+      <span>SUBMIT WORK (81980012)</span>
+    </a>
   </div>
 
   <!-- PASSWORD PIN MODAL -->
   <div id="authModal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-3 sm:p-4">
-    <div class="bg-white border-4 border-black w-full max-w-sm shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-5 flex flex-col font-mono-code">
-      <h3 class="font-black text-sm uppercase tracking-tight mb-1">TEACHER AUTHENTICATION</h3>
-      <p class="text-[11px] text-gray-500 mb-4">Enter master PIN to unlock text editing &amp; tabs studio.</p>
+    <div class="bg-white dark:bg-neutral-900 border-4 border-black dark:border-neutral-300 w-full max-w-sm shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-5 flex flex-col font-mono-code">
+      <h3 class="font-black text-sm uppercase tracking-tight mb-1 text-black dark:text-white">TEACHER AUTHENTICATION</h3>
+      <p class="text-[11px] text-gray-500 dark:text-neutral-400 mb-4">Enter master PIN to unlock text editing &amp; tabs studio.</p>
       
       <input 
         type="password" 
         id="passwordInput" 
         placeholder="Enter PIN" 
-        class="border-2 border-black p-2 text-sm bg-gray-50 mb-4 focus:bg-white focus:outline-none"
+        class="border-2 border-black dark:border-neutral-400 p-2 text-sm bg-gray-50 dark:bg-neutral-800 text-black dark:text-white mb-4 focus:bg-white focus:outline-none"
         onkeydown="if(event.key === 'Enter') { event.target.blur(); verifyPassword(); }"
       />
 
       <div class="flex justify-end gap-2 text-xs">
-        <button type="button" onclick="closeAuthModal()" class="px-3 py-1.5 border-2 border-black bg-white uppercase font-bold cursor-pointer">Cancel</button>
-        <button type="button" onclick="verifyPassword()" class="px-4 py-1.5 border-2 border-black bg-black text-white uppercase font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer">Unlock</button>
+        <button type="button" onclick="closeAuthModal()" class="px-3 py-1.5 border-2 border-black dark:border-neutral-400 bg-white dark:bg-neutral-800 text-black dark:text-white uppercase font-bold cursor-pointer">Cancel</button>
+        <button type="button" onclick="verifyPassword()" class="px-4 py-1.5 border-2 border-black dark:border-white bg-black dark:bg-white text-white dark:text-black uppercase font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer">Unlock</button>
       </div>
     </div>
   </div>
 
-  <!-- STUDIO MODAL: CHAPTER-SPECIFIC TABS MANAGEMENT -->
-  <div id="studioModal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-3 sm:p-4">
-    <div class="bg-white border-4 border-black w-full max-w-2xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] max-h-[90vh] flex flex-col">
-      <div class="p-4 border-b-2 border-black bg-gray-100 flex items-center justify-between shrink-0">
-        <div>
-          <h3 class="font-mono-code font-black text-sm sm:text-base uppercase tracking-tight">
-            STUDIO: <span id="studioChapterLabel">PORTAL SETTINGS</span>
-          </h3>
-          <p class="text-[11px] text-gray-500 font-mono-code">Configure independent tabs &amp; file names for this chapter</p>
-        </div>
-        <button type="button" onclick="closeStudioModal()" class="text-lg font-bold px-2 hover:bg-black hover:text-white transition cursor-pointer">✕</button>
-      </div>
-
-      <div class="p-4 sm:p-6 overflow-y-auto space-y-6 font-mono-code text-xs sm:text-sm flex-1">
-        
-        <!-- Add New Tab Form -->
-        <div class="bg-emerald-50 border-2 border-black p-4 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
-          <h4 class="font-black uppercase mb-3 flex items-center gap-2">
-            <span>➕</span>
-            <span>ADD NEW TAB TO THIS CHAPTER</span>
-          </h4>
-          <div class="space-y-3">
-            <div>
-              <label class="block font-bold text-[11px] uppercase mb-1">Tab Title (e.g. Lesson Tutorial 2, Exam Notes)</label>
-              <input type="text" id="newTabTitleInput" placeholder="Enter tab title..." class="w-full border-2 border-black p-2 bg-white focus:outline-none" />
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label class="block font-bold text-[11px] uppercase mb-1">Resource Type</label>
-                <select id="newTabTypeSelect" class="w-full border-2 border-black p-2 bg-white focus:outline-none">
-                  <option value="video">Video File</option>
-                  <option value="document">Document / PDF</option>
-                </select>
-              </div>
-              <div>
-                <label class="block font-bold text-[11px] uppercase mb-1">Exact File Name</label>
-                <input type="text" id="newTabUrlInput" placeholder="e.g. SVID_20261028_012045_1.mp4" class="w-full border-2 border-black p-2 bg-white focus:outline-none" />
-              </div>
-            </div>
-            <div class="pt-1">
-              <button 
-                type="button" 
-                onclick="addNewTabToChapter()" 
-                class="px-4 py-2 border-2 border-black bg-black text-white hover:bg-gray-800 uppercase font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px] cursor-pointer"
-              >
-                + Add Tab Now
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Existing Chapter-Specific Tabs List -->
-        <div>
-          <h4 class="font-black uppercase mb-3 flex items-center gap-2">
-            <span>📋</span>
-            <span>MANAGE TABS &amp; FILE NAMES FOR THIS CHAPTER</span>
-          </h4>
-          <div id="studioTabsListContainer" class="space-y-4">
-            <!-- Dynamically populated unique tab cards -->
-          </div>
-        </div>
-
-      </div>
-
-      <div class="p-3 sm:p-4 border-t-2 border-black bg-gray-50 flex items-center justify-between font-mono-code text-xs shrink-0">
-        <button type="button" onclick="lockTeacherMode()" class="text-red-600 font-bold uppercase underline cursor-pointer">Log Out &amp; Lock</button>
-        <div class="flex gap-2">
-          <button type="button" onclick="closeStudioModal()" class="px-4 py-2 border-2 border-black bg-white hover:bg-gray-200 uppercase font-bold cursor-pointer">Close Studio</button>
-          <button type="button" onclick="saveStudioChanges()" class="px-5 py-2 border-2 border-black bg-black text-white hover:bg-gray-800 uppercase font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px] cursor-pointer">Save All Changes</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="toast" class="fixed bottom-4 right-4 bg-black text-white font-mono-code text-xs px-4 py-2.5 border-2 border-white shadow-xl transition-opacity duration-300 opacity-0 pointer-events-none z-50">
+  <div id="toast" class="fixed bottom-4 left-4 bg-black text-white dark:bg-white dark:text-black font-mono-code text-xs px-4 py-2.5 border-2 border-white dark:border-black shadow-xl transition-opacity duration-300 opacity-0 pointer-events-none z-50">
     Changes saved!
   </div>
 
   <script>
     const MASTER_PIN = "94668661";
 
-    // CLEAN MASTER CONFIGURATION: Edit your exact file names right here inside the single quotes `url: '...'`
-    const CHECKLIST_CHAPTERS = [
-      { 
-        id: '01', 
-        title: 'Quadratic Functions', 
-        overview: '', 
-        tabs: [
-          { id: 'ch01_t1', title: '1. LESSON TUTORIAL', type: 'video', url: '' }, 
-          { id: 'ch01_t2', title: '2. PRACTICE WORKSHEET', type: 'document', url: '' }, 
-          { id: 'ch01_t3', title: '3. WORKSHEET WALKTHROUGH', type: 'video', url: '' }, 
-          { id: 'ch01_t4', title: '4. HANDWRITTEN SOLUTIONS', type: 'document', url: '' }
-        ] 
-      },
-      { 
-        id: '02', 
-        title: 'Equations and Inequalities', 
-        overview: '', 
-        tabs: [
-          { id: 'ch02_t1', title: '1. LESSON TUTORIAL', type: 'video', url: '' }, 
-          { id: 'ch02_t2', title: '2. PRACTICE WORKSHEET', type: 'document', url: '' }, 
-          { id: 'ch02_t3', title: '3. WORKSHEET WALKTHROUGH', type: 'video', url: '' }, 
-          { id: 'ch02_t4', title: '4. HANDWRITTEN SOLUTIONS', type: 'document', url: '' }
-        ] 
-      },
-      { 
-        id: '03', 
-        title: 'Surds', 
-        overview: '', 
-        tabs: [
-          { id: 'ch03_t1', title: '1. LESSON TUTORIAL', type: 'video', url: '' },
-          { id: 'ch03_t2', title: '2. PRACTICE WORKSHEET', type: 'document', url: '' },
-          { id: 'ch03_t3', title: '3. WORKSHEET WALKTHROUGH', type: 'video', url: '' },
-          { id: 'ch03_t4', title: '4. HANDWRITTEN SOLUTIONS', type: 'document', url: '' }
-        ] 
-      },
-      { 
-        id: '04', 
-        title: 'Polynomials, Cubic equations and partial fractions', 
-        overview: '', 
-        tabs: [
-          { id: 'ch04_t1', title: '1. LESSON TUTORIAL', type: 'video', url: '' },
-          { id: 'ch04_t2', title: '2. PRACTICE WORKSHEET', type: 'document', url: '' },
-          { id: 'ch04_t3', title: '3. WORKSHEET WALKTHROUGH', type: 'video', url: '' },
-          { id: 'ch04_t4', title: '4. HANDWRITTEN SOLUTIONS', type: 'document', url: '' }
-        ] 
-      },
-      { 
-        id: '05', 
-        title: 'Binomial Theorem', 
-        overview: '', 
-        tabs: [
-          { id: 'ch05_t1', title: '1. LESSON TUTORIAL', type: 'video', url: '' },
-          { id: 'ch05_t2', title: '2. PRACTICE WORKSHEET', type: 'document', url: '' },
-          { id: 'ch05_t3', title: '3. WORKSHEET WALKTHROUGH', type: 'video', url: '' },
-          { id: 'ch05_t4', title: '4. HANDWRITTEN SOLUTIONS', type: 'document', url: '' }
-        ] 
-      },
-      { 
-        id: '06', 
-        title: 'Exponential and Logarithmic Functions', 
-        overview: '', 
-        tabs: [
-          { id: 'ch06_t1', title: '1. LESSON TUTORIAL', type: 'video', url: '' },
-          { id: 'ch06_t2', title: '2. PRACTICE WORKSHEET', type: 'document', url: '' },
-          { id: 'ch06_t3', title: '3. WORKSHEET WALKTHROUGH', type: 'video', url: '' },
-          { id: 'ch06_t4', title: '4. HANDWRITTEN SOLUTIONS', type: 'document', url: '' }
-        ] 
-      },
-      { 
-        id: '07', 
-        title: 'Coordinate Geometry', 
-        overview: '', 
-        tabs: [
-          { id: 'ch07_t1', title: '1. LESSON TUTORIAL', type: 'video', url: '' },
-          { id: 'ch07_t2', title: '2. PRACTICE WORKSHEET', type: 'document', url: '' },
-          { id: 'ch07_t3', title: '3. WORKSHEET WALKTHROUGH', type: 'video', url: '' },
-          { id: 'ch07_t4', title: '4. HANDWRITTEN SOLUTIONS', type: 'document', url: '' }
-        ] 
-      },
-      { 
-        id: '08', 
-        title: 'Linear Law', 
-        overview: '', 
-        tabs: [
-          { id: 'ch08_t1', title: '1. LESSON TUTORIAL', type: 'video', url: '' },
-          { id: 'ch08_t2', title: '2. PRACTICE WORKSHEET', type: 'document', url: '' },
-          { id: 'ch08_t3', title: '3. WORKSHEET WALKTHROUGH', type: 'video', url: '' },
-          { id: 'ch08_t4', title: '4. HANDWRITTEN SOLUTIONS', type: 'document', url: '' }
-        ] 
-      },
-      { 
-        id: '09', 
-        title: 'Trigonometric Functions and Graphs', 
-        overview: '', 
-        tabs: [
-          { id: 'ch09_t1', title: '1. LESSON TUTORIAL', type: 'video', url: '' },
-          { id: 'ch09_t2', title: '2. PRACTICE WORKSHEET', type: 'document', url: '' },
-          { id: 'ch09_t3', title: '3. WORKSHEET WALKTHROUGH', type: 'video', url: '' },
-          { id: 'ch09_t4', title: '4. HANDWRITTEN SOLUTIONS', type: 'document', url: '' }
-        ] 
-      },
-      { 
-        id: '10', 
-        title: 'Trigonometric Equations and identities', 
-        overview: '', 
-        tabs: [
-          { id: 'ch10_t1', title: '1. LESSON TUTORIAL', type: 'video', url: '' },
-          { id: 'ch10_t2', title: '2. PRACTICE WORKSHEET', type: 'document', url: '' },
-          { id: 'ch10_t3', title: '3. WORKSHEET WALKTHROUGH', type: 'video', url: '' },
-          { id: 'ch10_t4', title: '4. HANDWRITTEN SOLUTIONS', type: 'document', url: '' }
-        ] 
-      },
-      { 
-        id: '11', 
-        title: 'Gradients, Derivatives and Differentiation Techniques', 
-        overview: '', 
-        tabs: [
-          { id: 'ch11_t1', title: '1. LESSON TUTORIAL', type: 'video', url: '' },
-          { id: 'ch11_t2', title: '2. PRACTICE WORKSHEET', type: 'document', url: '' },
-          { id: 'ch11_t3', title: '3. WORKSHEET WALKTHROUGH', type: 'video', url: '' },
-          { id: 'ch11_t4', title: '4. HANDWRITTEN SOLUTIONS', type: 'document', url: '' }
-        ] 
-      },
-      { 
-        id: '12', 
-        title: 'Application of Differentiation', 
-        overview: '', 
-        tabs: [
-          { id: 'ch12_t1', title: '1. LESSON TUTORIAL', type: 'video', url: '' },
-          { id: 'ch12_t2', title: '2. PRACTICE WORKSHEET', type: 'document', url: '' },
-          { id: 'ch12_t3', title: '3. WORKSHEET WALKTHROUGH', type: 'video', url: '' },
-          { id: 'ch12_t4', title: '4. HANDWRITTEN SOLUTIONS', type: 'document', url: '' }
-        ] 
-      },
-      { 
-        id: '13', 
-        title: 'Differentiation of Trigonometric Exponential and Logarithmic Functions and their applications', 
-        overview: '', 
-        tabs: [
-          { id: 'ch13_t1', title: '1. LESSON TUTORIAL', type: 'video', url: '' },
-          { id: 'ch13_t2', title: '2. PRACTICE WORKSHEET', type: 'document', url: '' },
-          { id: 'ch13_t3', title: '3. WORKSHEET WALKTHROUGH', type: 'video', url: '' },
-          { id: 'ch13_t4', title: '4. HANDWRITTEN SOLUTIONS', type: 'document', url: '' }
-        ] 
-      },
-      { 
-        id: '14', 
-        title: 'Integration', 
-        overview: '', 
-        tabs: [
-          { id: 'ch14_t1', title: '1. LESSON TUTORIAL', type: 'video', url: '' },
-          { id: 'ch14_t2', title: '2. PRACTICE WORKSHEET', type: 'document', url: '' },
-          { id: 'ch14_t3', title: '3. WORKSHEET WALKTHROUGH', type: 'video', url: '' },
-          { id: 'ch14_t4', title: '4. HANDWRITTEN SOLUTIONS', type: 'document', url: '' }
-        ] 
-      },
-      { 
-        id: '15', 
-        title: 'Applications of Integration', 
-        overview: '', 
-        tabs: [
-          { id: 'ch15_t1', title: '1. LESSON TUTORIAL', type: 'video', url: '' },
-          { id: 'ch15_t2', title: '2. PRACTICE WORKSHEET', type: 'document', url: '' },
-          { id: 'ch15_t3', title: '3. WORKSHEET WALKTHROUGH', type: 'video', url: '' },
-          { id: 'ch15_t4', title: '4. HANDWRITTEN SOLUTIONS', type: 'document', url: '' }
-        ] 
-      },
-      { 
-        id: '16', 
-        title: 'Kinematics', 
-        overview: '', 
-        tabs: [
-          { id: 'ch16_t1', title: '1. LESSON TUTORIAL', type: 'video', url: '' },
-          { id: 'ch16_t2', title: '2. PRACTICE WORKSHEET', type: 'document', url: '' },
-          { id: 'ch16_t3', title: '3. WORKSHEET WALKTHROUGH', type: 'video', url: '' },
-          { id: 'ch16_t4', title: '4. HANDWRITTEN SOLUTIONS', type: 'document', url: '' }
-        ] 
-      },
-      { 
-        id: '17', 
-        title: 'Proofs in Plane Geometry', 
-        overview: '', 
-        tabs: [
-          { id: 'ch17_t1', title: '1. LESSON TUTORIAL', type: 'video', url: '' },
-          { id: 'ch17_t2', title: '2. PRACTICE WORKSHEET', type: 'document', url: '' },
-          { id: 'ch17_t3', title: '3. WORKSHEET WALKTHROUGH', type: 'video', url: '' },
-          { id: 'ch17_t4', title: '4. HANDWRITTEN SOLUTIONS', type: 'document', url: '' }
-        ] 
+    const AUTHORIZED_STUDENTS = [
+      { code: "10293847", name: "Alex", greeting: "Welcome Alex To ExcelMathWithLucas" },
+      { code: "88234190", name: "Jaris", greeting: "Welcome Jaris To ExcelMathWithLucas" },
+      { code: "90412853", name: "Evette", greeting: "Welcome Evette To ExcelMathWithLucas" }
+    ];
+
+    const FORMULA_SHEET_IMAGE_SRC = "formula_sheet.jpg";
+    const HOME_WALKTHROUGH_VIDEO_URL = ""; 
+
+    let currentStudent = null;
+
+    /* ================= SPLIT SCREEN STATE & ENGINE ================= */
+    let isSplitScreenActive = false;
+    let splitRightSelectedValue = 'notepad';
+    let splitCanvas, splitCtx;
+    let isSplitDrawing = false;
+    let splitCanvasColor = '#10b981';
+    let splitPenThickness = 3;
+    let splitEraserThickness = 20;
+    let isSplitEraser = false;
+
+    function toggleSplitScreenMode() {
+      isSplitScreenActive = !isSplitScreenActive;
+      const singlePane = document.getElementById('singlePaneControls');
+      const splitPane = document.getElementById('splitScreenContainer');
+      const btnText = document.getElementById('splitScreenBtnText');
+      const toggleBtn = document.getElementById('splitScreenToggleBtn');
+
+      if (isSplitScreenActive) {
+        if (singlePane) singlePane.classList.add('hidden');
+        if (splitPane) {
+          splitPane.classList.remove('hidden');
+          splitPane.classList.add('flex');
+        }
+        if (btnText) btnText.textContent = "SINGLE SCREEN";
+        if (toggleBtn) {
+          toggleBtn.className = "px-3 py-1.5 border-2 border-black dark:border-neutral-300 bg-black text-white dark:bg-white dark:text-black font-mono-code text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer flex items-center gap-1.5";
+        }
+        setupSplitScreenPanes();
+        setTimeout(initSplitScratchCanvas, 150);
+        showToast("Split Screen Active: Choose any tab on the right!");
+      } else {
+        if (splitPane) {
+          splitPane.classList.add('hidden');
+          splitPane.classList.remove('flex');
+        }
+        if (singlePane) singlePane.classList.remove('hidden');
+        if (btnText) btnText.textContent = "SPLIT SCREEN";
+        if (toggleBtn) {
+          toggleBtn.className = "px-3 py-1.5 border-2 border-black dark:border-neutral-300 bg-cyan-300 dark:bg-cyan-500 text-black font-mono-code text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-cyan-200 cursor-pointer flex items-center gap-1.5";
+        }
+        showToast("Returned to single screen mode.");
       }
+    }
+
+    function setupSplitScreenPanes() {
+      if (currentChapterIndex === null) return;
+      const ch = chapters[currentChapterIndex];
+      const leftSelect = document.getElementById('splitLeftTabSelect');
+      const rightSelect = document.getElementById('splitRightTabSelect');
+      if (!leftSelect || !rightSelect) return;
+
+      leftSelect.innerHTML = '';
+      rightSelect.innerHTML = '<option value="notepad">📝 NOTEPAD (DIGITAL CANVAS)</option>';
+
+      ch.tabs.forEach(t => {
+        const optLeft = document.createElement('option');
+        optLeft.value = t.id;
+        optLeft.textContent = t.title;
+        if (t.id === activeTabId) optLeft.selected = true;
+        leftSelect.appendChild(optLeft);
+
+        const optRight = document.createElement('option');
+        optRight.value = t.id;
+        optRight.textContent = `${t.type === 'video' ? '🎬' : '📄'} ${t.title}`;
+        rightSelect.appendChild(optRight);
+      });
+
+      if (activeTabId && leftSelect.querySelector(`option[value="${activeTabId}"]`)) {
+        leftSelect.value = activeTabId;
+      }
+      switchSplitLeftTab(leftSelect.value);
+      switchSplitRightTab(splitRightSelectedValue);
+    }
+
+    function switchSplitLeftTab(tabId) {
+      if (currentChapterIndex === null) return;
+      const ch = chapters[currentChapterIndex];
+      const tab = ch.tabs.find(t => t.id === tabId);
+      const iframe = document.getElementById('splitLeftIframe');
+      const video = document.getElementById('splitLeftVideo');
+      const placeholder = document.getElementById('splitLeftPlaceholder');
+      const openBtn = document.getElementById('splitLeftOpenBtn');
+
+      if (tab && tab.url && tab.url.trim() !== '') {
+        const cleanUrl = tab.url.trim();
+        if (openBtn) openBtn.href = cleanUrl;
+        if (placeholder) placeholder.classList.add('hidden');
+
+        if (tab.type === 'video') {
+          if (iframe) { iframe.classList.add('hidden'); iframe.src = ''; }
+          if (video) {
+            video.classList.remove('hidden');
+            video.src = cleanUrl;
+            video.load();
+          }
+        } else {
+          if (video) { video.classList.add('hidden'); video.pause(); }
+          if (iframe) {
+            iframe.classList.remove('hidden');
+            iframe.src = cleanUrl;
+          }
+        }
+      } else {
+        if (video) { video.classList.add('hidden'); video.pause(); }
+        if (iframe) { iframe.classList.add('hidden'); iframe.src = ''; }
+        if (placeholder) placeholder.classList.remove('hidden');
+        if (openBtn) openBtn.href = '#';
+      }
+    }
+
+    function switchSplitRightTab(selectedKey) {
+      splitRightSelectedValue = selectedKey;
+      const canvasView = document.getElementById('splitRightCanvasView');
+      const contentView = document.getElementById('splitRightContentView');
+      const clearBtn = document.getElementById('splitCanvasClearBtn');
+      const video = document.getElementById('splitRightVideo');
+      const iframe = document.getElementById('splitRightIframe');
+      const placeholder = document.getElementById('splitRightPlaceholder');
+
+      if (selectedKey === 'notepad') {
+        if (contentView) contentView.classList.add('hidden');
+        if (video) { video.pause(); video.classList.add('hidden'); }
+        if (iframe) { iframe.src = ''; iframe.classList.add('hidden'); }
+        if (canvasView) canvasView.classList.remove('hidden');
+        if (clearBtn) clearBtn.classList.remove('hidden');
+        setTimeout(resizeSplitScratchCanvas, 100);
+      } else {
+        if (canvasView) canvasView.classList.add('hidden');
+        if (clearBtn) clearBtn.classList.add('hidden');
+        if (contentView) contentView.classList.remove('hidden');
+
+        if (currentChapterIndex !== null) {
+          const ch = chapters[currentChapterIndex];
+          const tab = ch.tabs.find(t => t.id === selectedKey);
+
+          if (tab && tab.url && tab.url.trim() !== '') {
+            const cleanUrl = tab.url.trim();
+            if (placeholder) placeholder.classList.add('hidden');
+
+            if (tab.type === 'video') {
+              if (iframe) { iframe.classList.add('hidden'); iframe.src = ''; }
+              if (video) {
+                video.classList.remove('hidden');
+                video.src = cleanUrl;
+                video.load();
+              }
+            } else {
+              if (video) { video.classList.add('hidden'); video.pause(); }
+              if (iframe) {
+                iframe.classList.remove('hidden');
+                iframe.src = cleanUrl;
+              }
+            }
+          } else {
+            if (video) { video.classList.add('hidden'); video.pause(); }
+            if (iframe) { iframe.classList.add('hidden'); iframe.src = ''; }
+            if (placeholder) placeholder.classList.remove('hidden');
+          }
+        }
+      }
+    }
+
+    function initSplitScratchCanvas() {
+      splitCanvas = document.getElementById('splitScratchCanvas');
+      if (!splitCanvas) return;
+      splitCtx = splitCanvas.getContext('2d');
+
+      resizeSplitScratchCanvas();
+      window.addEventListener('resize', resizeSplitScratchCanvas);
+
+      splitCanvas.addEventListener('pointerdown', (e) => {
+        if (isStylusOnlyMode && e.pointerType !== 'pen') return;
+        isSplitDrawing = true;
+        const rect = splitCanvas.getBoundingClientRect();
+        splitCtx.beginPath();
+        splitCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        try { splitCanvas.setPointerCapture(e.pointerId); } catch (err) {}
+      });
+
+      splitCanvas.addEventListener('pointermove', (e) => {
+        if (!isSplitDrawing) return;
+        if (isStylusOnlyMode && e.pointerType !== 'pen') return;
+        const rect = splitCanvas.getBoundingClientRect();
+
+        if (isSplitEraser) {
+          splitCtx.strokeStyle = '#171717';
+          splitCtx.lineWidth = splitEraserThickness;
+        } else {
+          splitCtx.strokeStyle = splitCanvasColor;
+          if (e.pointerType === 'pen' && e.pressure && e.pressure > 0) {
+            splitCtx.lineWidth = splitPenThickness * (0.6 + e.pressure * 0.8);
+          } else {
+            splitCtx.lineWidth = splitPenThickness;
+          }
+        }
+
+        splitCtx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+        splitCtx.stroke();
+      });
+
+      splitCanvas.addEventListener('pointerup', (e) => {
+        if (!isSplitDrawing) return;
+        isSplitDrawing = false;
+        splitCtx.closePath();
+        try { splitCanvas.releasePointerCapture(e.pointerId); } catch (err) {}
+      });
+    }
+
+    function resizeSplitScratchCanvas() {
+      if (!splitCanvas) return;
+      const rect = splitCanvas.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return;
+
+      const temp = document.createElement('canvas');
+      temp.width = splitCanvas.width;
+      temp.height = splitCanvas.height;
+      const tempCtx = temp.getContext('2d');
+      tempCtx.drawImage(splitCanvas, 0, 0);
+
+      splitCanvas.width = rect.width;
+      splitCanvas.height = rect.height;
+      splitCtx.lineCap = 'round';
+      splitCtx.lineJoin = 'round';
+      splitCtx.drawImage(temp, 0, 0);
+    }
+
+    function setSplitCanvasColor(color) {
+      splitCanvasColor = color;
+      isSplitEraser = false;
+      updateSplitToolUI();
+    }
+
+    function setSplitCanvasMode(mode) {
+      isSplitEraser = (mode === 'eraser');
+      updateSplitToolUI();
+    }
+
+    function updateSplitThickness(val) {
+      const parsed = parseInt(val, 10);
+      const label = document.getElementById('splitSizeValueLabel');
+      if (label) label.textContent = `${parsed}px`;
+
+      if (isSplitEraser) {
+        splitEraserThickness = parsed;
+      } else {
+        splitPenThickness = parsed;
+      }
+    }
+
+    function updateSplitToolUI() {
+      const penBtn = document.getElementById('splitPenModeBtn');
+      const eraserBtn = document.getElementById('splitEraserModeBtn');
+      const slider = document.getElementById('splitSizeSlider');
+      const label = document.getElementById('splitSizeValueLabel');
+
+      if (isSplitEraser) {
+        if (eraserBtn) eraserBtn.className = "px-2 py-0.5 bg-cyan-400 text-black font-bold uppercase rounded";
+        if (penBtn) penBtn.className = "px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-bold uppercase rounded";
+        if (slider) slider.value = splitEraserThickness;
+        if (label) label.textContent = `${splitEraserThickness}px`;
+      } else {
+        if (penBtn) penBtn.className = "px-2 py-0.5 bg-emerald-500 text-black font-bold uppercase rounded";
+        if (eraserBtn) eraserBtn.className = "px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-bold uppercase rounded";
+        if (slider) slider.value = splitPenThickness;
+        if (label) label.textContent = `${splitPenThickness}px`;
+      }
+    }
+
+    function clearSplitCanvas() {
+      if (!splitCanvas || !splitCtx) return;
+      splitCtx.clearRect(0, 0, splitCanvas.width, splitCanvas.height);
+      showToast("Split canvas cleared!");
+    }
+
+    /* ================= DRAWER NOTEPAD THICKNESS ENGINES ================= */
+    let drawerPenThickness = 3;
+    let drawerEraserThickness = 20;
+
+    function updateDrawerThickness(val) {
+      const parsed = parseInt(val, 10);
+      const label = document.getElementById('drawerSizeValueLabel');
+      if (label) label.textContent = `${parsed}px`;
+
+      if (isEraser) {
+        drawerEraserThickness = parsed;
+      } else {
+        drawerPenThickness = parsed;
+      }
+    }
+
+    /* ================= FOCUS LOCKDOWN STATE & ENGINE ================= */
+    let focusTimerInterval = null;
+    let focusTimeRemaining = 0;
+    let isLockdownActive = false;
+
+    function openFocusSetupModal() {
+      const modal = document.getElementById('focusSetupModal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeFocusSetupModal() {
+      const modal = document.getElementById('focusSetupModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function selectFocusPreset(minutes) {
+      const customInput = document.getElementById('customFocusInput');
+      if (customInput) customInput.value = minutes;
+      
+      document.querySelectorAll('.focus-preset-btn').forEach(btn => {
+        if (btn.textContent.trim().toLowerCase() === `${minutes}m`) {
+          btn.className = "focus-preset-btn px-2 py-2 border-2 border-black dark:border-neutral-400 bg-emerald-400 text-black text-xs font-black uppercase";
+        } else {
+          btn.className = "focus-preset-btn px-2 py-2 border-2 border-black dark:border-neutral-400 bg-white dark:bg-neutral-800 text-xs font-black uppercase text-black dark:text-white";
+        }
+      });
+    }
+
+    function startFocusLockdown() {
+      const customInput = document.getElementById('customFocusInput');
+      let minutes = parseInt(customInput ? customInput.value : '25', 10);
+      if (isNaN(minutes) || minutes < 1) minutes = 1;
+      if (minutes > 180) minutes = 180;
+
+      focusTimeRemaining = minutes * 60;
+      isLockdownActive = true;
+      closeFocusSetupModal();
+
+      const lockdownBar = document.getElementById('focusLockdownBar');
+      const focusBtn = document.getElementById('focusLockdownBtn');
+      const floatWa = document.getElementById('floatingWhatsAppContainer');
+
+      if (lockdownBar) lockdownBar.classList.remove('hidden');
+      if (focusBtn) {
+        focusBtn.classList.remove('bg-red-500', 'hover:bg-red-400');
+        focusBtn.classList.add('bg-neutral-800', 'text-emerald-400');
+        focusBtn.innerHTML = '<span>🔒</span><span class="hidden md:inline">IN LOCKDOWN</span>';
+      }
+      if (floatWa) floatWa.classList.add('hidden');
+
+      updateFocusTimerUI();
+      clearInterval(focusTimerInterval);
+      focusTimerInterval = setInterval(() => {
+        focusTimeRemaining--;
+        updateFocusTimerUI();
+        if (focusTimeRemaining <= 0) {
+          endFocusLockdown(true);
+        }
+      }, 1000);
+
+      showToast(`🔒 Focus Lockdown Active: ${minutes} Minutes! Full portal access enabled.`);
+    }
+
+    function updateFocusTimerUI() {
+      const display = document.getElementById('focusTimeRemainingDisplay');
+      if (!display) return;
+      const m = Math.floor(focusTimeRemaining / 60);
+      const s = focusTimeRemaining % 60;
+      display.textContent = `${m < 10 ? '0' + m : m}:${s < 10 ? '0' + s : s}`;
+    }
+
+    function confirmExitFocusLockdown() {
+      if (confirm("Are you sure you want to end your focus sprint early?")) {
+        endFocusLockdown(false);
+      }
+    }
+
+    function endFocusLockdown(completedSuccessfully) {
+      clearInterval(focusTimerInterval);
+      isLockdownActive = false;
+
+      const lockdownBar = document.getElementById('focusLockdownBar');
+      const focusBtn = document.getElementById('focusLockdownBtn');
+      const floatWa = document.getElementById('floatingWhatsAppContainer');
+
+      if (lockdownBar) lockdownBar.classList.add('hidden');
+      if (focusBtn) {
+        focusBtn.className = "flex items-center gap-1 bg-red-500 hover:bg-red-400 text-white px-2 sm:px-3 py-1 sm:py-1.5 border-2 border-black font-mono-code text-xs font-black uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px] cursor-pointer";
+        focusBtn.innerHTML = '<span>🔒</span><span class="hidden md:inline">LOCKDOWN</span>';
+      }
+      if (floatWa) floatWa.classList.remove('hidden');
+
+      if (completedSuccessfully) {
+        showToast("🏆 FOCUS SPRINT COMPLETE! Outstanding discipline! Take a quick 5-min break.");
+      } else {
+        showToast("Focus mode ended.");
+      }
+    }
+
+    /* ================= MOTIVATIONAL & STREAK ENGINES ================= */
+    const MOTIVATIONAL_QUOTES = [
+      "Speed in A-Math is a byproduct of precision. Master every algebraic foundation, and speed follows.",
+      "An A1 isn't won on the day of O-Levels; it's earned right now in your working steps and sign checks.",
+      "Never look at a question and say 'I don't know'. Write down the first equation, substitute what's given, and let the algebra guide you.",
+      "Careless mistakes are just habits in disguise. Discipline on your brackets today means an A1 on your result slip tomorrow.",
+      "Calculus is 90% algebra and 10% calculus rules. Solidify your expansions, factorisations, and indices!",
+      "Every mock question you get wrong now is an exam trap you will avoid during O-Levels. Correct it immediately!"
+    ];
+
+    function generateNewMotivationQuote() {
+      const quoteEl = document.getElementById('dailyMotivationQuote');
+      if (!quoteEl) return;
+      const randomIdx = Math.floor(Math.random() * MOTIVATIONAL_QUOTES.length);
+      quoteEl.textContent = `"${MOTIVATIONAL_QUOTES[randomIdx]}"`;
+      showToast("Mindset Refreshed!");
+    }
+
+    function checkAndUpdateDailyStreak() {
+      const streakText = document.getElementById('streakCountText');
+      const today = new Date().toISOString().slice(0, 10);
+      const lastStudyDate = localStorage.getItem('portal_last_study_date');
+      let streakCount = parseInt(localStorage.getItem('portal_streak_count') || '1', 10);
+
+      if (!lastStudyDate) {
+        streakCount = 1;
+        localStorage.setItem('portal_last_study_date', today);
+        localStorage.setItem('portal_streak_count', streakCount.toString());
+      } else if (lastStudyDate !== today) {
+        const lastDate = new Date(lastStudyDate);
+        const currentDate = new Date(today);
+        const diffTime = Math.abs(currentDate - lastDate);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        if (diffDays === 1) {
+          streakCount += 1;
+        } else if (diffDays > 1) {
+          streakCount = 1;
+        }
+        localStorage.setItem('portal_last_study_date', today);
+        localStorage.setItem('portal_streak_count', streakCount.toString());
+      }
+
+      if (streakText) {
+        streakText.textContent = `${streakCount} DAY${streakCount > 1 ? 'S' : ''}`;
+      }
+    }
+
+    /* ================= DIGITAL WORKING SCRATCHPAD ENGINE ================= */
+    let canvas, ctx;
+    let isDrawing = false;
+    let currentColor = '#10b981';
+    let isEraser = false;
+    let isStylusOnlyMode = false;
+
+    function initScratchpadCanvas() {
+      canvas = document.getElementById('scratchpadCanvas');
+      if (!canvas) return;
+      ctx = canvas.getContext('2d');
+
+      resizeScratchpadCanvas();
+      window.addEventListener('resize', resizeScratchpadCanvas);
+
+      canvas.addEventListener('pointerdown', handlePointerDown);
+      canvas.addEventListener('pointermove', handlePointerMove);
+      canvas.addEventListener('pointerup', handlePointerUp);
+      canvas.addEventListener('pointercancel', handlePointerUp);
+      canvas.addEventListener('pointerleave', handlePointerUp);
+    }
+
+    function toggleStylusOnlyMode() {
+      isStylusOnlyMode = !isStylusOnlyMode;
+      const statusText = document.getElementById('stylusOnlyStatusText');
+      const toggleBtn = document.getElementById('stylusOnlyToggleBtn');
+      const splitStatusText = document.getElementById('splitStylusOnlyStatusText');
+      const splitToggleBtn = document.getElementById('splitStylusOnlyToggleBtn');
+
+      if (isStylusOnlyMode) {
+        if (statusText) {
+          statusText.textContent = "ON";
+          statusText.className = "text-emerald-400 font-black";
+        }
+        if (toggleBtn) {
+          toggleBtn.className = "px-2 py-0.5 bg-emerald-950/70 border border-emerald-400 text-white font-bold text-[10px] uppercase rounded flex items-center gap-1 transition shadow-[1px_1px_0px_0px_rgba(16,185,129,1)]";
+        }
+        if (splitStatusText) {
+          splitStatusText.textContent = "ON";
+          splitStatusText.className = "text-emerald-400 font-black";
+        }
+        if (splitToggleBtn) {
+          splitToggleBtn.className = "px-2 py-0.5 bg-emerald-950/70 border border-emerald-400 text-white font-bold text-[10px] uppercase rounded flex items-center gap-1 transition shadow-[1px_1px_0px_0px_rgba(16,185,129,1)]";
+        }
+        showToast("Stylus Only Enabled: Palm touches ignored!");
+      } else {
+        if (statusText) {
+          statusText.textContent = "OFF";
+          statusText.className = "text-gray-400 font-black";
+        }
+        if (toggleBtn) {
+          toggleBtn.className = "px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-neutral-200 border border-neutral-500 font-bold text-[10px] uppercase rounded flex items-center gap-1 transition";
+        }
+        if (splitStatusText) {
+          splitStatusText.textContent = "OFF";
+          splitStatusText.className = "text-gray-400 font-black";
+        }
+        if (splitToggleBtn) {
+          splitToggleBtn.className = "px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-neutral-200 border border-neutral-500 font-bold text-[10px] uppercase rounded flex items-center gap-1 transition";
+        }
+        showToast("Stylus Only Disabled: Finger and stylus both draw.");
+      }
+    }
+
+    function handlePointerDown(e) {
+      if (isStylusOnlyMode && e.pointerType !== 'pen') return;
+
+      isDrawing = true;
+      const rect = canvas.getBoundingClientRect();
+      ctx.beginPath();
+      ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+      try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
+    }
+
+    function handlePointerMove(e) {
+      if (!isDrawing) return;
+      if (isStylusOnlyMode && e.pointerType !== 'pen') return;
+
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      if (isEraser) {
+        ctx.strokeStyle = '#171717';
+        ctx.lineWidth = drawerEraserThickness;
+      } else {
+        ctx.strokeStyle = currentColor;
+        if (e.pointerType === 'pen' && e.pressure && e.pressure > 0) {
+          ctx.lineWidth = drawerPenThickness * (0.6 + e.pressure * 0.8);
+        } else {
+          ctx.lineWidth = drawerPenThickness;
+        }
+      }
+
+      ctx.lineTo(x, y);
+      ctx.stroke();
+    }
+
+    function handlePointerUp(e) {
+      if (!isDrawing) return;
+      isDrawing = false;
+      ctx.closePath();
+      try { canvas.releasePointerCapture(e.pointerId); } catch (err) {}
+    }
+
+    function resizeScratchpadCanvas() {
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return;
+
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = canvas.width;
+      tempCanvas.height = canvas.height;
+      const tempCtx = tempCanvas.getContext('2d');
+      tempCtx.drawImage(canvas, 0, 0);
+
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.drawImage(tempCanvas, 0, 0);
+    }
+
+    function setCanvasColor(color) {
+      currentColor = color;
+      isEraser = false;
+      updateCanvasToolButtons();
+    }
+
+    function setCanvasMode(mode) {
+      isEraser = (mode === 'eraser');
+      updateCanvasToolButtons();
+    }
+
+    function updateCanvasToolButtons() {
+      const penBtn = document.getElementById('penModeBtn');
+      const eraserBtn = document.getElementById('eraserModeBtn');
+      const slider = document.getElementById('drawerSizeSlider');
+      const label = document.getElementById('drawerSizeValueLabel');
+
+      if (isEraser) {
+        if (eraserBtn) eraserBtn.className = "px-2 py-0.5 bg-cyan-400 text-black font-bold uppercase rounded";
+        if (penBtn) penBtn.className = "px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-bold uppercase rounded";
+        if (slider) slider.value = drawerEraserThickness;
+        if (label) label.textContent = `${drawerEraserThickness}px`;
+      } else {
+        if (penBtn) penBtn.className = "px-2 py-0.5 bg-emerald-500 text-black font-bold uppercase rounded";
+        if (eraserBtn) eraserBtn.className = "px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-bold uppercase rounded";
+        if (slider) slider.value = drawerPenThickness;
+        if (label) label.textContent = `${drawerPenThickness}px`;
+      }
+    }
+
+    function clearScratchpadCanvas() {
+      if (!ctx || !canvas) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      showToast("Scratchpad cleared!");
+    }
+
+    function toggleScratchpadDrawer() {
+      const drawer = document.getElementById('scratchpadDrawer');
+      const formulaDrawer = document.getElementById('formulaDrawer');
+      const btn = document.getElementById('scratchpadToggleBtn');
+      if (!drawer) return;
+
+      const isOpen = drawer.classList.contains('open');
+      if (isOpen) {
+        drawer.classList.remove('open');
+        if (btn) btn.classList.remove('ring-2', 'ring-black');
+      } else {
+        if (formulaDrawer && formulaDrawer.classList.contains('open')) {
+          formulaDrawer.classList.remove('open');
+        }
+        drawer.classList.add('open');
+        if (btn) btn.classList.add('ring-2', 'ring-black');
+        setTimeout(resizeScratchpadCanvas, 320);
+      }
+    }
+
+    function downloadScratchpadPNG() {
+      if (!canvas) return;
+      const link = document.createElement('a');
+      link.download = `A-Math_Working_${Date.now()}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      showToast("Saved working as image!");
+    }
+
+    function sendScratchpadToLucas() {
+      const studentName = currentStudent ? currentStudent.name : 'Student';
+      const encoded = encodeURIComponent(`Hi Lucas, I am ${studentName}! I just saved my digital scratchpad working. Sending the photo over for checking!`);
+      window.open(`https://wa.me/6581980012?text=${encoded}`, '_blank');
+    }
+
+    /* ================= DARK MODE & FORMULA DRAWER ================= */
+    function initDarkMode() {
+      const savedTheme = localStorage.getItem('portal_theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+        document.documentElement.classList.add('dark');
+        updateDarkModeButtonUI(true);
+      } else {
+        document.documentElement.classList.remove('dark');
+        updateDarkModeButtonUI(false);
+      }
+    }
+
+    function toggleDarkMode() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('portal_theme', isDark ? 'dark' : 'light');
+      updateDarkModeButtonUI(isDark);
+      showToast(isDark ? 'Night Study Mode Enabled' : 'Day Study Mode Enabled');
+    }
+
+    function updateDarkModeButtonUI(isDark) {
+      const icon = document.getElementById('darkModeIcon');
+      const text = document.getElementById('darkModeText');
+      if (icon) icon.textContent = isDark ? '☀️' : '🌙';
+      if (text) text.textContent = isDark ? 'DAY' : 'NIGHT';
+    }
+
+    function toggleFormulaDrawer() {
+      const drawer = document.getElementById('formulaDrawer');
+      const scratchpad = document.getElementById('scratchpadDrawer');
+      const btn = document.getElementById('formulaToggleBtn');
+      if (!drawer) return;
+
+      const isOpen = drawer.classList.contains('open');
+      if (isOpen) {
+        drawer.classList.remove('open');
+        if (btn) btn.classList.remove('bg-amber-400', 'ring-2', 'ring-black');
+      } else {
+        if (scratchpad && scratchpad.classList.contains('open')) {
+          scratchpad.classList.remove('open');
+        }
+        drawer.classList.add('open');
+        if (btn) btn.classList.add('bg-amber-400', 'ring-2', 'ring-black');
+        const img = document.getElementById('formulaSheetImg');
+        if (img && FORMULA_SHEET_IMAGE_SRC) {
+          img.src = FORMULA_SHEET_IMAGE_SRC;
+        }
+      }
+    }
+
+    /* ================= TIMESTAMPS & MEDIA ENGINE ================= */
+    function jumpVideoTo(seconds) {
+      const video = document.getElementById('activeMediaVideo');
+      if (!video || video.classList.contains('hidden')) {
+        showToast('Timestamps are available when playing HTML5 video files.');
+        return;
+      }
+      video.currentTime = seconds;
+      video.play();
+      showToast(`Jumped to ${formatTimestampDisplay(seconds)}`);
+    }
+
+    function formatTimestampDisplay(totalSeconds) {
+      const m = Math.floor(totalSeconds / 60);
+      const s = Math.floor(totalSeconds % 60);
+      return `${m < 10 ? '0' + m : m}:${s < 10 ? '0' + s : s}`;
+    }
+
+    function renderVideoTimestamps() {
+      const container = document.getElementById('timestampsContainer');
+      const bar = document.getElementById('videoTimestampsBar');
+      if (!container || !bar || currentChapterIndex === null) return;
+
+      const ch = chapters[currentChapterIndex];
+      const activeTab = ch.tabs ? ch.tabs.find(t => t.id === activeTabId) : null;
+
+      if (!activeTab || activeTab.type !== 'video' || !activeTab.timestamps || activeTab.timestamps.length === 0) {
+        bar.classList.add('hidden');
+        container.innerHTML = '';
+        return;
+      }
+
+      bar.classList.remove('hidden');
+      container.innerHTML = '';
+
+      activeTab.timestamps.forEach(stamp => {
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.onclick = () => jumpVideoTo(stamp.time);
+        chip.className = 'px-2.5 py-1 text-xs font-mono-code font-bold bg-neutral-800 hover:bg-neutral-700 text-emerald-400 border border-neutral-600 flex items-center gap-1.5 transition active:scale-95 cursor-pointer';
+        chip.innerHTML = `
+          <span class="text-white bg-black px-1 py-0.5 rounded text-[10px]">${formatTimestampDisplay(stamp.time)}</span>
+          <span>${stamp.label}</span>
+        `;
+        container.appendChild(chip);
+      });
+    }
+
+    function updateWorksheetToolbar(tab) {
+      const toolbar = document.getElementById('worksheetActionToolbar');
+      const title = document.getElementById('worksheetToolbarTitle');
+      const downloadBtn = document.getElementById('worksheetDownloadBtn');
+      const printBtn = document.getElementById('worksheetOpenPrintBtn');
+
+      if (!toolbar || !downloadBtn || !printBtn) return;
+
+      if (tab && tab.type === 'document' && tab.url && tab.url.trim() !== '') {
+        const fileUrl = tab.url.trim();
+        toolbar.classList.remove('hidden');
+        toolbar.classList.add('flex');
+
+        if (title) title.textContent = `${tab.title} READY TO PRINT / EXPORT`;
+
+        downloadBtn.href = fileUrl;
+        const filename = fileUrl.split('/').pop().split('?')[0] || 'worksheet.pdf';
+        downloadBtn.setAttribute('download', filename);
+        printBtn.href = fileUrl;
+      } else {
+        toolbar.classList.add('hidden');
+        toolbar.classList.remove('flex');
+        downloadBtn.href = '#';
+        printBtn.href = '#';
+      }
+    }
+
+    /* ================= STUDENT AUTH ================= */
+    function verifyStudentPin() {
+      const input = document.getElementById('studentPasscodeInput');
+      const val = input ? input.value.trim() : '';
+      const errBox = document.getElementById('authErrorBox');
+      const errMsg = document.getElementById('authErrorMsg');
+
+      if (!val || val.length !== 8) {
+        if (errMsg) errMsg.textContent = "Please enter a valid 8-digit code.";
+        if (errBox) errBox.classList.remove('hidden');
+        return;
+      }
+
+      const matched = AUTHORIZED_STUDENTS.find(s => s.code === val);
+      if (matched) {
+        currentStudent = matched;
+        localStorage.setItem('portal_student_code', matched.code);
+        unlockPortalForStudent(matched);
+      } else {
+        if (errMsg) errMsg.textContent = "Invalid 8-digit code. Access denied.";
+        if (errBox) errBox.classList.remove('hidden');
+        if (input) input.value = '';
+      }
+    }
+
+    function unlockPortalForStudent(student) {
+      currentStudent = student;
+      const gate = document.getElementById('authGateOverlay');
+      const chip = document.getElementById('studentChip');
+      const chipName = document.getElementById('studentChipName');
+      const welcomeHeader = document.getElementById('personalizedWelcomeHeader');
+      const progressTitle = document.getElementById('progressStudentTitle');
+
+      if (gate) gate.classList.add('hidden');
+      if (chip) {
+        chip.classList.remove('hidden');
+        chip.classList.add('flex');
+      }
+      if (chipName) chipName.textContent = student.name;
+      if (welcomeHeader) {
+        welcomeHeader.innerHTML = `${student.greeting.replace('ExcelMathWithLucas', '<span class="text-emerald-700 dark:text-emerald-400">ExcelMathWithLucas</span>')}`;
+      }
+      if (progressTitle) {
+        progressTitle.textContent = `${student.name.toUpperCase()}'S SYLLABUS PROGRESS`;
+      }
+
+      checkAndUpdateDailyStreak();
+      updateProgressDisplay();
+      updateDynamicWhatsAppLinks();
+      checkLastLessonResume();
+      showToast(`Welcome back, ${student.name}!`);
+    }
+
+    function studentSignOut() {
+      localStorage.removeItem('portal_student_code');
+      window.location.reload();
+    }
+
+    function checkActiveStudentSession() {
+      const savedCode = localStorage.getItem('portal_student_code');
+      if (savedCode) {
+        const matched = AUTHORIZED_STUDENTS.find(s => s.code === savedCode);
+        if (matched) unlockPortalForStudent(matched);
+      }
+    }
+
+    function setVideoSpeed(speed) {
+      const video = document.getElementById('activeMediaVideo');
+      if (video) {
+        video.playbackRate = speed;
+        showToast(`Video Speed: ${speed}x`);
+      }
+    }
+
+    /* ================= PROGRESS & CHAPTER DATA ================= */
+    function getStudentProgressKey() {
+      return currentStudent ? `progress_${currentStudent.code}` : null;
+    }
+
+    function getStudentCompletedTabs() {
+      const key = getStudentProgressKey();
+      if (!key) return [];
+      try { return JSON.parse(localStorage.getItem(key)) || []; } catch (e) { return []; }
+    }
+
+    function setStudentCompletedTabs(tabsArray) {
+      const key = getStudentProgressKey();
+      if (!key) return;
+      localStorage.setItem(key, JSON.stringify(tabsArray));
+      updateProgressDisplay();
+    }
+
+    function isTabCompleted(tabId) {
+      return getStudentCompletedTabs().includes(tabId);
+    }
+
+    function toggleCurrentTabCompletion(checked) {
+      if (!activeTabId) return;
+      let list = getStudentCompletedTabs();
+      if (checked) {
+        if (!list.includes(activeTabId)) list.push(activeTabId);
+      } else {
+        list = list.filter(id => id !== activeTabId);
+      }
+      setStudentCompletedTabs(list);
+      updateTabCheckboxUI();
+      renderChapterTabsBar();
+    }
+
+    function updateTabCheckboxUI() {
+      const checkbox = document.getElementById('tabCompletionCheckbox');
+      const statusTag = document.getElementById('tabCompletionStatusTag');
+      if (!checkbox || !activeTabId) return;
+
+      const completed = isTabCompleted(activeTabId);
+      checkbox.checked = completed;
+
+      if (statusTag) {
+        if (completed) {
+          statusTag.textContent = "COMPLETED ✅";
+          statusTag.className = "text-[10px] font-bold px-2 py-0.5 border border-emerald-600 bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 uppercase";
+        } else {
+          statusTag.textContent = "NOT COMPLETED";
+          statusTag.className = "text-[10px] font-bold px-2 py-0.5 border border-black dark:border-neutral-600 bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-neutral-400 uppercase";
+        }
+      }
+    }
+
+    function updateProgressDisplay() {
+      let totalTabs = 0;
+      chapters.forEach(ch => { totalTabs += (ch.tabs ? ch.tabs.length : 0); });
+
+      const completedList = getStudentCompletedTabs();
+      const completedCount = completedList.length;
+      const percentage = totalTabs > 0 ? Math.round((completedCount / totalTabs) * 100) : 0;
+
+      const progressBar = document.getElementById('overallProgressBar');
+      const percentageText = document.getElementById('overallPercentageText');
+      const countText = document.getElementById('completedItemsCountText');
+
+      if (progressBar) progressBar.style.width = `${percentage}%`;
+      if (percentageText) percentageText.textContent = `${percentage}% COMPLETE`;
+      if (countText) countText.textContent = `${completedCount} of ${totalTabs} lessons completed`;
+    }
+
+    function recordLastLesson(chapIdx, tabId) {
+      if (!currentStudent) return;
+      localStorage.setItem(`last_lesson_${currentStudent.code}`, JSON.stringify({ chapterIndex: chapIdx, tabId: tabId }));
+    }
+
+    function checkLastLessonResume() {
+      if (!currentStudent) return;
+      const raw = localStorage.getItem(`last_lesson_${currentStudent.code}`);
+      const resumeCard = document.getElementById('resumeLessonCard');
+      const resumeLabel = document.getElementById('resumeLessonLabel');
+
+      if (!raw || !resumeCard) return;
+      try {
+        const record = JSON.parse(raw);
+        const ch = chapters[record.chapterIndex];
+        if (ch) {
+          resumeLabel.textContent = `CHAPTER ${ch.id} - ${ch.title}`;
+          resumeCard.classList.remove('hidden');
+        }
+      } catch (e) {
+        resumeCard.classList.add('hidden');
+      }
+    }
+
+    function resumeLastLesson() {
+      if (!currentStudent) return;
+      const raw = localStorage.getItem(`last_lesson_${currentStudent.code}`);
+      if (!raw) return;
+      try {
+        const record = JSON.parse(raw);
+        selectChapter(record.chapterIndex);
+        if (record.tabId) switchTab(record.tabId);
+      } catch (e) {}
+    }
+
+    function updateDynamicWhatsAppLinks() {
+      const studentName = currentStudent ? currentStudent.name : 'Student';
+      const floatingBtn = document.getElementById('floatingWhatsAppBtn');
+      const topbarLink = document.getElementById('topbarWhatsAppBtn');
+
+      let currentContext = "ExcelMath Portal";
+      if (currentChapterIndex !== null) {
+        const ch = chapters[currentChapterIndex];
+        const tab = ch.tabs.find(t => t.id === activeTabId);
+        currentContext = `Chapter ${ch.id} (${ch.title})${tab ? ' - ' + tab.title : ''}`;
+      }
+
+      const encodedMsg = encodeURIComponent(`Hi Lucas, I am ${studentName}! I am submitting my work / have a question regarding: ${currentContext}.`);
+      const url = `https://wa.me/6581980012?text=${encodedMsg}`;
+
+      if (floatingBtn) floatingBtn.href = url;
+      if (topbarLink) topbarLink.href = url;
+    }
+
+    /* MASTER CHAPTER REPOSITORY */
+    const CHECKLIST_CHAPTERS = [
+      { id: '01', title: 'Quadratic Functions', overview: '', pitfalls: '', tabs: [
+        { id: 'ch01_t1', title: '1. LESSON TUTORIAL', type: 'video', url: '', timestamps: [{ time: 45, label: 'Vertex Form & Completing Square' }, { time: 180, label: 'Discriminant Conditions' }] },
+        { id: 'ch01_t2', title: '2. PRACTICE WORKSHEET', type: 'document', url: '' },
+        { id: 'ch01_t3', title: '3. WORKSHEET WALKTHROUGH', type: 'video', url: '', timestamps: [{ time: 60, label: 'Q1 to Q3 Solutions' }] },
+        { id: 'ch01_t4', title: '4. HANDWRITTEN SOLUTIONS', type: 'document', url: '' }
+      ]},
+      { id: '02', title: 'Equations and Inequalities', overview: '', pitfalls: '', tabs: [
+        { id: 'ch02_t1', title: '1. LESSON TUTORIAL', type: 'video', url: '', timestamps: [{ time: 30, label: 'Sign Diagram Technique' }] },
+        { id: 'ch02_t2', title: '2. PRACTICE WORKSHEET', type: 'document', url: '' },
+        { id: 'ch02_t3', title: '3. WORKSHEET WALKTHROUGH', type: 'video', url: '', timestamps: [{ time: 50, label: 'Worksheet Solutions' }] },
+        { id: 'ch02_t4', title: '4. HANDWRITTEN SOLUTIONS', type: 'document', url: '' }
+      ]},
+      { id: '03', title: 'Surds', overview: '', pitfalls: '', tabs: [
+        { id: 'ch03_t1', title: '1. LESSON TUTORIAL', type: 'video', url: '', timestamps: [{ time: 40, label: 'Surd Simplification' }] },
+        { id: 'ch03_t2', title: '2. PRACTICE WORKSHEET', type: 'document', url: '' },
+        { id: 'ch03_t3', title: '3. WORKSHEET WALKTHROUGH', type: 'video', url: '', timestamps: [{ time: 45, label: 'Rationalisation Walkthrough' }] },
+        { id: 'ch03_t4', title: '4. HANDWRITTEN SOLUTIONS', type: 'document', url: '' }
+      ]},
+      { id: '04', title: 'Polynomials, Cubic equations and partial fractions', overview: '', pitfalls: '', tabs: [
+        { id: 'ch04_t1', title: '1. LESSON TUTORIAL', type: 'video', url: '', timestamps: [{ time: 60, label: 'Remainder & Factor Theorems' }] },
+        { id: 'ch04_t2', title: '2. PRACTICE WORKSHEET', type: 'document', url: '' },
+        { id: 'ch04_t3', title: '3. WORKSHEET WALKTHROUGH', type: 'video', url: '', timestamps: [{ time: 55, label: 'Partial Fractions Steps' }] },
+        { id: 'ch04_t4', title: '4. HANDWRITTEN SOLUTIONS', type: 'document', url: '' }
+      ]},
+      { id: '05', title: 'Binomial Theorem', overview: '', pitfalls: '', tabs: [
+        { id: 'ch05_t1', title: '1. LESSON TUTORIAL', type: 'video', url: '', timestamps: [{ time: 50, label: 'General Term T_(r+1)' }] },
+        { id: 'ch05_t2', title: '2. PRACTICE WORKSHEET', type: 'document', url: '' },
+        { id: 'ch05_t3', title: '3. WORKSHEET WALKTHROUGH', type: 'video', url: '', timestamps: [{ time: 40, label: 'Unknown Constants Setup' }] },
+        { id: 'ch05_t4', title: '4. HANDWRITTEN SOLUTIONS', type: 'document', url: '' }
+      ]},
+      { id: '06', title: 'Exponential and Logarithmic Functions', overview: '', pitfalls: '', tabs: [
+        { id: 'ch06_t1', title: '1. LESSON TUTORIAL', type: 'video', url: '', timestamps: [{ time: 55, label: 'Change of Base' }] },
+        { id: 'ch06_t2', title: '2. PRACTICE WORKSHEET', type: 'document', url: '' },
+        { id: 'ch06_t3', title: '3. WORKSHEET WALKTHROUGH', type: 'video', url: '', timestamps: [{ time: 60, label: 'Log Equations Traps' }] },
+        { id: 'ch06_t4', title: '4. HANDWRITTEN SOLUTIONS', type: 'document', url: '' }
+      ]},
+      { id: '07', title: 'Coordinate Geometry', overview: '', pitfalls: '', tabs: [
+        { id: 'ch07_t1', title: '1. LESSON TUTORIAL', type: 'video', url: '', timestamps: [{ time: 60, label: 'Perpendicular Bisectors' }] },
+        { id: 'ch07_t2', title: '2. PRACTICE WORKSHEET', type: 'document', url: '' },
+        { id: 'ch07_t3', title: '3. WORKSHEET WALKTHROUGH', type: 'video', url: '', timestamps: [{ time: 50, label: 'Circle Tangents' }] },
+        { id: 'ch07_t4', title: '4. HANDWRITTEN SOLUTIONS', type: 'document', url: '' }
+      ]},
+      { id: '08', title: 'Linear Law', overview: '', pitfalls: '', tabs: [
+        { id: 'ch08_t1', title: '1. LESSON TUTORIAL', type: 'video', url: '', timestamps: [{ time: 45, label: 'Y = mX + c Conversion' }] },
+        { id: 'ch08_t2', title: '2. PRACTICE WORKSHEET', type: 'document', url: '' },
+        { id: 'ch08_t3', title: '3. WORKSHEET WALKTHROUGH', type: 'video', url: '', timestamps: [{ time: 40, label: 'Finding Constants' }] },
+        { id: 'ch08_t4', title: '4. HANDWRITTEN SOLUTIONS', type: 'document', url: '' }
+      ]},
+      { id: '09', title: 'Trigonometric Functions and Graphs', overview: '', pitfalls: '', tabs: [
+        { id: 'ch09_t1', title: '1. LESSON TUTORIAL', type: 'video', url: '', timestamps: [{ time: 60, label: 'Period & Amplitude' }] },
+        { id: 'ch09_t2', title: '2. PRACTICE WORKSHEET', type: 'document', url: '' },
+        { id: 'ch09_t3', title: '3. WORKSHEET WALKTHROUGH', type: 'video', url: '', timestamps: [{ time: 55, label: 'Graphical Intersections' }] },
+        { id: 'ch09_t4', title: '4. HANDWRITTEN SOLUTIONS', type: 'document', url: '' }
+      ]},
+      { id: '10', title: 'Trigonometric Equations and identities', overview: '', pitfalls: '', tabs: [
+        { id: 'ch10_t1', title: '1. LESSON TUTORIAL', type: 'video', url: '', timestamps: [{ time: 70, label: 'R-Formula Derivations' }] },
+        { id: 'ch10_t2', title: '2. PRACTICE WORKSHEET', type: 'document', url: '' },
+        { id: 'ch10_t3', title: '3. WORKSHEET WALKTHROUGH', type: 'video', url: '', timestamps: [{ time: 65, label: 'Proving Identities' }] },
+        { id: 'ch10_t4', title: '4. HANDWRITTEN SOLUTIONS', type: 'document', url: '' }
+      ]},
+      { id: '11', title: 'Gradients, Derivatives and Differentiation Techniques', overview: '', pitfalls: '', tabs: [
+        { id: 'ch11_t1', title: '1. LESSON TUTORIAL', type: 'video', url: '', timestamps: [{ time: 45, label: 'Product & Quotient Rules' }] },
+        { id: 'ch11_t2', title: '2. PRACTICE WORKSHEET', type: 'document', url: '' },
+        { id: 'ch11_t3', title: '3. WORKSHEET WALKTHROUGH', type: 'video', url: '', timestamps: [{ time: 40, label: 'Quotient Rule Simplification' }] },
+        { id: 'ch11_t4', title: '4. HANDWRITTEN SOLUTIONS', type: 'document', url: '' }
+      ]},
+      { id: '12', title: 'Application of Differentiation', overview: '', pitfalls: '', tabs: [
+        { id: 'ch12_t1', title: '1. LESSON TUTORIAL', type: 'video', url: '', timestamps: [{ time: 60, label: 'Connected Rates of Change' }] },
+        { id: 'ch12_t2', title: '2. PRACTICE WORKSHEET', type: 'document', url: '' },
+        { id: 'ch12_t3', title: '3. WORKSHEET WALKTHROUGH', type: 'video', url: '', timestamps: [{ time: 50, label: 'Optimization Questions' }] },
+        { id: 'ch12_t4', title: '4. HANDWRITTEN SOLUTIONS', type: 'document', url: '' }
+      ]},
+      { id: '13', title: 'Differentiation of Trigonometric Exponential and Logarithmic Functions and their applications', overview: '', pitfalls: '', tabs: [
+        { id: 'ch13_t1', title: '1. LESSON TUTORIAL', type: 'video', url: '', timestamps: [{ time: 50, label: 'Derivatives of ln(f(x)) and e^(f(x))' }] },
+        { id: 'ch13_t2', title: '2. PRACTICE WORKSHEET', type: 'document', url: '' },
+        { id: 'ch13_t3', title: '3. WORKSHEET WALKTHROUGH', type: 'video', url: '', timestamps: [{ time: 45, label: 'Stationary Points of Exponentials' }] },
+        { id: 'ch13_t4', title: '4. HANDWRITTEN SOLUTIONS', type: 'document', url: '' }
+      ]},
+      { id: '14', title: 'Integration', overview: '', pitfalls: '', tabs: [
+        { id: 'ch14_t1', title: '1. LESSON TUTORIAL', type: 'video', url: '', timestamps: [{ time: 55, label: 'Integration Rules & +c' }] },
+        { id: 'ch14_t2', title: '2. PRACTICE WORKSHEET', type: 'document', url: '' },
+        { id: 'ch14_t3', title: '3. WORKSHEET WALKTHROUGH', type: 'video', url: '', timestamps: [{ time: 50, label: 'Trig Substitutions' }] },
+        { id: 'ch14_t4', title: '4. HANDWRITTEN SOLUTIONS', type: 'document', url: '' }
+      ]},
+      { id: '15', title: 'Applications of Integration', overview: '', pitfalls: '', tabs: [
+        { id: 'ch15_t1', title: '1. LESSON TUTORIAL', type: 'video', url: '', timestamps: [{ time: 60, label: 'Area Under Curve (dx vs dy)' }] },
+        { id: 'ch15_t2', title: '2. PRACTICE WORKSHEET', type: 'document', url: '' },
+        { id: 'ch15_t3', title: '3. WORKSHEET WALKTHROUGH', type: 'video', url: '', timestamps: [{ time: 55, label: 'Area Between Curve & Line' }] },
+        { id: 'ch15_t4', title: '4. HANDWRITTEN SOLUTIONS', type: 'document', url: '' }
+      ]},
+      { id: '16', title: 'Kinematics', overview: '', pitfalls: '', tabs: [
+        { id: 'ch16_t1', title: '1. LESSON TUTORIAL', type: 'video', url: '', timestamps: [{ time: 50, label: 'Displacement, Velocity & Acceleration' }] },
+        { id: 'ch16_t2', title: '2. PRACTICE WORKSHEET', type: 'document', url: '' },
+        { id: 'ch16_t3', title: '3. WORKSHEET WALKTHROUGH', type: 'video', url: '', timestamps: [{ time: 45, label: 'Total Distance Reversals' }] },
+        { id: 'ch16_t4', title: '4. HANDWRITTEN SOLUTIONS', type: 'document', url: '' }
+      ]},
+      { id: '17', title: 'Proofs in Plane Geometry', overview: '', pitfalls: '', tabs: [
+        { id: 'ch17_t1', title: '1. LESSON TUTORIAL', type: 'video', url: '', timestamps: [{ time: 60, label: 'Circle Theorems & Cyclic Quads' }] },
+        { id: 'ch17_t2', title: '2. PRACTICE WORKSHEET', type: 'document', url: '' },
+        { id: 'ch17_t3', title: '3. WORKSHEET WALKTHROUGH', type: 'video', url: '', timestamps: [{ time: 50, label: 'Formal Proof Writing Layout' }] },
+        { id: 'ch17_t4', title: '4. HANDWRITTEN SOLUTIONS', type: 'document', url: '' }
+      ]}
     ];
 
     let chapters = [];
@@ -635,15 +2040,14 @@
     let isEditingText = false;
     let isTeacherUnlocked = false;
 
-    // FRESH SYNC ENGINE: Always prioritizes code array for zero-glitch hardcoded file names
     function initData() {
+      initDarkMode();
       chapters = CHECKLIST_CHAPTERS;
       renderChapterNav();
       selectHomeView();
-    }
-
-    function persistData() {
-      // Clean persistence handler for session overrides
+      checkActiveStudentSession();
+      initScratchpadCanvas();
+      checkAndUpdateDailyStreak();
     }
 
     function selectHomeView() {
@@ -651,33 +2055,44 @@
       activeTabId = null;
       const homeView = document.getElementById('homeViewContainer');
       const chapterView = document.getElementById('chapterViewContainer');
+      const expandBtn = document.getElementById('expandMediaBtn');
+
       if (homeView) homeView.classList.remove('hidden');
       if (chapterView) chapterView.classList.add('hidden');
+      if (expandBtn) expandBtn.classList.add('hidden');
 
       const badge = document.getElementById('pinnedChapterBadge');
       const title = document.getElementById('pinnedChapterTitle');
       if (badge) badge.textContent = 'HOME';
-      if (title) title.textContent = 'WELCOME';
+      if (title) title.textContent = currentStudent ? `WELCOME ${currentStudent.name.toUpperCase()}` : 'WELCOME';
 
       const homeBtn = document.getElementById('sidebarHomeBtn');
       if (homeBtn) {
-        homeBtn.className = "w-full text-left p-3.5 flex items-center justify-between text-xs sm:text-sm font-mono-code font-bold border-b-2 border-black bg-black text-white transition-colors shrink-0 cursor-pointer";
+        homeBtn.className = "w-full text-left p-3.5 flex items-center justify-between text-xs sm:text-sm font-mono-code font-bold border-b-2 border-black dark:border-neutral-700 bg-black text-white dark:bg-white dark:text-black transition-colors shrink-0 cursor-pointer";
       }
       
       const searchInput = document.getElementById('chapterSearchInput');
       renderChapterNav(searchInput ? searchInput.value : '');
+      updateProgressDisplay();
+      updateDynamicWhatsAppLinks();
+      checkLastLessonResume();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function selectChapter(index) {
       currentChapterIndex = index;
       const ch = chapters[index];
+      const expandBtn = document.getElementById('expandMediaBtn');
+
+      if (expandBtn) expandBtn.classList.remove('hidden');
 
       if (ch.tabs && ch.tabs.length > 0) {
         activeTabId = ch.tabs[0].id;
       } else {
         activeTabId = null;
       }
+
+      recordLastLesson(index, activeTabId);
 
       const homeView = document.getElementById('homeViewContainer');
       const chapterView = document.getElementById('chapterViewContainer');
@@ -689,30 +2104,30 @@
 
       const homeBtn = document.getElementById('sidebarHomeBtn');
       if (homeBtn) {
-        homeBtn.className = "w-full text-left p-3.5 flex items-center justify-between text-xs sm:text-sm font-mono-code font-bold border-b-2 border-black bg-white text-gray-800 hover:bg-gray-100 transition-colors shrink-0 cursor-pointer";
+        homeBtn.className = "w-full text-left p-3.5 flex items-center justify-between text-xs sm:text-sm font-mono-code font-bold border-b-2 border-black dark:border-neutral-700 bg-white dark:bg-neutral-900 text-gray-800 dark:text-neutral-200 hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors shrink-0 cursor-pointer";
       }
 
       const badge = document.getElementById('pinnedChapterBadge');
       const pTitle = document.getElementById('pinnedChapterTitle');
       const chIndex = document.getElementById('currentChapterIndexText');
       const chTitle = document.getElementById('currentChapterTitle');
-      const studioLabel = document.getElementById('studioChapterLabel');
 
       if (badge) badge.textContent = `CH ${ch.id}`;
       if (pTitle) pTitle.textContent = ch.title;
       if (chIndex) chIndex.textContent = `CHAPTER ${ch.id}`;
       if (chTitle) chTitle.textContent = ch.title;
-      if (studioLabel) studioLabel.textContent = `CHAPTER ${ch.id} (${ch.title})`;
-
-      if (ch.overview) {
-        const overviewP = document.getElementById('overviewParagraph');
-        if (overviewP) overviewP.textContent = ch.overview;
-      }
 
       const searchInput = document.getElementById('chapterSearchInput');
       renderChapterNav(searchInput ? searchInput.value : '');
       renderChapterTabsBar();
       loadActiveMedia();
+      updateTabCheckboxUI();
+      updateDynamicWhatsAppLinks();
+
+      if (isSplitScreenActive) {
+        setupSplitScreenPanes();
+      }
+
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -732,101 +2147,24 @@
         const item = document.createElement('div');
         item.className = `w-full text-left p-3.5 flex items-center justify-between text-xs sm:text-sm font-mono-code transition-colors cursor-pointer ${
           isCurrent 
-            ? 'bg-black text-white font-bold' 
-            : 'text-gray-800 hover:bg-gray-100'
+            ? 'bg-black text-white dark:bg-neutral-200 dark:text-black font-bold' 
+            : 'text-gray-800 dark:text-neutral-300 hover:bg-gray-100 dark:hover:bg-neutral-800'
         }`;
         
-        item.onclick = (e) => {
-          if ((e.target.classList.contains('sidebar-ch-title') || e.target.classList.contains('sidebar-ch-id')) && isEditingText && isTeacherUnlocked) return;
-          selectChapter(idx);
-        };
-
-        const editModeActive = isEditingText && isTeacherUnlocked;
+        item.onclick = () => selectChapter(idx);
 
         item.innerHTML = `
           <div class="flex items-center gap-2 truncate min-w-0 flex-1 mr-2">
-            <span 
-              class="opacity-70 font-bold shrink-0 ${editModeActive ? 'ring-1 ring-emerald-400 bg-emerald-50/20 px-1 rounded text-black' : ''}"
-              contenteditable="${editModeActive ? 'true' : 'false'}"
-              oninput="handleSidebarIdInput(event, ${idx})"
-              title="Click to edit Chapter ID"
-            >${ch.id}</span>
-            <span 
-              class="sidebar-ch-title truncate ${editModeActive ? 'ring-1 ring-emerald-400 bg-emerald-50/20 px-1 rounded text-black' : ''}" 
-              contenteditable="${editModeActive ? 'true' : 'false'}"
-              oninput="handleSidebarTitleInput(event, ${idx})"
-              title="Click to edit Chapter Title"
-            >${ch.title}</span>
+            <span class="opacity-70 font-bold shrink-0">${ch.id}</span>
+            <span class="truncate">${ch.title}</span>
           </div>
-          <div class="flex items-center gap-2 shrink-0">
-            ${editModeActive ? `
-              <button 
-                type="button" 
-                onclick="event.stopPropagation(); deleteChapter(${idx});" 
-                class="px-1.5 py-0.5 bg-red-600 text-white text-[10px] font-bold uppercase rounded hover:bg-red-700 cursor-pointer"
-                title="Delete Chapter"
-              >✕</button>
-            ` : ''}
-            <span class="text-xs ${isCurrent ? 'text-white' : 'text-gray-400'}">→</span>
-          </div>
+          <span class="text-xs ${isCurrent ? 'text-white dark:text-black' : 'text-gray-400 dark:text-neutral-500'}">→</span>
         `;
         container.appendChild(item);
       });
 
       const countEl = document.getElementById('activeChapterCount');
       if (countEl) countEl.textContent = `${visibleCount} TOPICS`;
-    }
-
-    function handleSidebarIdInput(e, idx) {
-      if (!isTeacherUnlocked) return;
-      chapters[idx].id = e.target.textContent.trim();
-    }
-
-    function handleSidebarTitleInput(e, idx) {
-      if (!isTeacherUnlocked) return;
-      const newText = e.target.textContent.trim();
-      chapters[idx].title = newText;
-      if (currentChapterIndex === idx) {
-        const pTitle = document.getElementById('pinnedChapterTitle');
-        const chTitle = document.getElementById('currentChapterTitle');
-        if (pTitle) pTitle.textContent = newText;
-        if (chTitle) chTitle.textContent = newText;
-      }
-    }
-
-    function addNewChapter() {
-      if (!isTeacherUnlocked) return;
-      const nextNum = chapters.length + 1;
-      const formattedId = nextNum < 10 ? '0' + nextNum : String(nextNum);
-      const newCh = {
-        id: formattedId,
-        title: 'New Chapter Title',
-        overview: '',
-        tabs: [
-          { id: 'ch' + formattedId + '_t1', title: '1. LESSON TUTORIAL', type: 'video', url: '' },
-          { id: 'ch' + formattedId + '_t2', title: '2. PRACTICE WORKSHEET', type: 'document', url: '' },
-          { id: 'ch' + formattedId + '_t3', title: '3. WORKSHEET WALKTHROUGH', type: 'video', url: '' },
-          { id: 'ch' + formattedId + '_t4', title: '4. HANDWRITTEN SOLUTIONS', type: 'document', url: '' }
-        ]
-      };
-      chapters.push(newCh);
-      const searchInput = document.getElementById('chapterSearchInput');
-      renderChapterNav(searchInput ? searchInput.value : '');
-      selectChapter(chapters.length - 1);
-      showToast('New chapter added!');
-    }
-
-    function deleteChapter(idx) {
-      if (!isTeacherUnlocked) return;
-      if (chapters.length <= 1) {
-        alert('Portal must contain at least one chapter.');
-        return;
-      }
-      if (confirm(`Are you sure you want to delete Chapter ${chapters[idx].id}: ${chapters[idx].title}?`)) {
-        chapters.splice(idx, 1);
-        selectHomeView();
-        showToast('Chapter deleted.');
-      }
     }
 
     function filterChapters(query) {
@@ -839,33 +2177,48 @@
       tabsBar.innerHTML = '';
 
       const ch = chapters[currentChapterIndex];
-      if (!ch.tabs || ch.tabs.length === 0) {
-        tabsBar.innerHTML = `<span class="text-xs font-mono-code text-gray-500 italic">No tabs configured for this chapter.</span>`;
-        return;
-      }
+      if (!ch.tabs || ch.tabs.length === 0) return;
 
       ch.tabs.forEach(tab => {
         const isActive = activeTabId === tab.id;
+        const isDone = isTabCompleted(tab.id);
+
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.onclick = () => switchTab(tab.id);
-        btn.className = `tab-btn px-3 sm:px-4 py-2 border-2 border-black font-mono-code text-xs sm:text-sm font-bold uppercase transition shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer ${
+        btn.className = `tab-btn px-3 sm:px-4 py-2 border-2 border-black dark:border-neutral-400 font-mono-code text-xs sm:text-sm font-bold uppercase transition shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center gap-1.5 cursor-pointer ${
           isActive 
-            ? 'bg-black text-white' 
-            : 'bg-white text-black hover:bg-gray-200'
+            ? 'bg-black text-white dark:bg-white dark:text-black' 
+            : 'bg-white dark:bg-neutral-800 text-black dark:text-white hover:bg-gray-200'
         }`;
-        btn.textContent = tab.title;
+        
+        btn.innerHTML = `
+          <span>${tab.title}</span>
+          ${isDone ? '<span class="text-emerald-400 font-black">✓</span>' : ''}
+        `;
         tabsBar.appendChild(btn);
       });
     }
 
     function switchTab(tabId) {
       activeTabId = tabId;
+      if (currentChapterIndex !== null) {
+        recordLastLesson(currentChapterIndex, activeTabId);
+      }
       renderChapterTabsBar();
       loadActiveMedia();
+      updateTabCheckboxUI();
+      updateDynamicWhatsAppLinks();
+
+      if (isSplitScreenActive) {
+        const leftSelect = document.getElementById('splitLeftTabSelect');
+        if (leftSelect) {
+          leftSelect.value = tabId;
+          switchSplitLeftTab(tabId);
+        }
+      }
     }
 
-    // BULLETPROOF MEDIA ROUTER: Instantly binds any exact filename or link pasted in the code
     function loadActiveMedia() {
       if (currentChapterIndex === null || !activeTabId) return;
       const ch = chapters[currentChapterIndex];
@@ -876,10 +2229,28 @@
       const videoPlayer = document.getElementById('activeMediaVideo');
       const placeholder = document.getElementById('mediaPlaceholder');
       const statusLabel = document.getElementById('mediaStatusLabel');
+      const speedControls = document.getElementById('videoSpeedControls');
+
+      const quickBtn = document.getElementById('quickWorksheetDownloadBtn');
+      const worksheetTab = ch.tabs.find(t => t.title.toLowerCase().includes('worksheet') && t.type === 'document') || 
+                           ch.tabs.find(t => t.type === 'document');
+
+      if (quickBtn) {
+        if (worksheetTab && worksheetTab.url && worksheetTab.url.trim() !== '') {
+          const cleanUrl = worksheetTab.url.trim();
+          quickBtn.href = cleanUrl;
+          quickBtn.setAttribute('download', cleanUrl.split('/').pop().split('?')[0] || `Chapter_${ch.id}_Worksheet.pdf`);
+          quickBtn.classList.remove('hidden');
+          quickBtn.classList.add('inline-flex');
+        } else {
+          quickBtn.classList.add('hidden');
+          quickBtn.classList.remove('inline-flex');
+        }
+      }
 
       if (tab.url && tab.url.trim() !== '') {
         const cleanedUrl = tab.url.trim();
-        statusLabel.innerHTML = `<span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span> ${tab.title} (${tab.type === 'video' ? 'VIDEO FILE' : 'DOCUMENT'})`;
+        statusLabel.innerHTML = `<span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span> ${tab.title}`;
         
         if (tab.type === 'video') {
           iframe.classList.add('hidden');
@@ -888,12 +2259,14 @@
           videoPlayer.src = cleanedUrl;
           videoPlayer.load();
           placeholder.classList.add('hidden');
+          if (speedControls) speedControls.classList.remove('hidden');
         } else {
           videoPlayer.classList.add('hidden');
           videoPlayer.pause();
           iframe.classList.remove('hidden');
           iframe.src = cleanedUrl;
           placeholder.classList.add('hidden');
+          if (speedControls) speedControls.classList.add('hidden');
         }
       } else {
         videoPlayer.classList.add('hidden');
@@ -901,8 +2274,12 @@
         iframe.classList.add('hidden');
         iframe.src = '';
         placeholder.classList.remove('hidden');
-        statusLabel.innerHTML = `<span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span> ${tab.title} (NO FILE CONFIGURED IN CODE)`;
+        if (speedControls) speedControls.classList.add('hidden');
+        statusLabel.innerHTML = `<span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span> ${tab.title} (NO FILE CONFIGURED)`;
       }
+
+      renderVideoTimestamps();
+      updateWorksheetToolbar(tab);
     }
 
     function toggleSidebar() {
@@ -920,27 +2297,43 @@
       }
     }
 
-    function toggleMediaFullscreen() {
-      const mediaSection = document.getElementById('mediaContainer');
-      if (!mediaSection) return;
-      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-        if (mediaSection.requestFullscreen) {
-          mediaSection.requestFullscreen();
-        } else if (mediaSection.webkitRequestFullscreen) {
-          mediaSection.webkitRequestFullscreen();
+    async function toggleMediaFullscreen() {
+      const homeView = document.getElementById('homeViewContainer');
+      if (homeView && !homeView.classList.contains('hidden')) {
+        showToast('Open a chapter lesson first to use fullscreen!');
+        return;
+      }
+
+      const mediaContainer = document.getElementById('mediaContainer');
+      const video = document.getElementById('activeMediaVideo');
+      
+      if (!mediaContainer || mediaContainer.classList.contains('hidden')) {
+        showToast('No active media container found.');
+        return;
+      }
+
+      const isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement);
+
+      try {
+        if (!isFullscreen) {
+          const target = mediaContainer || video;
+          if (target && target.requestFullscreen) {
+            await target.requestFullscreen();
+          } else if (video && video.webkitEnterFullscreen) {
+            video.webkitEnterFullscreen();
+          }
+        } else {
+          if (document.exitFullscreen) await document.exitFullscreen();
         }
-      } else {
-        if (document.exitFullscreen) {
-          document.exitFullscreen();
-        } else if (document.webkitExitFullscreen) {
-          document.webkitExitFullscreen();
-        }
+      } catch (err) {
+        console.error("Fullscreen error:", err);
+        showToast('Fullscreen mode not supported on this element.');
       }
     }
 
     function handleTeacherAuthClick() {
       if (isTeacherUnlocked) {
-        openStudioModal();
+        showToast("Teacher mode active.");
       } else {
         const authModal = document.getElementById('authModal');
         const passInput = document.getElementById('passwordInput');
@@ -962,249 +2355,11 @@
       if (val === MASTER_PIN) {
         isTeacherUnlocked = true;
         closeAuthModal();
-        const editToggle = document.getElementById('editTextToggle');
-        const teacherBtn = document.getElementById('teacherAuthBtn');
-        const teacherTabActionContainer = document.getElementById('teacherTabActionContainer');
-        const teacherAddChapterBar = document.getElementById('teacherAddChapterBar');
-        if (editToggle) editToggle.classList.remove('hidden');
-        if (teacherBtn) teacherBtn.textContent = "STUDIO";
-        if (teacherTabActionContainer) teacherTabActionContainer.classList.remove('hidden');
-        if (teacherAddChapterBar) teacherAddChapterBar.classList.remove('hidden');
         showToast('Teacher mode unlocked!');
-        openStudioModal();
       } else {
         alert('Incorrect PIN. Student access only.');
         if (passInput) passInput.value = '';
       }
-    }
-
-    function lockTeacherMode() {
-      isTeacherUnlocked = false;
-      if (isEditingText) toggleEditTextMode();
-      const editToggle = document.getElementById('editTextToggle');
-      const teacherBtn = document.getElementById('teacherAuthBtn');
-      const teacherTabActionContainer = document.getElementById('teacherTabActionContainer');
-      const teacherAddChapterBar = document.getElementById('teacherAddChapterBar');
-      if (editToggle) editToggle.classList.add('hidden');
-      if (teacherBtn) teacherBtn.textContent = "TEACHER LOGIN";
-      if (teacherTabActionContainer) teacherTabActionContainer.classList.add('hidden');
-      if (teacherAddChapterBar) teacherAddChapterBar.classList.add('hidden');
-      closeStudioModal();
-      showToast('Logged out.');
-    }
-
-    function toggleEditTextMode() {
-      if (!isTeacherUnlocked) return;
-
-      isEditingText = !isEditingText;
-      const statusSpan = document.getElementById('editTextStatus');
-      const chTitleEl = document.getElementById('currentChapterTitle');
-      const overviewEl = document.getElementById('overviewParagraph');
-
-      if (isEditingText) {
-        if (statusSpan) {
-          statusSpan.textContent = 'ON';
-          statusSpan.className = 'text-emerald-600 font-black';
-        }
-
-        if (chTitleEl) {
-          chTitleEl.setAttribute('contenteditable', 'true');
-          chTitleEl.classList.add('ring-2', 'ring-emerald-400', 'bg-emerald-50/20');
-        }
-        if (overviewEl) {
-          overviewEl.setAttribute('contenteditable', 'true');
-          overviewEl.classList.add('ring-2', 'ring-emerald-400', 'bg-emerald-50/20');
-        }
-
-        const searchInput = document.getElementById('chapterSearchInput');
-        renderChapterNav(searchInput ? searchInput.value : '');
-        showToast('Text edit ON.');
-      } else {
-        if (statusSpan) {
-          statusSpan.textContent = 'OFF';
-          statusSpan.className = 'text-red-600 font-bold';
-        }
-
-        if (chTitleEl && overviewEl && currentChapterIndex !== null) {
-          chTitleEl.setAttribute('contenteditable', 'false');
-          chTitleEl.classList.remove('ring-2', 'ring-emerald-400', 'bg-emerald-50/20');
-          overviewEl.setAttribute('contenteditable', 'false');
-          overviewEl.classList.remove('ring-2', 'ring-emerald-400', 'bg-emerald-50/20');
-
-          chapters[currentChapterIndex].title = chTitleEl.textContent.trim();
-          chapters[currentChapterIndex].overview = overviewEl.textContent.trim();
-          const pTitle = document.getElementById('pinnedChapterTitle');
-          if (pTitle) pTitle.textContent = chapters[currentChapterIndex].title;
-        }
-
-        const searchInput = document.getElementById('chapterSearchInput');
-        renderChapterNav(searchInput ? searchInput.value : '');
-        showToast('Changes updated.');
-      }
-    }
-
-    function openStudioModal() {
-      if (!isTeacherUnlocked) return;
-      const studioLabel = document.getElementById('studioChapterLabel');
-      
-      if (currentChapterIndex !== null) {
-        const ch = chapters[currentChapterIndex];
-        if (studioLabel) studioLabel.textContent = `CHAPTER ${ch.id} (${ch.title})`;
-        renderStudioTabsList();
-      } else {
-        if (studioLabel) studioLabel.textContent = `PORTAL SETTINGS (PLEASE SELECT A CHAPTER FIRST)`;
-        const tabsList = document.getElementById('studioTabsListContainer');
-        if (tabsList) tabsList.innerHTML = `<p class="text-gray-500 text-xs italic">Please select a specific chapter from the sidebar first.</p>`;
-      }
-      
-      const studioModal = document.getElementById('studioModal');
-      if (studioModal) studioModal.classList.remove('hidden');
-    }
-
-    function closeStudioModal() {
-      const studioModal = document.getElementById('studioModal');
-      if (studioModal) studioModal.classList.add('hidden');
-    }
-
-    function renderStudioTabsList() {
-      const container = document.getElementById('studioTabsListContainer');
-      if (!container || currentChapterIndex === null) return;
-      container.innerHTML = '';
-
-      const ch = chapters[currentChapterIndex];
-      if (!ch.tabs || ch.tabs.length === 0) {
-        container.innerHTML = `<p class="text-xs text-gray-500 italic">No tabs added for this chapter yet.</p>`;
-        return;
-      }
-
-      ch.tabs.forEach((tab, index) => {
-        const card = document.createElement('div');
-        card.className = "border-2 border-black p-3.5 bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] space-y-3";
-        card.innerHTML = `
-          <div class="flex items-center justify-between gap-2 border-b border-gray-200 pb-2">
-            <div class="flex items-center gap-2 flex-1">
-              <span class="text-xs font-bold bg-black text-white px-1.5 py-0.5">#${index + 1}</span>
-              <input 
-                type="text" 
-                value="${tab.title}" 
-                oninput="updateStudioTabField('${tab.id}', 'title', this.value)"
-                class="border border-gray-300 px-2 py-1 text-xs font-mono-code font-bold w-full focus:outline-none focus:border-black rounded"
-              />
-            </div>
-            <button 
-              type="button" 
-              onclick="deleteTabFromChapter('${tab.id}')" 
-              class="px-2.5 py-1 bg-red-600 text-white font-bold text-xs uppercase hover:bg-red-700 transition cursor-pointer shrink-0"
-              title="Delete Tab"
-            >
-              🗑️ Delete
-            </button>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label class="block text-[10px] font-bold uppercase mb-1">Content Type</label>
-              <select 
-                onchange="updateStudioTabType('${tab.id}', this.value)"
-                class="border border-gray-300 p-1.5 text-xs font-mono-code w-full bg-gray-50 focus:outline-none rounded"
-              >
-                <option value="video" ${tab.type === 'video' ? 'selected' : ''}>Video File</option>
-                <option value="document" ${tab.type === 'document' ? 'selected' : ''}>Document / PDF</option>
-              </select>
-            </div>
-
-            <div>
-              <label class="block text-[10px] font-bold uppercase mb-1">Exact File Name</label>
-              <input 
-                type="text" 
-                value="${tab.url || ''}" 
-                oninput="updateStudioTabField('${tab.id}', 'url', this.value)"
-                placeholder="e.g. SVID_20261028_012045_1.mp4"
-                class="border border-gray-300 p-1.5 text-xs font-mono-code w-full bg-gray-50 focus:outline-none rounded"
-              />
-            </div>
-          </div>
-        `;
-        container.appendChild(card);
-      });
-    }
-
-    function updateStudioTabField(tabId, field, value) {
-      if (currentChapterIndex === null) return;
-      const ch = chapters[currentChapterIndex];
-      const tab = ch.tabs.find(t => t.id === tabId);
-      if (tab) {
-        tab[field] = value.trim();
-      }
-    }
-
-    function updateStudioTabType(tabId, newType) {
-      if (currentChapterIndex === null) return;
-      const ch = chapters[currentChapterIndex];
-      const tab = ch.tabs.find(t => t.id === tabId);
-      if (tab) {
-        tab.type = newType;
-      }
-    }
-
-    function addNewTabToChapter() {
-      if (currentChapterIndex === null) return;
-      const titleInput = document.getElementById('newTabTitleInput');
-      const typeSelect = document.getElementById('newTabTypeSelect');
-      const urlInput = document.getElementById('newTabUrlInput');
-
-      const titleVal = titleInput ? titleInput.value.trim() : '';
-      if (!titleVal) {
-        alert('Please enter a valid title for the new tab.');
-        return;
-      }
-
-      const typeVal = typeSelect ? typeSelect.value : 'video';
-      const urlVal = urlInput ? urlInput.value.trim() : '';
-
-      const chId = chapters[currentChapterIndex].id;
-      const newId = 'custom_' + chId + '_' + Date.now();
-      chapters[currentChapterIndex].tabs.push({
-        id: newId,
-        title: titleVal,
-        type: typeVal,
-        url: urlVal
-      });
-
-      if (titleInput) titleInput.value = '';
-      if (urlInput) urlInput.value = '';
-
-      renderStudioTabsList();
-      renderChapterTabsBar();
-      showToast('New tab created!');
-    }
-
-    function deleteTabFromChapter(tabId) {
-      if (currentChapterIndex === null) return;
-      const ch = chapters[currentChapterIndex];
-      if (ch.tabs.length <= 1) {
-        alert('A chapter must have at least one tab.');
-        return;
-      }
-
-      if (confirm('Are you sure you want to delete this tab?')) {
-        ch.tabs = ch.tabs.filter(t => t.id !== tabId);
-        if (activeTabId === tabId) {
-          activeTabId = ch.tabs[0].id;
-        }
-        renderStudioTabsList();
-        renderChapterTabsBar();
-        loadActiveMedia();
-        showToast('Tab deleted.');
-      }
-    }
-
-    function saveStudioChanges() {
-      if (!isTeacherUnlocked) return;
-      renderChapterTabsBar();
-      loadActiveMedia();
-      closeStudioModal();
-      showToast('Changes applied!');
     }
 
     function showToast(msg) {
@@ -1216,7 +2371,7 @@
       setTimeout(() => {
         toast.classList.remove('opacity-100');
         toast.classList.add('opacity-0', 'pointer-events-none');
-      }, 2000);
+      }, 2500);
     }
 
     window.addEventListener('DOMContentLoaded', () => {
