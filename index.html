@@ -313,7 +313,17 @@
         onclick="toggleEditTextMode()" 
         class="hidden text-xs font-mono-code font-bold uppercase border-2 border-black dark:border-white px-2 py-1 bg-white dark:bg-neutral-800 text-black dark:text-white cursor-pointer"
       >
-        EDIT: <span id="editTextStatus" class="text-red-600">OFF</span>
+        EDIT: <span id="editTextStatus" class="text-red-600 font-black">OFF</span>
+      </button>
+
+      <button 
+        type="button" 
+        id="teacherExportBtn" 
+        onclick="exportPortalConfiguration()" 
+        title="Export all Portal Chapters & Tabs as JSON"
+        class="hidden text-xs font-mono-code font-bold uppercase border-2 border-black dark:border-white px-2 py-1 bg-emerald-300 text-black cursor-pointer"
+      >
+        EXPORT DATA
       </button>
 
       <button 
@@ -329,7 +339,7 @@
         type="button" 
         id="teacherAuthBtn" 
         onclick="handleTeacherAuthClick()" 
-        class="text-xs font-mono-code font-bold uppercase bg-black text-white dark:bg-white dark:text-black px-2.5 py-1 sm:py-1.5 border-2 border-black cursor-pointer"
+        class="text-xs font-mono-code font-bold uppercase bg-black text-white dark:bg-white dark:text-black px-2.5 py-1 sm:py-1.5 border-2 border-black cursor-pointer shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
       >
         TEACHER LOGIN
       </button>
@@ -442,8 +452,8 @@
                 onerror="this.style.display='none'; document.getElementById('logoPlaceholderBox').style.display='flex';"
               />
               <div id="logoPlaceholderBox" class="hidden absolute inset-0 flex-col items-center justify-center p-4 text-center text-gray-400 font-mono-code text-xs">
-                <span class="text-2xl mb-1">🖼️</span>
-                <span class="font-bold text-black dark:text-white uppercase text-[11px]">Logo Circle</span>
+                <span class="text-3xl mb-1">📐</span>
+                <span class="font-bold text-black dark:text-white uppercase text-[11px]">ExcelMath Portal</span>
               </div>
             </div>
           </div>
@@ -457,7 +467,7 @@
             </h1>
           </div>
 
-          <div id="resumeLessonCard" class="hidden w-full border-2 border-black dark:border-neutral-700 bg-yellow-100 dark:bg-yellow-950/50 p-4 mb-4 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] font-mono-code text-left flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div id="resumeLessonCard" class="hidden w-full border-2 border-black dark:border-neutral-700 bg-yellow-100 dark:yellow-950/50 p-4 mb-4 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] font-mono-code text-left flex flex-col sm:flex-row items-center justify-between gap-3">
             <div class="flex items-center gap-2.5">
               <span class="text-2xl">⚡</span>
               <div>
@@ -522,11 +532,22 @@
             <span id="currentChapterIndexText" class="text-xs font-mono-code font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400 block mb-1">
               CHAPTER 01
             </span>
-            <h2 id="currentChapterTitle" class="text-xl sm:text-2xl font-black uppercase tracking-tight text-black dark:text-white" contenteditable="false">
+            <h2 id="currentChapterTitle" class="text-xl sm:text-2xl font-black uppercase tracking-tight text-black dark:text-white" contenteditable="false" onblur="handleChapterTitleEdit(this.innerText)">
               Quadratic Functions
             </h2>
           </div>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 flex-wrap">
+            <!-- TEACHER EDIT TABS BUTTON -->
+            <button 
+              type="button" 
+              id="teacherManageTabsBtn" 
+              onclick="openTeacherTabsModal()" 
+              class="hidden px-3 py-1.5 border-2 border-black dark:border-neutral-300 bg-amber-300 text-black font-mono-code text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-amber-200 cursor-pointer flex items-center gap-1.5"
+            >
+              <span>⚙️</span>
+              <span>EDIT TABS &amp; URLS</span>
+            </button>
+
             <!-- SPLIT SCREEN TOGGLE BUTTON -->
             <button 
               type="button" 
@@ -654,8 +675,9 @@
               ></video>
               
               <div id="mediaPlaceholder" class="hidden absolute inset-0 bg-neutral-900 text-white flex flex-col items-center justify-center p-6 text-center">
-                <h3 class="text-sm sm:text-base font-bold font-mono-code uppercase mb-1">No File Name Configured</h3>
-                <p class="text-xs text-gray-400 max-w-sm mb-4">Set your video or PDF file in the teacher panel or code!</p>
+                <h3 class="text-sm sm:text-base font-bold font-mono-code uppercase mb-1">No Resource Configured Yet</h3>
+                <p class="text-xs text-gray-400 max-w-sm mb-4">Set your video or PDF link via Teacher Login or by clicking "Edit Tabs & URLs".</p>
+                <button type="button" onclick="handleTeacherAuthClick()" class="px-3 py-1.5 border border-emerald-400 bg-emerald-950 text-emerald-300 font-mono-code text-xs font-bold uppercase">Configure Resource →</button>
               </div>
             </div>
 
@@ -714,7 +736,6 @@
                   <span class="shrink-0">⚙️ RIGHT:</span>
                   <select id="splitRightTabSelect" onchange="switchSplitRightTab(this.value)" class="bg-neutral-900 text-white border border-neutral-700 px-2 py-0.5 text-xs font-bold uppercase rounded truncate max-w-[220px] sm:max-w-none">
                     <option value="notepad">📝 NOTEPAD (DIGITAL CANVAS)</option>
-                    <!-- Other chapter tabs injected dynamically -->
                   </select>
                 </div>
                 <div class="flex items-center gap-1 shrink-0">
@@ -784,7 +805,7 @@
                 <iframe id="splitRightIframe" class="w-full h-full border-0 hidden" src="" title="Split Right Content"></iframe>
                 <div id="splitRightPlaceholder" class="hidden absolute inset-0 flex flex-col items-center justify-center p-4 text-center text-gray-400 text-xs font-mono-code">
                   <span>📹</span>
-                  <p class="font-bold mt-1">No File Name Configured for This Tab</p>
+                  <p class="font-bold mt-1">No Resource Configured for This Tab</p>
                 </div>
               </div>
 
@@ -911,8 +932,8 @@
           />
           <div id="formulaSheetPlaceholder" class="hidden absolute inset-0 flex-col items-center justify-center p-6 text-center text-gray-500 bg-white font-mono-code">
             <span class="text-4xl mb-2">📄</span>
-            <h4 class="font-bold text-xs text-black uppercase mb-1">Formula Sheet Not Found</h4>
-            <p class="text-[10px] text-gray-600">Place <code class="text-emerald-700 font-bold">formula_sheet.jpg</code> in your root folder.</p>
+            <h4 class="font-bold text-xs text-black uppercase mb-1">Formula Sheet Reference</h4>
+            <p class="text-[10px] text-gray-600">Ensure <code class="text-emerald-700 font-bold">formula_sheet.jpg</code> is placed in your portal folder.</p>
           </div>
         </div>
       </div>
@@ -954,6 +975,41 @@
     </div>
   </div>
 
+  <!-- TEACHER TAB & RESOURCE MANAGEMENT MODAL -->
+  <div id="teacherTabsModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+    <div class="bg-white dark:bg-neutral-900 border-4 border-black dark:border-neutral-200 w-full max-w-2xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-5 sm:p-6 flex flex-col font-mono-code max-h-[90vh]">
+      <div class="flex items-center justify-between pb-3 border-b-2 border-black dark:border-neutral-700">
+        <div>
+          <h3 class="font-black text-sm sm:text-base uppercase text-black dark:text-white flex items-center gap-1.5">
+            <span>⚙️</span>
+            <span>MANAGE CHAPTER RESOURCES</span>
+          </h3>
+          <span id="teacherModalChapterLabel" class="text-[11px] text-gray-600 dark:text-neutral-400 font-bold uppercase">CHAPTER 01</span>
+        </div>
+        <button type="button" onclick="closeTeacherTabsModal()" class="px-2 py-1 bg-black text-white dark:bg-white dark:text-black font-bold text-xs uppercase">✕ CLOSE</button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto py-4 space-y-4" id="teacherTabsListContainer">
+        <!-- Injected dynamically -->
+      </div>
+
+      <div class="pt-3 border-t-2 border-black dark:border-neutral-700 flex flex-wrap items-center justify-between gap-2">
+        <button type="button" onclick="addNewTabToCurrentChapter()" class="px-3 py-1.5 bg-cyan-300 text-black text-xs font-bold uppercase border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+          ➕ ADD NEW TAB
+        </button>
+
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="closeTeacherTabsModal()" class="px-3 py-1.5 border-2 border-black text-xs font-bold uppercase bg-white dark:bg-neutral-800 text-black dark:text-white">
+            Cancel
+          </button>
+          <button type="button" onclick="saveTeacherTabsChanges()" class="px-4 py-1.5 bg-emerald-400 text-black text-xs font-black uppercase border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+            💾 Save All Changes
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="toast" class="fixed bottom-4 left-4 bg-black text-white dark:bg-white dark:text-black font-mono-code text-xs px-4 py-2.5 border-2 border-white dark:border-black shadow-xl transition-opacity duration-300 opacity-0 pointer-events-none z-50">
     Changes saved!
   </div>
@@ -968,8 +1024,6 @@
     ];
 
     const FORMULA_SHEET_IMAGE_SRC = "formula_sheet.jpg";
-    const HOME_WALKTHROUGH_VIDEO_URL = ""; 
-
     let currentStudent = null;
 
     /* ================= SPLIT SCREEN STATE & ENGINE ================= */
@@ -1056,22 +1110,24 @@
       const openBtn = document.getElementById('splitLeftOpenBtn');
 
       if (tab && tab.url && tab.url.trim() !== '') {
-        const cleanUrl = tab.url.trim();
-        if (openBtn) openBtn.href = cleanUrl;
+        const rawUrl = tab.url.trim();
+        const formattedUrl = formatResourceUrl(rawUrl, tab.type);
+
+        if (openBtn) openBtn.href = rawUrl;
         if (placeholder) placeholder.classList.add('hidden');
 
-        if (tab.type === 'video') {
+        if (tab.type === 'video' && isDirectVideoFile(rawUrl)) {
           if (iframe) { iframe.classList.add('hidden'); iframe.src = ''; }
           if (video) {
             video.classList.remove('hidden');
-            video.src = cleanUrl;
+            video.src = formattedUrl;
             video.load();
           }
         } else {
           if (video) { video.classList.add('hidden'); video.pause(); }
           if (iframe) {
             iframe.classList.remove('hidden');
-            iframe.src = cleanUrl;
+            iframe.src = formattedUrl;
           }
         }
       } else {
@@ -1108,21 +1164,23 @@
           const tab = ch.tabs.find(t => t.id === selectedKey);
 
           if (tab && tab.url && tab.url.trim() !== '') {
-            const cleanUrl = tab.url.trim();
+            const rawUrl = tab.url.trim();
+            const formattedUrl = formatResourceUrl(rawUrl, tab.type);
+
             if (placeholder) placeholder.classList.add('hidden');
 
-            if (tab.type === 'video') {
+            if (tab.type === 'video' && isDirectVideoFile(rawUrl)) {
               if (iframe) { iframe.classList.add('hidden'); iframe.src = ''; }
               if (video) {
                 video.classList.remove('hidden');
-                video.src = cleanUrl;
+                video.src = formattedUrl;
                 video.load();
               }
             } else {
               if (video) { video.classList.add('hidden'); video.pause(); }
               if (iframe) {
                 iframe.classList.remove('hidden');
-                iframe.src = cleanUrl;
+                iframe.src = formattedUrl;
               }
             }
           } else {
@@ -1189,13 +1247,17 @@
       temp.width = splitCanvas.width;
       temp.height = splitCanvas.height;
       const tempCtx = temp.getContext('2d');
-      tempCtx.drawImage(splitCanvas, 0, 0);
+      if (splitCanvas.width > 0 && splitCanvas.height > 0) {
+        tempCtx.drawImage(splitCanvas, 0, 0);
+      }
 
       splitCanvas.width = rect.width;
       splitCanvas.height = rect.height;
       splitCtx.lineCap = 'round';
       splitCtx.lineJoin = 'round';
-      splitCtx.drawImage(temp, 0, 0);
+      if (temp.width > 0 && temp.height > 0) {
+        splitCtx.drawImage(temp, 0, 0);
+      }
     }
 
     function setSplitCanvasColor(color) {
@@ -1523,14 +1585,18 @@
       tempCanvas.width = canvas.width;
       tempCanvas.height = canvas.height;
       const tempCtx = tempCanvas.getContext('2d');
-      tempCtx.drawImage(canvas, 0, 0);
+      if (canvas.width > 0 && canvas.height > 0) {
+        tempCtx.drawImage(canvas, 0, 0);
+      }
 
       canvas.width = rect.width;
       canvas.height = rect.height;
 
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
-      ctx.drawImage(tempCanvas, 0, 0);
+      if (tempCanvas.width > 0 && tempCanvas.height > 0) {
+        ctx.drawImage(tempCanvas, 0, 0);
+      }
     }
 
     function setCanvasColor(color) {
@@ -1654,16 +1720,62 @@
       }
     }
 
+    /* ================= URL & EMBED HELPERS ================= */
+    function isDirectVideoFile(url) {
+      if (!url) return false;
+      const clean = url.split('?')[0].toLowerCase();
+      return clean.endsWith('.mp4') || clean.endsWith('.webm') || clean.endsWith('.mov') || clean.endsWith('.ogg');
+    }
+
+    function formatResourceUrl(url, type) {
+      if (!url) return '';
+      let trimmed = url.trim();
+
+      // Convert YouTube watch links to embed links
+      const ytMatch = trimmed.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/))([\w-]{11})/);
+      if (ytMatch && ytMatch[1]) {
+        return `https://www.youtube.com/embed/${ytMatch[1]}?enablejsapi=1&rel=0`;
+      }
+
+      // Convert Google Drive view links to preview links for iframe embed
+      if (trimmed.includes('drive.google.com') && trimmed.includes('/view')) {
+        return trimmed.replace('/view', '/preview');
+      }
+
+      return trimmed;
+    }
+
     /* ================= TIMESTAMPS & MEDIA ENGINE ================= */
     function jumpVideoTo(seconds) {
       const video = document.getElementById('activeMediaVideo');
-      if (!video || video.classList.contains('hidden')) {
-        showToast('Timestamps are available when playing HTML5 video files.');
+      const iframe = document.getElementById('activeMediaIframe');
+
+      if (video && !video.classList.contains('hidden')) {
+        video.currentTime = seconds;
+        video.play();
+        showToast(`Jumped to ${formatTimestampDisplay(seconds)}`);
         return;
       }
-      video.currentTime = seconds;
-      video.play();
-      showToast(`Jumped to ${formatTimestampDisplay(seconds)}`);
+
+      if (iframe && !iframe.classList.contains('hidden')) {
+        // If it's a YouTube iframe, attempt postMessage seek or reload with start time
+        try {
+          iframe.contentWindow.postMessage(JSON.stringify({
+            event: 'command',
+            func: 'seekTo',
+            args: [seconds, true]
+          }), '*');
+          showToast(`Jumped to ${formatTimestampDisplay(seconds)}`);
+        } catch (e) {
+          let currentSrc = iframe.src;
+          if (currentSrc.includes('youtube.com/embed/')) {
+            currentSrc = currentSrc.replace(/&start=\d+/, '').replace(/\?start=\d+/, '');
+            const sep = currentSrc.includes('?') ? '&' : '?';
+            iframe.src = `${currentSrc}${sep}start=${seconds}&autoplay=1`;
+            showToast(`Jumped to ${formatTimestampDisplay(seconds)}`);
+          }
+        }
+      }
     }
 
     function formatTimestampDisplay(totalSeconds) {
@@ -1912,7 +2024,6 @@
     function updateDynamicWhatsAppLinks() {
       const studentName = currentStudent ? currentStudent.name : 'Student';
       const floatingBtn = document.getElementById('floatingWhatsAppBtn');
-      const topbarLink = document.getElementById('topbarWhatsAppBtn');
 
       let currentContext = "ExcelMath Portal";
       if (currentChapterIndex !== null) {
@@ -1925,7 +2036,6 @@
       const url = `https://wa.me/6581980012?text=${encodedMsg}`;
 
       if (floatingBtn) floatingBtn.href = url;
-      if (topbarLink) topbarLink.href = url;
     }
 
     /* MASTER CHAPTER REPOSITORY */
@@ -2042,12 +2152,27 @@
 
     function initData() {
       initDarkMode();
-      chapters = CHECKLIST_CHAPTERS;
+      
+      const storedChapters = localStorage.getItem('portal_custom_chapters');
+      if (storedChapters) {
+        try {
+          chapters = JSON.parse(storedChapters);
+        } catch (e) {
+          chapters = CHECKLIST_CHAPTERS;
+        }
+      } else {
+        chapters = CHECKLIST_CHAPTERS;
+      }
+
       renderChapterNav();
       selectHomeView();
       checkActiveStudentSession();
       initScratchpadCanvas();
       checkAndUpdateDailyStreak();
+    }
+
+    function saveChaptersToStorage() {
+      localStorage.setItem('portal_custom_chapters', JSON.stringify(chapters));
     }
 
     function selectHomeView() {
@@ -2115,7 +2240,10 @@
       if (badge) badge.textContent = `CH ${ch.id}`;
       if (pTitle) pTitle.textContent = ch.title;
       if (chIndex) chIndex.textContent = `CHAPTER ${ch.id}`;
-      if (chTitle) chTitle.textContent = ch.title;
+      if (chTitle) {
+        chTitle.textContent = ch.title;
+        chTitle.contentEditable = isEditingText ? "true" : "false";
+      }
 
       const searchInput = document.getElementById('chapterSearchInput');
       renderChapterNav(searchInput ? searchInput.value : '');
@@ -2249,14 +2377,15 @@
       }
 
       if (tab.url && tab.url.trim() !== '') {
-        const cleanedUrl = tab.url.trim();
+        const rawUrl = tab.url.trim();
+        const formattedUrl = formatResourceUrl(rawUrl, tab.type);
         statusLabel.innerHTML = `<span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span> ${tab.title}`;
         
-        if (tab.type === 'video') {
+        if (tab.type === 'video' && isDirectVideoFile(rawUrl)) {
           iframe.classList.add('hidden');
           iframe.src = '';
           videoPlayer.classList.remove('hidden');
-          videoPlayer.src = cleanedUrl;
+          videoPlayer.src = formattedUrl;
           videoPlayer.load();
           placeholder.classList.add('hidden');
           if (speedControls) speedControls.classList.remove('hidden');
@@ -2264,7 +2393,7 @@
           videoPlayer.classList.add('hidden');
           videoPlayer.pause();
           iframe.classList.remove('hidden');
-          iframe.src = cleanedUrl;
+          iframe.src = formattedUrl;
           placeholder.classList.add('hidden');
           if (speedControls) speedControls.classList.add('hidden');
         }
@@ -2331,9 +2460,12 @@
       }
     }
 
+    /* ================= TEACHER AUTH & ADVANCED EDITING ================= */
     function handleTeacherAuthClick() {
       if (isTeacherUnlocked) {
-        showToast("Teacher mode active.");
+        if (confirm("Teacher mode is currently UNLOCKED. Do you want to log out and lock teacher access?")) {
+          lockTeacherMode();
+        }
       } else {
         const authModal = document.getElementById('authModal');
         const passInput = document.getElementById('passwordInput');
@@ -2353,13 +2485,274 @@
       const passInput = document.getElementById('passwordInput');
       const val = passInput ? passInput.value.trim() : '';
       if (val === MASTER_PIN) {
-        isTeacherUnlocked = true;
-        closeAuthModal();
-        showToast('Teacher mode unlocked!');
+        unlockTeacherMode();
       } else {
         alert('Incorrect PIN. Student access only.');
         if (passInput) passInput.value = '';
       }
+    }
+
+    function unlockTeacherMode() {
+      isTeacherUnlocked = true;
+      closeAuthModal();
+
+      const teacherAuthBtn = document.getElementById('teacherAuthBtn');
+      const editTextToggle = document.getElementById('editTextToggle');
+      const teacherAddBar = document.getElementById('teacherAddChapterBar');
+      const teacherExportBtn = document.getElementById('teacherExportBtn');
+      const manageTabsBtn = document.getElementById('teacherManageTabsBtn');
+
+      if (teacherAuthBtn) teacherAuthBtn.textContent = "TEACHER LOGOUT";
+      if (editTextToggle) editTextToggle.classList.remove('hidden');
+      if (teacherAddBar) teacherAddBar.classList.remove('hidden');
+      if (teacherExportBtn) teacherExportBtn.classList.remove('hidden');
+      if (manageTabsBtn) manageTabsBtn.classList.remove('hidden');
+
+      showToast('Teacher master mode unlocked! Edit controls active.');
+    }
+
+    function lockTeacherMode() {
+      isTeacherUnlocked = false;
+      isEditingText = false;
+
+      const teacherAuthBtn = document.getElementById('teacherAuthBtn');
+      const editTextToggle = document.getElementById('editTextToggle');
+      const editTextStatus = document.getElementById('editTextStatus');
+      const teacherAddBar = document.getElementById('teacherAddChapterBar');
+      const teacherExportBtn = document.getElementById('teacherExportBtn');
+      const manageTabsBtn = document.getElementById('teacherManageTabsBtn');
+      const chTitle = document.getElementById('currentChapterTitle');
+
+      if (teacherAuthBtn) teacherAuthBtn.textContent = "TEACHER LOGIN";
+      if (editTextToggle) editTextToggle.classList.add('hidden');
+      if (editTextStatus) {
+        editTextStatus.textContent = "OFF";
+        editTextStatus.className = "text-red-600 font-black";
+      }
+      if (teacherAddBar) teacherAddBar.classList.add('hidden');
+      if (teacherExportBtn) teacherExportBtn.classList.add('hidden');
+      if (manageTabsBtn) manageTabsBtn.classList.add('hidden');
+      if (chTitle) chTitle.contentEditable = "false";
+
+      showToast('Teacher mode locked.');
+    }
+
+    function toggleEditTextMode() {
+      if (!isTeacherUnlocked) return;
+      isEditingText = !isEditingText;
+
+      const status = document.getElementById('editTextStatus');
+      const chTitle = document.getElementById('currentChapterTitle');
+
+      if (isEditingText) {
+        if (status) {
+          status.textContent = "ON";
+          status.className = "text-emerald-500 font-black";
+        }
+        if (chTitle) chTitle.contentEditable = "true";
+        showToast('Text Editing ON: Click chapter titles to rename them!');
+      } else {
+        if (status) {
+          status.textContent = "OFF";
+          status.className = "text-red-600 font-black";
+        }
+        if (chTitle) chTitle.contentEditable = "false";
+        saveChaptersToStorage();
+        showToast('Text Editing OFF. All title changes saved!');
+      }
+    }
+
+    function handleChapterTitleEdit(newTitle) {
+      if (!isTeacherUnlocked || currentChapterIndex === null) return;
+      const clean = newTitle.trim();
+      if (!clean) return;
+      chapters[currentChapterIndex].title = clean;
+      saveChaptersToStorage();
+      renderChapterNav();
+      const pTitle = document.getElementById('pinnedChapterTitle');
+      if (pTitle) pTitle.textContent = clean;
+      showToast('Chapter title updated & saved!');
+    }
+
+    function addNewChapter() {
+      if (!isTeacherUnlocked) return;
+      const nextNum = (chapters.length + 1).toString().padStart(2, '0');
+      const chapterName = prompt(`Enter title for new Chapter ${nextNum}:`, `Topic ${nextNum}`);
+      if (!chapterName || !chapterName.trim()) return;
+
+      const newCh = {
+        id: nextNum,
+        title: chapterName.trim(),
+        overview: '',
+        pitfalls: '',
+        tabs: [
+          { id: `ch${nextNum}_t1`, title: '1. LESSON TUTORIAL', type: 'video', url: '', timestamps: [] },
+          { id: `ch${nextNum}_t2`, title: '2. PRACTICE WORKSHEET', type: 'document', url: '' },
+          { id: `ch${nextNum}_t3`, title: '3. WORKSHEET WALKTHROUGH', type: 'video', url: '', timestamps: [] },
+          { id: `ch${nextNum}_t4`, title: '4. HANDWRITTEN SOLUTIONS', type: 'document', url: '' }
+        ]
+      };
+
+      chapters.push(newCh);
+      saveChaptersToStorage();
+      renderChapterNav();
+      selectChapter(chapters.length - 1);
+      showToast(`Chapter ${nextNum} added successfully!`);
+    }
+
+    /* ================= TEACHER TABS & RESOURCE STUDIO MODAL ================= */
+    function openTeacherTabsModal() {
+      if (!isTeacherUnlocked || currentChapterIndex === null) return;
+      const ch = chapters[currentChapterIndex];
+      const modal = document.getElementById('teacherTabsModal');
+      const label = document.getElementById('teacherModalChapterLabel');
+      const container = document.getElementById('teacherTabsListContainer');
+
+      if (label) label.textContent = `CHAPTER ${ch.id}: ${ch.title}`;
+      renderTeacherTabsStudioList();
+
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeTeacherTabsModal() {
+      const modal = document.getElementById('teacherTabsModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function renderTeacherTabsStudioList() {
+      if (currentChapterIndex === null) return;
+      const ch = chapters[currentChapterIndex];
+      const container = document.getElementById('teacherTabsListContainer');
+      if (!container) return;
+
+      container.innerHTML = '';
+
+      if (!ch.tabs || ch.tabs.length === 0) {
+        container.innerHTML = '<p class="text-xs text-gray-500 font-bold">No tabs in this chapter. Click "Add New Tab" below.</p>';
+        return;
+      }
+
+      ch.tabs.forEach((tab, tIdx) => {
+        const card = document.createElement('div');
+        card.className = "p-3 border-2 border-black dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800 space-y-2";
+
+        const timestampsFormatted = (tab.timestamps || []).map(t => `${t.time}:${t.label}`).join(', ');
+
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-black uppercase text-black dark:text-white">TAB ${tIdx + 1}</span>
+            <button type="button" onclick="deleteTabFromCurrentChapter(${tIdx})" class="text-[10px] text-red-600 dark:text-red-400 font-bold uppercase underline">Delete Tab</button>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+            <div>
+              <label class="block text-[10px] font-bold uppercase text-gray-600 dark:text-neutral-400">Tab Title</label>
+              <input type="text" id="tab_title_${tIdx}" value="${escapeHtml(tab.title)}" class="w-full p-1.5 border border-black dark:border-neutral-600 bg-white dark:bg-neutral-900 text-black dark:text-white text-xs font-bold" />
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-bold uppercase text-gray-600 dark:text-neutral-400">Type</label>
+              <select id="tab_type_${tIdx}" class="w-full p-1.5 border border-black dark:border-neutral-600 bg-white dark:bg-neutral-900 text-black dark:text-white text-xs font-bold">
+                <option value="video" ${tab.type === 'video' ? 'selected' : ''}>🎬 Video (YouTube, MP4, Embed)</option>
+                <option value="document" ${tab.type === 'document' ? 'selected' : ''}>📄 Document (PDF, Google Drive)</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[10px] font-bold uppercase text-gray-600 dark:text-neutral-400">Resource URL / File Link</label>
+            <input type="text" id="tab_url_${tIdx}" value="${escapeHtml(tab.url || '')}" placeholder="e.g. https://www.youtube.com/watch?v=... or PDF link" class="w-full p-1.5 border border-black dark:border-neutral-600 bg-white dark:bg-neutral-900 text-black dark:text-white text-xs" />
+          </div>
+
+          <div>
+            <label class="block text-[10px] font-bold uppercase text-gray-600 dark:text-neutral-400">Timestamps (Format: seconds:Label, seconds:Label)</label>
+            <input type="text" id="tab_timestamps_${tIdx}" value="${escapeHtml(timestampsFormatted)}" placeholder="e.g. 45:Completing Square, 180:Discriminant" class="w-full p-1.5 border border-black dark:border-neutral-600 bg-white dark:bg-neutral-900 text-black dark:text-white text-[11px]" />
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function addNewTabToCurrentChapter() {
+      if (currentChapterIndex === null) return;
+      const ch = chapters[currentChapterIndex];
+      const count = ch.tabs ? ch.tabs.length + 1 : 1;
+      const newTab = {
+        id: `ch${ch.id}_t${Date.now()}`,
+        title: `${count}. LESSON RESOURCE`,
+        type: 'video',
+        url: '',
+        timestamps: []
+      };
+      ch.tabs.push(newTab);
+      renderTeacherTabsStudioList();
+    }
+
+    function deleteTabFromCurrentChapter(index) {
+      if (currentChapterIndex === null) return;
+      const ch = chapters[currentChapterIndex];
+      if (confirm(`Delete tab "${ch.tabs[index].title}"?`)) {
+        ch.tabs.splice(index, 1);
+        renderTeacherTabsStudioList();
+      }
+    }
+
+    function saveTeacherTabsChanges() {
+      if (currentChapterIndex === null) return;
+      const ch = chapters[currentChapterIndex];
+
+      ch.tabs.forEach((tab, tIdx) => {
+        const titleEl = document.getElementById(`tab_title_${tIdx}`);
+        const typeEl = document.getElementById(`tab_type_${tIdx}`);
+        const urlEl = document.getElementById(`tab_url_${tIdx}`);
+        const tsEl = document.getElementById(`tab_timestamps_${tIdx}`);
+
+        if (titleEl) tab.title = titleEl.value.trim();
+        if (typeEl) tab.type = typeEl.value;
+        if (urlEl) tab.url = urlEl.value.trim();
+
+        if (tsEl) {
+          const raw = tsEl.value.trim();
+          if (raw) {
+            const parsed = [];
+            raw.split(',').forEach(item => {
+              const parts = item.split(':');
+              if (parts.length >= 2) {
+                const s = parseInt(parts[0].trim(), 10);
+                const l = parts.slice(1).join(':').trim();
+                if (!isNaN(s) && l) parsed.push({ time: s, label: l });
+              }
+            });
+            tab.timestamps = parsed;
+          } else {
+            tab.timestamps = [];
+          }
+        }
+      });
+
+      saveChaptersToStorage();
+      closeTeacherTabsModal();
+      renderChapterTabsBar();
+      loadActiveMedia();
+      updateProgressDisplay();
+      showToast('All tab resources saved successfully!');
+    }
+
+    function exportPortalConfiguration() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(chapters, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `ExcelMath_Curriculum_${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      showToast('Curriculum JSON configuration exported!');
     }
 
     function showToast(msg) {
