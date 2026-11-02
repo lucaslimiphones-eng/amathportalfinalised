@@ -933,7 +933,7 @@
           <div id="formulaSheetPlaceholder" class="hidden absolute inset-0 flex-col items-center justify-center p-6 text-center text-gray-500 bg-white font-mono-code">
             <span class="text-4xl mb-2">📄</span>
             <h4 class="font-bold text-xs text-black uppercase mb-1">Formula Sheet Reference</h4>
-            <p class="text-[10px] text-gray-600">Ensure <code class="text-emerald-700 font-bold">formula_sheet.jpg</code> is placed in your portal folder.</p>
+            <p class="text-[10px] text-gray-600">Ensure <code class="text-emerald-700 font-bold">IMG_00691fac-85d6-44d7-9a1a-2c5e7a45bedb.png</code> is in your portal folder.</p>
           </div>
         </div>
       </div>
@@ -1023,7 +1023,8 @@
       { code: "90412853", name: "Evette", greeting: "Welcome Evette To ExcelMathWithLucas" }
     ];
 
-    const FORMULA_SHEET_IMAGE_SRC = "formula_sheet.jpg";
+    // MATCHED EXACTLY WITH THE HTML IMG SRC
+    const FORMULA_SHEET_IMAGE_SRC = "IMG_00691fac-85d6-44d7-9a1a-2c5e7a45bedb.png";
     let currentStudent = null;
 
     /* ================= SPLIT SCREEN STATE & ENGINE ================= */
@@ -1713,9 +1714,13 @@
         }
         drawer.classList.add('open');
         if (btn) btn.classList.add('bg-amber-400', 'ring-2', 'ring-black');
+        
         const img = document.getElementById('formulaSheetImg');
+        const placeholder = document.getElementById('formulaSheetPlaceholder');
         if (img && FORMULA_SHEET_IMAGE_SRC) {
           img.src = FORMULA_SHEET_IMAGE_SRC;
+          img.style.display = 'block';
+          if (placeholder) placeholder.style.display = 'none';
         }
       }
     }
@@ -1758,7 +1763,6 @@
       }
 
       if (iframe && !iframe.classList.contains('hidden')) {
-        // If it's a YouTube iframe, attempt postMessage seek or reload with start time
         try {
           iframe.contentWindow.postMessage(JSON.stringify({
             event: 'command',
