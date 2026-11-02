@@ -2,8 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>ExcelMathWithLucas - Additional Mathematics Portal</title>
+  
+  <!-- ================= PWA & MOBILE APP CAPABILITIES ================= -->
+  <meta name="application-name" content="ExcelMath" />
+  <meta name="apple-mobile-web-app-title" content="ExcelMath" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#0a0a0a" />
+  <meta name="msapplication-navbutton-color" content="#0a0a0a" />
+  <link rel="apple-touch-icon" href="1793377076129_edit_6603537396491.jpg" />
+  
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -17,10 +28,21 @@
   <style>
     * {
       box-sizing: border-box;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    input, textarea, [contenteditable="true"] {
+      -webkit-user-select: text;
+      user-select: text;
     }
     body {
       font-family: 'Space Grotesk', sans-serif;
       -webkit-tap-highlight-color: transparent;
+      overscroll-behavior-y: none;
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
     }
     .font-mono-code {
       font-family: 'JetBrains Mono', monospace;
@@ -74,6 +96,14 @@
       cursor: crosshair;
     }
 
+    /* Mathematical Grid Overlay */
+    .math-grid {
+      background-size: 24px 24px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+    }
+
     #mediaContainer:fullscreen,
     #mediaContainer:-webkit-full-screen,
     #mediaContainer:-moz-full-screen,
@@ -120,7 +150,7 @@
     }
   </style>
 </head>
-<body class="bg-gray-100 dark:bg-neutral-950 text-gray-900 dark:text-neutral-100 min-h-screen flex flex-col antialiased transition-colors duration-200">
+<body class="bg-gray-100 dark:bg-neutral-950 text-gray-900 dark:text-neutral-100 min-h-screen flex flex-col antialiased transition-colors duration-200 select-none">
 
   <!-- ================= 8-DIGIT STUDENT LOGIN GATE ================= -->
   <div id="authGateOverlay" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
@@ -247,7 +277,7 @@
             </h1>
           </div>
           <p class="text-[9px] sm:text-[10px] font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-widest truncate hidden sm:block">
-            EXCELMATHWITHLUCAS PORTAL
+            EXCELMATHWITHLUCAS APP
           </p>
         </div>
       </div>
@@ -255,6 +285,17 @@
 
     <!-- Header Actions -->
     <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+      <!-- PWA Install Button -->
+      <button 
+        type="button" 
+        id="installPwaBtn"
+        onclick="triggerPwaInstall()" 
+        class="hidden items-center gap-1 bg-emerald-400 hover:bg-emerald-300 text-black px-2 sm:px-2.5 py-1 border-2 border-black font-mono-code text-xs font-black uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer"
+      >
+        <span>📲</span>
+        <span class="hidden sm:inline">INSTALL APP</span>
+      </button>
+
       <button 
         type="button" 
         id="focusLockdownBtn"
@@ -739,14 +780,15 @@
                   </select>
                 </div>
                 <div class="flex items-center gap-1 shrink-0">
-                  <button type="button" id="splitCanvasClearBtn" onclick="clearSplitCanvas()" class="text-[10px] bg-red-600 hover:bg-red-700 px-2 py-0.5 text-white font-bold uppercase rounded">Clear Canvas</button>
+                  <button type="button" onclick="undoSplitCanvas()" title="Undo Step" class="text-[10px] bg-neutral-700 hover:bg-neutral-600 px-2 py-0.5 text-white font-bold uppercase rounded">↩ Undo</button>
+                  <button type="button" id="splitCanvasClearBtn" onclick="clearSplitCanvas()" class="text-[10px] bg-red-600 hover:bg-red-700 px-2 py-0.5 text-white font-bold uppercase rounded">Clear</button>
                 </div>
               </div>
 
               <!-- Right Pane: Digital Scratchpad Canvas -->
               <div id="splitRightCanvasView" class="flex-1 bg-neutral-950 relative flex flex-col overflow-hidden">
                 
-                <!-- Enhanced Canvas Controls Bar: Colors, Stylus Only, Pen/Eraser & Thickness Sliders -->
+                <!-- Enhanced Canvas Controls Bar: Colors, Grid, Stylus Only, Pen/Eraser & Thickness Sliders -->
                 <div class="p-2.5 bg-neutral-900 border-b border-neutral-800 flex flex-wrap items-center justify-between gap-2 text-xs text-white shrink-0">
                   <!-- Ink Colors -->
                   <div class="flex items-center gap-1.5">
@@ -758,6 +800,17 @@
                     <button type="button" onclick="setSplitCanvasColor('#f87171')" class="w-4 h-4 rounded-full bg-red-400 border border-white hover:scale-110 transition"></button>
                   </div>
 
+                  <!-- Grid Lines Toggle -->
+                  <button 
+                    type="button" 
+                    id="splitGridToggleBtn" 
+                    onclick="toggleCanvasGrid('split')" 
+                    class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-neutral-200 border border-neutral-500 font-bold text-[10px] uppercase rounded flex items-center gap-1 transition"
+                  >
+                    <span>📏 GRID:</span>
+                    <span id="splitGridStatusText" class="text-gray-400 font-black">OFF</span>
+                  </button>
+
                   <!-- Stylus Only / Palm Rejection Toggle for Split Screen Canvas -->
                   <button 
                     type="button" 
@@ -766,8 +819,7 @@
                     class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-neutral-200 border border-neutral-500 font-bold text-[10px] uppercase rounded flex items-center gap-1 transition"
                     title="Blocks palm/finger touches. Only Apple Pencil or active stylus draws."
                   >
-                    <span>✍️</span>
-                    <span>STYLUS ONLY:</span>
+                    <span>✍️ STYLUS:</span>
                     <span id="splitStylusOnlyStatusText" class="text-gray-400 font-black">OFF</span>
                   </button>
 
@@ -845,6 +897,17 @@
           <button type="button" onclick="setCanvasColor('#ffffff')" class="w-5 h-5 rounded-full bg-white border border-neutral-400 hover:scale-110 transition"></button>
         </div>
 
+        <!-- Grid Lines Toggle -->
+        <button 
+          type="button" 
+          id="drawerGridToggleBtn" 
+          onclick="toggleCanvasGrid('drawer')" 
+          class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-neutral-200 border border-neutral-500 font-bold text-[10px] uppercase rounded flex items-center gap-1 transition"
+        >
+          <span>📏 GRID:</span>
+          <span id="drawerGridStatusText" class="text-gray-400 font-black">OFF</span>
+        </button>
+
         <button 
           type="button" 
           id="stylusOnlyToggleBtn" 
@@ -852,8 +915,7 @@
           class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-neutral-200 border border-neutral-500 font-bold text-[10px] uppercase rounded flex items-center gap-1 transition"
           title="Blocks palm/finger touches. Only Apple Pencil or active stylus draws."
         >
-          <span>✍️</span>
-          <span>STYLUS ONLY:</span>
+          <span>✍️ STYLUS:</span>
           <span id="stylusOnlyStatusText" class="text-gray-400 font-black">OFF</span>
         </button>
 
@@ -875,7 +937,8 @@
         <div class="flex items-center gap-1 text-[11px]">
           <button type="button" onclick="setCanvasMode('pen')" id="penModeBtn" class="px-2 py-0.5 bg-emerald-500 text-black font-bold uppercase rounded">PEN</button>
           <button type="button" onclick="setCanvasMode('eraser')" id="eraserModeBtn" class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-bold uppercase rounded">ERASER</button>
-          <button type="button" onclick="clearScratchpadCanvas()" class="px-2 py-0.5 bg-red-600 hover:bg-red-700 text-white font-bold uppercase rounded ml-1">CLEAR</button>
+          <button type="button" onclick="undoDrawerCanvas()" title="Undo stroke" class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-bold uppercase rounded">↩</button>
+          <button type="button" onclick="clearScratchpadCanvas()" class="px-2 py-0.5 bg-red-600 hover:bg-red-700 text-white font-bold uppercase rounded">CLEAR</button>
         </div>
       </div>
 
@@ -887,7 +950,7 @@
         <div class="bg-amber-100 dark:bg-amber-950/60 border-t-2 border-black p-2.5 text-[11px] font-mono-code text-black dark:text-amber-200 shrink-0 mt-2">
           <p class="font-black uppercase mb-1">💡 How to ask a winning question:</p>
           <p class="text-[10px] text-gray-700 dark:text-neutral-300 leading-tight">
-            Don't just send a blank page! Circle where you got stuck, write down your first step, and ask: <span class="italic font-bold">"Lucas, I got up to step 2 here, but why did the sign flip when expanding the bracket?"</span>
+            Circle where you got stuck, write down your first step, and ask: <span class="italic font-bold">"Lucas, I got up to step 2 here, but why did the sign flip when expanding the bracket?"</span>
           </p>
         </div>
       </div>
@@ -933,7 +996,7 @@
           <div id="formulaSheetPlaceholder" class="hidden absolute inset-0 flex-col items-center justify-center p-6 text-center text-gray-500 bg-white font-mono-code">
             <span class="text-4xl mb-2">📄</span>
             <h4 class="font-bold text-xs text-black uppercase mb-1">Formula Sheet Reference</h4>
-            <p class="text-[10px] text-gray-600">Ensure <code class="text-emerald-700 font-bold">IMG_00691fac-85d6-44d7-9a1a-2c5e7a45bedb.png</code> is in your portal folder.</p>
+            <p class="text-[10px] text-gray-600">Ensure <code class="text-emerald-700 font-bold">IMG_00691fac-85d6-44d7-9a1a-2c5e7a45bedb.png</code> is in your portal directory.</p>
           </div>
         </div>
       </div>
@@ -989,9 +1052,7 @@
         <button type="button" onclick="closeTeacherTabsModal()" class="px-2 py-1 bg-black text-white dark:bg-white dark:text-black font-bold text-xs uppercase">✕ CLOSE</button>
       </div>
 
-      <div class="flex-1 overflow-y-auto py-4 space-y-4" id="teacherTabsListContainer">
-        <!-- Injected dynamically -->
-      </div>
+      <div class="flex-1 overflow-y-auto py-4 space-y-4" id="teacherTabsListContainer"></div>
 
       <div class="pt-3 border-t-2 border-black dark:border-neutral-700 flex flex-wrap items-center justify-between gap-2">
         <button type="button" onclick="addNewTabToCurrentChapter()" class="px-3 py-1.5 bg-cyan-300 text-black text-xs font-bold uppercase border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
@@ -1023,9 +1084,91 @@
       { code: "90412853", name: "Evette", greeting: "Welcome Evette To ExcelMathWithLucas" }
     ];
 
-    // MATCHED EXACTLY WITH THE HTML IMG SRC
     const FORMULA_SHEET_IMAGE_SRC = "IMG_00691fac-85d6-44d7-9a1a-2c5e7a45bedb.png";
     let currentStudent = null;
+
+    /* ================= PWA SETUP & MANIFEST INJECTION ================= */
+    let deferredPrompt = null;
+
+    function initPWA() {
+      // 1. Create and inject dynamic PWA Web App Manifest
+      const manifest = {
+        name: "ExcelMathWithLucas Portal",
+        short_name: "ExcelMath",
+        description: "O-Level Additional Mathematics Interactive Study Portal",
+        start_url: "./",
+        display: "standalone",
+        background_color: "#0a0a0a",
+        theme_color: "#0a0a0a",
+        orientation: "any",
+        icons: [
+          {
+            src: "1793377076129_edit_6603537396491.jpg",
+            sizes: "192x192 512x512",
+            type: "image/jpeg",
+            purpose: "any maskable"
+          }
+        ]
+      };
+
+      const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+      const manifestURL = URL.createObjectURL(manifestBlob);
+      const manifestLink = document.createElement('link');
+      manifestLink.rel = 'manifest';
+      manifestLink.href = manifestURL;
+      document.head.appendChild(manifestLink);
+
+      // 2. Install prompt listener for Android/Chrome/Edge
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        const installBtn = document.getElementById('installPwaBtn');
+        if (installBtn) {
+          installBtn.classList.remove('hidden');
+          installBtn.classList.add('flex');
+        }
+      });
+
+      // 3. Register lightweight inline Service Worker for offline PWA eligibility
+      if ('serviceWorker' in navigator) {
+        const swCode = `
+          const CACHE_NAME = 'excelmath-app-cache-v1';
+          self.addEventListener('install', (e) => { self.skipWaiting(); });
+          self.addEventListener('activate', (e) => { e.waitUntil(clients.claim()); });
+          self.addEventListener('fetch', (e) => {
+            e.respondWith(
+              fetch(e.request).catch(() => caches.match(e.request))
+            );
+          });
+        `;
+        const swBlob = new Blob([swCode], { type: 'application/javascript' });
+        navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(() => {
+          // Fallback if blob SW is restricted in local origin
+        });
+      }
+    }
+
+    function triggerPwaInstall() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            showToast("Installing ExcelMath App!");
+          }
+          deferredPrompt = null;
+          const installBtn = document.getElementById('installPwaBtn');
+          if (installBtn) installBtn.classList.add('hidden');
+        });
+      } else {
+        // Fallback instructions for iOS Safari users
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        if (isIOS) {
+          alert("To install on iPad/iPhone:\n1. Tap the Share button (square with arrow up)\n2. Tap 'Add to Home Screen'\n3. Open ExcelMath from your home screen for full-screen mode!");
+        } else {
+          showToast("App already installed or ready in browser menu!");
+        }
+      }
+    }
 
     /* ================= SPLIT SCREEN STATE & ENGINE ================= */
     let isSplitScreenActive = false;
@@ -1036,6 +1179,7 @@
     let splitPenThickness = 3;
     let splitEraserThickness = 20;
     let isSplitEraser = false;
+    let splitUndoHistory = [];
 
     function toggleSplitScreenMode() {
       isSplitScreenActive = !isSplitScreenActive;
@@ -1143,7 +1287,6 @@
       splitRightSelectedValue = selectedKey;
       const canvasView = document.getElementById('splitRightCanvasView');
       const contentView = document.getElementById('splitRightContentView');
-      const clearBtn = document.getElementById('splitCanvasClearBtn');
       const video = document.getElementById('splitRightVideo');
       const iframe = document.getElementById('splitRightIframe');
       const placeholder = document.getElementById('splitRightPlaceholder');
@@ -1153,11 +1296,9 @@
         if (video) { video.pause(); video.classList.add('hidden'); }
         if (iframe) { iframe.src = ''; iframe.classList.add('hidden'); }
         if (canvasView) canvasView.classList.remove('hidden');
-        if (clearBtn) clearBtn.classList.remove('hidden');
         setTimeout(resizeSplitScratchCanvas, 100);
       } else {
         if (canvasView) canvasView.classList.add('hidden');
-        if (clearBtn) clearBtn.classList.add('hidden');
         if (contentView) contentView.classList.remove('hidden');
 
         if (currentChapterIndex !== null) {
@@ -1203,6 +1344,7 @@
 
       splitCanvas.addEventListener('pointerdown', (e) => {
         if (isStylusOnlyMode && e.pointerType !== 'pen') return;
+        saveSplitState();
         isSplitDrawing = true;
         const rect = splitCanvas.getBoundingClientRect();
         splitCtx.beginPath();
@@ -1237,6 +1379,23 @@
         splitCtx.closePath();
         try { splitCanvas.releasePointerCapture(e.pointerId); } catch (err) {}
       });
+    }
+
+    function saveSplitState() {
+      if (!splitCanvas) return;
+      if (splitUndoHistory.length > 20) splitUndoHistory.shift();
+      splitUndoHistory.push(splitCanvas.toDataURL());
+    }
+
+    function undoSplitCanvas() {
+      if (!splitCanvas || !splitCtx || splitUndoHistory.length === 0) return;
+      const prevData = splitUndoHistory.pop();
+      const img = new Image();
+      img.onload = () => {
+        splitCtx.clearRect(0, 0, splitCanvas.width, splitCanvas.height);
+        splitCtx.drawImage(img, 0, 0);
+      };
+      img.src = prevData;
     }
 
     function resizeSplitScratchCanvas() {
@@ -1305,8 +1464,35 @@
 
     function clearSplitCanvas() {
       if (!splitCanvas || !splitCtx) return;
+      saveSplitState();
       splitCtx.clearRect(0, 0, splitCanvas.width, splitCanvas.height);
       showToast("Split canvas cleared!");
+    }
+
+    /* ================= GRID TOGGLE SYSTEM ================= */
+    let isDrawerGridOn = false;
+    let isSplitGridOn = false;
+
+    function toggleCanvasGrid(target) {
+      if (target === 'drawer') {
+        isDrawerGridOn = !isDrawerGridOn;
+        const wrapper = document.getElementById('scratchpadCanvas');
+        const status = document.getElementById('drawerGridStatusText');
+        if (wrapper) wrapper.classList.toggle('math-grid', isDrawerGridOn);
+        if (status) {
+          status.textContent = isDrawerGridOn ? 'ON' : 'OFF';
+          status.className = isDrawerGridOn ? 'text-emerald-400 font-black' : 'text-gray-400 font-black';
+        }
+      } else if (target === 'split') {
+        isSplitGridOn = !isSplitGridOn;
+        const wrapper = document.getElementById('splitScratchCanvas');
+        const status = document.getElementById('splitGridStatusText');
+        if (wrapper) wrapper.classList.toggle('math-grid', isSplitGridOn);
+        if (status) {
+          status.textContent = isSplitGridOn ? 'ON' : 'OFF';
+          status.className = isSplitGridOn ? 'text-emerald-400 font-black' : 'text-gray-400 font-black';
+        }
+      }
     }
 
     /* ================= DRAWER NOTEPAD THICKNESS ENGINES ================= */
@@ -1478,6 +1664,7 @@
     let currentColor = '#10b981';
     let isEraser = false;
     let isStylusOnlyMode = false;
+    let drawerUndoHistory = [];
 
     function initScratchpadCanvas() {
       canvas = document.getElementById('scratchpadCanvas');
@@ -1536,9 +1723,26 @@
       }
     }
 
+    function saveDrawerState() {
+      if (!canvas) return;
+      if (drawerUndoHistory.length > 20) drawerUndoHistory.shift();
+      drawerUndoHistory.push(canvas.toDataURL());
+    }
+
+    function undoDrawerCanvas() {
+      if (!canvas || !ctx || drawerUndoHistory.length === 0) return;
+      const prevData = drawerUndoHistory.pop();
+      const img = new Image();
+      img.onload = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0);
+      };
+      img.src = prevData;
+    }
+
     function handlePointerDown(e) {
       if (isStylusOnlyMode && e.pointerType !== 'pen') return;
-
+      saveDrawerState();
       isDrawing = true;
       const rect = canvas.getBoundingClientRect();
       ctx.beginPath();
@@ -1632,6 +1836,7 @@
 
     function clearScratchpadCanvas() {
       if (!ctx || !canvas) return;
+      saveDrawerState();
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       showToast("Scratchpad cleared!");
     }
@@ -1736,13 +1941,11 @@
       if (!url) return '';
       let trimmed = url.trim();
 
-      // Convert YouTube watch links to embed links
       const ytMatch = trimmed.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/))([\w-]{11})/);
       if (ytMatch && ytMatch[1]) {
         return `https://www.youtube.com/embed/${ytMatch[1]}?enablejsapi=1&rel=0`;
       }
 
-      // Convert Google Drive view links to preview links for iframe embed
       if (trimmed.includes('drive.google.com') && trimmed.includes('/view')) {
         return trimmed.replace('/view', '/preview');
       }
@@ -2156,6 +2359,7 @@
 
     function initData() {
       initDarkMode();
+      initPWA();
       
       const storedChapters = localStorage.getItem('portal_custom_chapters');
       if (storedChapters) {
