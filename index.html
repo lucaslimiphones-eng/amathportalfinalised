@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>ExcelMathWithLucas - Additional Mathematics Portal</title>
+  <title>ExcelMathsWithLucas - Additional Mathematics Portal</title>
   
   <!-- ================= PWA & MOBILE APP CAPABILITIES ================= -->
-  <meta name="application-name" content="ExcelMath" />
-  <meta name="apple-mobile-web-app-title" content="ExcelMath" />
+  <meta name="application-name" content="ExcelMathsWithLucas" />
+  <meta name="apple-mobile-web-app-title" content="ExcelMaths" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="theme-color" content="#0a0a0a" />
   <meta name="msapplication-navbutton-color" content="#0a0a0a" />
-  <link rel="apple-touch-icon" href="1793377076129_edit_6603537396491.jpg" />
+  <link rel="apple-touch-icon" href="logo.png" />
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -46,6 +46,20 @@
     }
     .font-mono-code {
       font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Suppress Netlify Injected Floating Badges & Overlays */
+    [data-netlify-deploy-id],
+    .netlify-badge,
+    #netlify-badge,
+    iframe[src*="netlify"],
+    a[href*="netlify.com"] {
+      display: none !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+      opacity: 0 !important;
+      width: 0 !important;
+      height: 0 !important;
     }
 
     #sidebar {
@@ -267,6 +281,12 @@
       </button>
 
       <div class="flex items-center gap-2.5 min-w-0 cursor-pointer" onclick="selectHomeView()">
+        <img 
+          src="logo.png" 
+          alt="ExcelMaths Logo" 
+          class="w-8 h-8 rounded-full border border-black dark:border-white object-cover hidden sm:block shrink-0"
+          onerror="this.style.display='none'"
+        />
         <div class="min-w-0 flex flex-col justify-center">
           <div class="flex items-center gap-2">
             <span id="pinnedChapterBadge" class="text-[10px] font-mono-code font-bold bg-black text-white dark:bg-white dark:text-black px-1.5 py-0.5 uppercase tracking-wider shrink-0">
@@ -277,7 +297,7 @@
             </h1>
           </div>
           <p class="text-[9px] sm:text-[10px] font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-widest truncate hidden sm:block">
-            EXCELMATHWITHLUCAS APP
+            EXCELMATHSWITHLUCAS APP
           </p>
         </div>
       </div>
@@ -483,18 +503,19 @@
             </button>
           </div>
 
+          <!-- Crest / Logo Display Box -->
           <div class="w-full mb-6 flex justify-center">
-            <div class="w-36 h-36 sm:w-48 sm:h-48 rounded-full border-4 border-black dark:border-neutral-300 bg-gray-50 dark:bg-neutral-800 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden flex items-center justify-center relative">
+            <div class="w-44 h-44 sm:w-56 sm:h-56 rounded-full border-4 border-black dark:border-amber-400 bg-white dark:bg-neutral-800 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] overflow-hidden flex items-center justify-center relative p-1">
               <img 
                 id="portalLogoImage" 
-                src="1793377076129_edit_6603537396491.jpg" 
-                alt="Logo" 
-                class="w-full h-full object-cover"
-                onerror="this.style.display='none'; document.getElementById('logoPlaceholderBox').style.display='flex';"
+                src="logo.png" 
+                alt="ExcelMathsWithLucas Crest Logo" 
+                class="w-full h-full object-contain rounded-full"
+                onerror="this.src='54009.jpg'; this.onerror=function(){ this.style.display='none'; document.getElementById('logoPlaceholderBox').style.display='flex'; };"
               />
               <div id="logoPlaceholderBox" class="hidden absolute inset-0 flex-col items-center justify-center p-4 text-center text-gray-400 font-mono-code text-xs">
                 <span class="text-3xl mb-1">📐</span>
-                <span class="font-bold text-black dark:text-white uppercase text-[11px]">ExcelMath Portal</span>
+                <span class="font-bold text-black dark:text-white uppercase text-[11px]">ExcelMathsWithLucas</span>
               </div>
             </div>
           </div>
@@ -504,7 +525,7 @@
               STUDENT LEARNING DASHBOARD
             </span>
             <h1 id="personalizedWelcomeHeader" class="text-xl sm:text-3xl font-black uppercase tracking-tight font-mono-code text-black dark:text-white">
-              WELCOME <span class="text-emerald-700 dark:text-emerald-400">TO EXCELMATHWITHLUCAS</span>
+              WELCOME <span class="text-emerald-700 dark:text-emerald-400">TO EXCELMATHSWITHLUCAS</span>
             </h1>
           </div>
 
@@ -578,7 +599,6 @@
             </h2>
           </div>
           <div class="flex items-center gap-2 flex-wrap">
-            <!-- TEACHER EDIT TABS BUTTON -->
             <button 
               type="button" 
               id="teacherManageTabsBtn" 
@@ -589,7 +609,6 @@
               <span>EDIT TABS &amp; URLS</span>
             </button>
 
-            <!-- SPLIT SCREEN TOGGLE BUTTON -->
             <button 
               type="button" 
               id="splitScreenToggleBtn" 
@@ -679,7 +698,7 @@
           <section id="mediaContainer" class="bg-black border-2 border-black dark:border-neutral-700 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden flex flex-col">
             <div class="bg-gray-900 border-b border-gray-700 px-3 py-2 flex flex-wrap items-center justify-between gap-2 text-white text-xs font-mono-code shrink-0">
               <span id="mediaStatusLabel" class="flex items-center gap-2">
-                <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
                 MEDIA PLAYER
               </span>
               
@@ -749,13 +768,12 @@
           <!-- Split Workspace Layout -->
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
             
-            <!-- LEFT PANE: Reference Material (Worksheets, Tutorials, Solutions) -->
+            <!-- LEFT PANE: Reference Material -->
             <div class="bg-white dark:bg-neutral-900 border-2 border-black dark:border-neutral-700 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex flex-col h-[700px] overflow-hidden">
               <div class="p-2.5 bg-neutral-800 text-white flex items-center justify-between text-xs font-bold shrink-0">
                 <div class="flex items-center gap-2 min-w-0">
                   <span class="shrink-0">📄 LEFT:</span>
                   <select id="splitLeftTabSelect" onchange="switchSplitLeftTab(this.value)" class="bg-neutral-900 text-white border border-neutral-700 px-2 py-0.5 text-xs font-bold uppercase rounded truncate max-w-[200px] sm:max-w-none">
-                    <!-- Populated dynamically -->
                   </select>
                 </div>
                 <a id="splitLeftOpenBtn" href="#" target="_blank" class="text-[10px] text-cyan-300 underline shrink-0">Open Full ↗</a>
@@ -770,7 +788,7 @@
               </div>
             </div>
 
-            <!-- RIGHT PANE: Flexible Tab Switcher (Notepad / Tutorial / Walkthrough / Worksheet / Solutions) -->
+            <!-- RIGHT PANE: Flexible Tab Switcher -->
             <div class="bg-white dark:bg-neutral-900 border-2 border-black dark:border-neutral-700 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex flex-col h-[700px] overflow-hidden">
               <div class="p-2.5 bg-neutral-800 text-white flex items-center justify-between text-xs font-bold shrink-0">
                 <div class="flex items-center gap-2 min-w-0">
@@ -787,10 +805,7 @@
 
               <!-- Right Pane: Digital Scratchpad Canvas -->
               <div id="splitRightCanvasView" class="flex-1 bg-neutral-950 relative flex flex-col overflow-hidden">
-                
-                <!-- Enhanced Canvas Controls Bar: Colors, Grid, Stylus Only, Pen/Eraser & Thickness Sliders -->
                 <div class="p-2.5 bg-neutral-900 border-b border-neutral-800 flex flex-wrap items-center justify-between gap-2 text-xs text-white shrink-0">
-                  <!-- Ink Colors -->
                   <div class="flex items-center gap-1.5">
                     <span class="text-[10px] text-gray-400 font-bold uppercase">INK:</span>
                     <button type="button" onclick="setSplitCanvasColor('#10b981')" class="w-4 h-4 rounded-full bg-emerald-500 border border-white hover:scale-110 transition"></button>
@@ -800,7 +815,6 @@
                     <button type="button" onclick="setSplitCanvasColor('#f87171')" class="w-4 h-4 rounded-full bg-red-400 border border-white hover:scale-110 transition"></button>
                   </div>
 
-                  <!-- Grid Lines Toggle -->
                   <button 
                     type="button" 
                     id="splitGridToggleBtn" 
@@ -811,7 +825,6 @@
                     <span id="splitGridStatusText" class="text-gray-400 font-black">OFF</span>
                   </button>
 
-                  <!-- Stylus Only / Palm Rejection Toggle for Split Screen Canvas -->
                   <button 
                     type="button" 
                     id="splitStylusOnlyToggleBtn" 
@@ -823,13 +836,11 @@
                     <span id="splitStylusOnlyStatusText" class="text-gray-400 font-black">OFF</span>
                   </button>
 
-                  <!-- Tool Mode: Pen vs Eraser -->
                   <div class="flex items-center gap-1 text-[10px]">
                     <button type="button" onclick="setSplitCanvasMode('pen')" id="splitPenModeBtn" class="px-2 py-0.5 bg-emerald-500 text-black font-bold uppercase rounded">PEN</button>
                     <button type="button" onclick="setSplitCanvasMode('eraser')" id="splitEraserModeBtn" class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-bold uppercase rounded">ERASER</button>
                   </div>
 
-                  <!-- Thickness Controls -->
                   <div class="flex items-center gap-2 bg-neutral-800 px-2 py-1 rounded border border-neutral-700 text-[10px]">
                     <span class="text-neutral-400 font-bold uppercase">SIZE:</span>
                     <input 
@@ -845,13 +856,12 @@
                   </div>
                 </div>
 
-                <!-- Canvas Wrapper -->
                 <div class="flex-1 relative overflow-hidden" id="splitCanvasWrapper">
                   <canvas id="splitScratchCanvas" class="w-full h-full bg-neutral-900"></canvas>
                 </div>
               </div>
 
-              <!-- Right Pane: Lesson Content (Video / PDF) -->
+              <!-- Right Pane: Lesson Content -->
               <div id="splitRightContentView" class="hidden flex-1 bg-black relative flex flex-col overflow-hidden">
                 <video id="splitRightVideo" class="w-full h-full object-contain hidden" controls playsinline></video>
                 <iframe id="splitRightIframe" class="w-full h-full border-0 hidden" src="" title="Split Right Content"></iframe>
@@ -887,7 +897,6 @@
         </button>
       </div>
 
-      <!-- Canvas Toolbar & Controls -->
       <div class="p-2.5 bg-neutral-800 border-b border-neutral-700 flex flex-wrap items-center justify-between gap-2 font-mono-code text-xs text-white shrink-0">
         <div class="flex items-center gap-1.5">
           <span class="text-[10px] text-gray-400 font-bold uppercase">INK:</span>
@@ -897,7 +906,6 @@
           <button type="button" onclick="setCanvasColor('#ffffff')" class="w-5 h-5 rounded-full bg-white border border-neutral-400 hover:scale-110 transition"></button>
         </div>
 
-        <!-- Grid Lines Toggle -->
         <button 
           type="button" 
           id="drawerGridToggleBtn" 
@@ -919,7 +927,6 @@
           <span id="stylusOnlyStatusText" class="text-gray-400 font-black">OFF</span>
         </button>
 
-        <!-- Thickness Slider for Drawer Canvas -->
         <div class="flex items-center gap-1.5 bg-neutral-900 px-2 py-0.5 rounded border border-neutral-700 text-[10px]">
           <span class="text-neutral-400 uppercase font-bold">SIZE:</span>
           <input 
@@ -946,7 +953,6 @@
         <div class="flex-1 relative overflow-hidden flex items-center justify-center">
           <canvas id="scratchpadCanvas" class="w-full h-full bg-neutral-900 border border-neutral-700 rounded shadow-inner"></canvas>
         </div>
-        <!-- Smart Question Prompt Helper inside Scratchpad -->
         <div class="bg-amber-100 dark:bg-amber-950/60 border-t-2 border-black p-2.5 text-[11px] font-mono-code text-black dark:text-amber-200 shrink-0 mt-2">
           <p class="font-black uppercase mb-1">💡 How to ask a winning question:</p>
           <p class="text-[10px] text-gray-700 dark:text-neutral-300 leading-tight">
@@ -1004,8 +1010,8 @@
 
   </div>
 
-  <!-- FLOATING WHATSAPP BUTTON -->
-  <div id="floatingWhatsAppContainer" class="fixed bottom-4 right-4 z-40">
+  <!-- FLOATING WHATSAPP BUTTON (Raised & High Z-Index to avoid being blocked) -->
+  <div id="floatingWhatsAppContainer" class="fixed bottom-16 sm:bottom-20 right-4 z-[9999] pointer-events-auto">
     <a 
       id="floatingWhatsAppBtn"
       href="https://wa.me/6581980012?text=Hi%20Lucas!%20I'm%20submitting%20my%20work%20to%20be%20marked%20or%20I%20have%20a%20question." 
@@ -1079,9 +1085,9 @@
     const MASTER_PIN = "94668661";
 
     const AUTHORIZED_STUDENTS = [
-      { code: "10293847", name: "Alex", greeting: "Welcome Alex To ExcelMathWithLucas" },
-      { code: "88234190", name: "Jaris", greeting: "Welcome Jaris To ExcelMathWithLucas" },
-      { code: "90412853", name: "Evette", greeting: "Welcome Evette To ExcelMathWithLucas" }
+      { code: "10293847", name: "Alex", greeting: "Welcome Alex To ExcelMathsWithLucas" },
+      { code: "88234190", name: "Jaris", greeting: "Welcome Jaris To ExcelMathsWithLucas" },
+      { code: "90412853", name: "Evette", greeting: "Welcome Evette To ExcelMathsWithLucas" }
     ];
 
     const FORMULA_SHEET_IMAGE_SRC = "IMG_00691fac-85d6-44d7-9a1a-2c5e7a45bedb.png";
@@ -1091,10 +1097,9 @@
     let deferredPrompt = null;
 
     function initPWA() {
-      // 1. Create and inject dynamic PWA Web App Manifest
       const manifest = {
-        name: "ExcelMathWithLucas Portal",
-        short_name: "ExcelMath",
+        name: "ExcelMathsWithLucas",
+        short_name: "ExcelMaths",
         description: "O-Level Additional Mathematics Interactive Study Portal",
         start_url: "./",
         display: "standalone",
@@ -1103,9 +1108,9 @@
         orientation: "any",
         icons: [
           {
-            src: "1793377076129_edit_6603537396491.jpg",
+            src: "logo.png",
             sizes: "192x192 512x512",
-            type: "image/jpeg",
+            type: "image/png",
             purpose: "any maskable"
           }
         ]
@@ -1118,7 +1123,6 @@
       manifestLink.href = manifestURL;
       document.head.appendChild(manifestLink);
 
-      // 2. Install prompt listener for Android/Chrome/Edge
       window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
@@ -1129,22 +1133,16 @@
         }
       });
 
-      // 3. Register lightweight inline Service Worker for offline PWA eligibility
       if ('serviceWorker' in navigator) {
         const swCode = `
-          const CACHE_NAME = 'excelmath-app-cache-v1';
           self.addEventListener('install', (e) => { self.skipWaiting(); });
           self.addEventListener('activate', (e) => { e.waitUntil(clients.claim()); });
           self.addEventListener('fetch', (e) => {
-            e.respondWith(
-              fetch(e.request).catch(() => caches.match(e.request))
-            );
+            e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
           });
         `;
         const swBlob = new Blob([swCode], { type: 'application/javascript' });
-        navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(() => {
-          // Fallback if blob SW is restricted in local origin
-        });
+        navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(() => {});
       }
     }
 
@@ -1153,19 +1151,18 @@
         deferredPrompt.prompt();
         deferredPrompt.userChoice.then((choiceResult) => {
           if (choiceResult.outcome === 'accepted') {
-            showToast("Installing ExcelMath App!");
+            showToast("Installing ExcelMaths App!");
           }
           deferredPrompt = null;
           const installBtn = document.getElementById('installPwaBtn');
           if (installBtn) installBtn.classList.add('hidden');
         });
       } else {
-        // Fallback instructions for iOS Safari users
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
         if (isIOS) {
-          alert("To install on iPad/iPhone:\n1. Tap the Share button (square with arrow up)\n2. Tap 'Add to Home Screen'\n3. Open ExcelMath from your home screen for full-screen mode!");
+          alert("To install on iPad/iPhone:\n1. Tap the Share button in Safari (square with arrow up)\n2. Tap 'Add to Home Screen'\n3. Launch ExcelMaths with full screen app experience!");
         } else {
-          showToast("App already installed or ready in browser menu!");
+          showToast("Tap browser menu (⋮) -> 'Install App' or 'Add to Home Screen'.");
         }
       }
     }
@@ -2088,7 +2085,7 @@
       }
       if (chipName) chipName.textContent = student.name;
       if (welcomeHeader) {
-        welcomeHeader.innerHTML = `${student.greeting.replace('ExcelMathWithLucas', '<span class="text-emerald-700 dark:text-emerald-400">ExcelMathWithLucas</span>')}`;
+        welcomeHeader.innerHTML = `${student.greeting.replace('ExcelMathsWithLucas', '<span class="text-emerald-700 dark:text-emerald-400">ExcelMathsWithLucas</span>')}`;
       }
       if (progressTitle) {
         progressTitle.textContent = `${student.name.toUpperCase()}'S SYLLABUS PROGRESS`;
@@ -2232,7 +2229,7 @@
       const studentName = currentStudent ? currentStudent.name : 'Student';
       const floatingBtn = document.getElementById('floatingWhatsAppBtn');
 
-      let currentContext = "ExcelMath Portal";
+      let currentContext = "ExcelMaths Portal";
       if (currentChapterIndex !== null) {
         const ch = chapters[currentChapterIndex];
         const tab = ch.tabs.find(t => t.id === activeTabId);
@@ -2956,7 +2953,7 @@
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(chapters, null, 2));
       const downloadAnchor = document.createElement('a');
       downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `ExcelMath_Curriculum_${new Date().toISOString().slice(0,10)}.json`);
+      downloadAnchor.setAttribute("download", `ExcelMaths_Curriculum_${new Date().toISOString().slice(0,10)}.json`);
       document.body.appendChild(downloadAnchor);
       downloadAnchor.click();
       downloadAnchor.remove();
