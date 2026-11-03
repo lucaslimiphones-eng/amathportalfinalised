@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>ExcelMathsWithLucas - Additional Mathematics Portal</title>
   
-  <!-- ================= PWA & MOBILE APP CAPABILITIES ================= -->
+  <!-- ================= UNIVERSAL PWA & MOBILE APP CAPABILITIES ================= -->
   <meta name="application-name" content="ExcelMathsWithLucas" />
   <meta name="apple-mobile-web-app-title" content="ExcelMaths" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -13,7 +13,10 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="theme-color" content="#0a0a0a" />
   <meta name="msapplication-navbutton-color" content="#0a0a0a" />
+  <meta name="msapplication-TileColor" content="#0a0a0a" />
   <link rel="apple-touch-icon" href="54009.jpg" />
+  <link rel="apple-touch-icon" sizes="180x180" href="54009.jpg" />
+  <link rel="icon" type="image/jpeg" href="54009.jpg" />
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -225,7 +228,7 @@
         </div>
       </div>
 
-      <!-- Quick One-Tap Button (Shown on Android / Supported Chrome) -->
+      <!-- Quick One-Tap Button (Shown on Android / Supported Chrome & Edge) -->
       <div id="nativeInstallSection" class="hidden my-4 p-3 bg-emerald-100 dark:bg-emerald-950 border-2 border-black dark:border-emerald-400 text-center">
         <p class="text-xs font-bold mb-2 text-black dark:text-white">Your browser supports 1-Tap installation!</p>
         <button 
@@ -269,7 +272,7 @@
         <div id="installGuideAndroid" class="hidden space-y-2.5 text-xs text-gray-800 dark:text-neutral-200">
           <div class="p-2 border border-black dark:border-neutral-600 bg-gray-50 dark:bg-neutral-800 flex items-start gap-2">
             <span class="font-black bg-black text-white px-1.5 py-0.5 text-[10px]">1</span>
-            <p>Open this website in <strong>Google Chrome</strong>.</p>
+            <p>Open this website in <strong>Google Chrome</strong> or Samsung Internet.</p>
           </div>
           <div class="p-2 border border-black dark:border-neutral-600 bg-gray-50 dark:bg-neutral-800 flex items-start gap-2">
             <span class="font-black bg-black text-white px-1.5 py-0.5 text-[10px]">2</span>
@@ -414,8 +417,8 @@
       <button 
         type="button" 
         id="topNavInstallBtn"
-        onclick="openInstallModal()" 
-        title="Install ExcelMaths to your Home Screen / Desktop"
+        onclick="triggerUniversalInstall()" 
+        title="Install ExcelMaths directly to your Home Screen / Desktop"
         class="flex items-center gap-1 bg-emerald-400 hover:bg-emerald-300 text-black px-2 sm:px-3 py-1 sm:py-1.5 border-2 border-black font-mono-code text-xs font-black uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px] cursor-pointer"
       >
         <span>📲</span>
@@ -490,6 +493,19 @@
             </div>
             <button type="button" onclick="studentSignOut()" class="text-[10px] text-red-600 dark:text-red-400 font-bold uppercase underline shrink-0 cursor-pointer">Lock</button>
           </div>
+
+          <!-- Direct Install Option in Menu -->
+          <button 
+            type="button" 
+            onclick="closeHeaderMenu(); triggerUniversalInstall();" 
+            class="w-full flex items-center justify-between p-2 border border-black dark:border-neutral-700 bg-emerald-100 dark:bg-emerald-950/60 hover:bg-emerald-200 dark:hover:bg-emerald-900 text-left font-bold text-black dark:text-emerald-300 cursor-pointer"
+          >
+            <span class="flex items-center gap-2">
+              <span>📲</span>
+              <span>Install Web App</span>
+            </span>
+            <span class="text-[10px] uppercase font-black text-emerald-800 dark:text-emerald-400">1-TAP</span>
+          </button>
 
           <!-- Night / Day Theme -->
           <button 
@@ -646,7 +662,7 @@
             </div>
             <button 
               type="button" 
-              onclick="openInstallModal()" 
+              onclick="triggerUniversalInstall()" 
               class="px-4 py-2 border-2 border-black dark:border-neutral-200 bg-black text-white dark:bg-white dark:text-black text-xs font-black uppercase hover:bg-neutral-800 cursor-pointer shrink-0 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
             >
               Install App Now 🚀
@@ -1290,24 +1306,32 @@
       }
     });
 
-    /* ================= UNIVERSAL PWA & APP INSTALL ENGINE ================= */
+    /* ================= UNIVERSAL PWA, SERVICE WORKER & 1-TAP INSTALL ENGINE ================= */
     let deferredPrompt = null;
 
     function initPWA() {
-      // 1. Data-URI Self-Contained Web App Manifest (Works without separate static file)
+      // 1. Inject Comprehensive Web App Manifest with Data-URI for instant offline installability
       const manifestData = {
         name: "ExcelMathsWithLucas",
         short_name: "ExcelMaths",
-        description: "O-Level Additional Mathematics Interactive Study Portal",
-        start_url: "./",
+        start_url: window.location.pathname || "./",
+        scope: window.location.pathname ? window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1) : "./",
         display: "standalone",
+        display_override: ["window-controls-overlay", "standalone", "minimal-ui"],
         background_color: "#0a0a0a",
         theme_color: "#0a0a0a",
         orientation: "any",
+        description: "Official Additional Mathematics Practice Portal & Video System",
         icons: [
           {
             src: "54009.jpg",
-            sizes: "192x192 512x512",
+            sizes: "192x192",
+            type: "image/jpeg",
+            purpose: "any"
+          },
+          {
+            src: "54009.jpg",
+            sizes: "512x512",
             type: "image/jpeg",
             purpose: "any maskable"
           }
@@ -1321,26 +1345,111 @@
       manifestLink.href = manifestURL;
       document.head.appendChild(manifestLink);
 
-      // 2. Check if already running in Installed Standalone App Mode
-      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-      if (isStandalone) {
-        const topInstallText = document.getElementById('topNavInstallText');
-        const topInstallBtn = document.getElementById('topNavInstallBtn');
-        if (topInstallText) topInstallText.textContent = "INSTALLED";
-        if (topInstallBtn) {
-          topInstallBtn.classList.remove('bg-emerald-400');
-          topInstallBtn.classList.add('bg-neutral-200', 'dark:bg-neutral-800', 'text-gray-600', 'dark:text-neutral-300');
-          topInstallBtn.title = "App is already installed and running in full screen!";
+      // 2. Register Service Worker (Required by Chromium browsers to qualify for 1-click app install prompt)
+      if ('serviceWorker' in navigator) {
+        const swScript = `
+          const CACHE_NAME = 'excelmaths-v1';
+          self.addEventListener('install', (e) => {
+            self.skipWaiting();
+          });
+          self.addEventListener('activate', (e) => {
+            e.waitUntil(clients.claim());
+          });
+          self.addEventListener('fetch', (e) => {
+            // Keep app operational offline & pass through network requests
+            e.respondWith(
+              fetch(e.request).catch(() => caches.match(e.request))
+            );
+          });
+        `;
+        try {
+          const swBlob = new Blob([swScript], { type: 'text/javascript' });
+          const swUrl = URL.createObjectURL(swBlob);
+          navigator.serviceWorker.register(swUrl).catch(() => {
+            // If Blob URL SW is blocked by origin sandbox, try regular relative registration gracefully
+            navigator.serviceWorker.register('./sw.js').catch(() => {});
+          });
+        } catch (e) {
+          // Continue gracefully
         }
       }
 
-      // 3. Capture native install prompt (Android, Chrome Desktop, Edge)
+      // 3. Check if already running in Installed Standalone App Mode
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                           window.navigator.standalone === true || 
+                           document.referrer.includes('android-app://');
+                           
+      if (isStandalone) {
+        markAppAsInstalled();
+      }
+
+      // 4. Capture native install prompt (Android, Chrome Desktop, Edge, Samsung Internet)
       window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
+
+        // Upgrade button to high-attention ready state
+        const topInstallBtn = document.getElementById('topNavInstallBtn');
+        const topInstallText = document.getElementById('topNavInstallText');
         const nativeSection = document.getElementById('nativeInstallSection');
+
+        if (topInstallText) topInstallText.textContent = "INSTALL APP";
+        if (topInstallBtn) {
+          topInstallBtn.classList.remove('bg-emerald-400');
+          topInstallBtn.classList.add('bg-emerald-300', 'animate-pulse');
+        }
         if (nativeSection) nativeSection.classList.remove('hidden');
       });
+
+      // 5. Listen for successful install completion event
+      window.addEventListener('appinstalled', () => {
+        deferredPrompt = null;
+        markAppAsInstalled();
+        showToast("🎉 ExcelMaths installed successfully to your device!");
+        closeInstallModal();
+      });
+    }
+
+    function markAppAsInstalled() {
+      const topInstallText = document.getElementById('topNavInstallText');
+      const topInstallBtn = document.getElementById('topNavInstallBtn');
+      if (topInstallText) topInstallText.textContent = "OPEN APP";
+      if (topInstallBtn) {
+        topInstallBtn.classList.remove('bg-emerald-400', 'animate-pulse');
+        topInstallBtn.classList.add('bg-neutral-200', 'dark:bg-neutral-800', 'text-gray-600', 'dark:text-neutral-300');
+        topInstallBtn.title = "ExcelMaths is installed on your device!";
+      }
+      const nativeSection = document.getElementById('nativeInstallSection');
+      if (nativeSection) nativeSection.classList.add('hidden');
+    }
+
+    // Direct 1-Tap Trigger for students clicking Install
+    async function triggerUniversalInstall() {
+      // 1. If native deferred prompt is available (Android, Chrome, Edge, Windows, Mac), invoke directly
+      if (deferredPrompt) {
+        try {
+          deferredPrompt.prompt();
+          const choiceResult = await deferredPrompt.userChoice;
+          if (choiceResult && choiceResult.outcome === 'accepted') {
+            showToast("Installing ExcelMaths App to your home screen...");
+            markAppAsInstalled();
+          }
+          deferredPrompt = null;
+          return;
+        } catch (err) {
+          console.log("Install prompt handled:", err);
+        }
+      }
+
+      // 2. If already installed, inform student
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+      if (isStandalone) {
+        showToast("App already running in full screen mode!");
+        return;
+      }
+
+      // 3. Otherwise, open device-tailored step-by-step modal
+      openInstallModal();
     }
 
     function openInstallModal() {
