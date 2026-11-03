@@ -13,7 +13,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="theme-color" content="#0a0a0a" />
   <meta name="msapplication-navbutton-color" content="#0a0a0a" />
-  <link rel="apple-touch-icon"1793377076129_edit_6603537396491.jpg" />
+  <link rel="apple-touch-icon" href="54009.jpg" />
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -206,6 +206,106 @@
     </div>
   </div>
 
+  <!-- ================= UNIVERSAL INSTALL APP MODAL (FOR ALL DEVICES) ================= -->
+  <div id="installAppModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-neutral-900 border-4 border-black dark:border-neutral-200 w-full max-w-lg p-5 sm:p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] font-mono-code relative">
+      <button 
+        type="button" 
+        onclick="closeInstallModal()" 
+        class="absolute top-4 right-4 text-sm font-black bg-black text-white dark:bg-white dark:text-black px-2 py-0.5 border border-black hover:opacity-80 cursor-pointer"
+      >
+        ✕
+      </button>
+
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-3xl">📲</span>
+        <div>
+          <h3 class="text-base sm:text-lg font-black uppercase text-black dark:text-white leading-tight">INSTALL EXCELMATHS APP</h3>
+          <p class="text-[10px] text-gray-500 dark:text-neutral-400 uppercase font-bold">Fast Offline Access &amp; Full Screen Experience</p>
+        </div>
+      </div>
+
+      <!-- Quick One-Tap Button (Shown on Android / Supported Chrome) -->
+      <div id="nativeInstallSection" class="hidden my-4 p-3 bg-emerald-100 dark:bg-emerald-950 border-2 border-black dark:border-emerald-400 text-center">
+        <p class="text-xs font-bold mb-2 text-black dark:text-white">Your browser supports 1-Tap installation!</p>
+        <button 
+          type="button" 
+          onclick="runNativeInstall()" 
+          class="w-full py-2.5 bg-emerald-400 hover:bg-emerald-300 text-black font-black text-xs uppercase border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] cursor-pointer"
+        >
+          ⬇️ Tap Here to Install App Now
+        </button>
+      </div>
+
+      <!-- Device Specific Tabs -->
+      <div class="mt-4">
+        <div class="flex border-b-2 border-black dark:border-neutral-700 text-xs font-bold uppercase gap-1 mb-3">
+          <button id="tabIosBtn" onclick="switchInstallTab('ios')" class="px-3 py-1.5 border-t-2 border-l-2 border-r-2 border-black dark:border-neutral-400 bg-black text-white dark:bg-white dark:text-black">📱 iPad &amp; iPhone</button>
+          <button id="tabAndroidBtn" onclick="switchInstallTab('android')" class="px-3 py-1.5 border-t-2 border-l-2 border-r-2 border-transparent text-gray-600 dark:text-neutral-400">🤖 Android</button>
+          <button id="tabDesktopBtn" onclick="switchInstallTab('desktop')" class="px-3 py-1.5 border-t-2 border-l-2 border-r-2 border-transparent text-gray-600 dark:text-neutral-400">💻 Laptop / PC</button>
+        </div>
+
+        <!-- iOS Instructions -->
+        <div id="installGuideIos" class="space-y-2.5 text-xs text-gray-800 dark:text-neutral-200">
+          <div class="p-2 border border-black dark:border-neutral-600 bg-gray-50 dark:bg-neutral-800 flex items-start gap-2">
+            <span class="font-black bg-black text-white px-1.5 py-0.5 text-[10px]">1</span>
+            <p>Open this portal inside <strong>Safari</strong> on your iPad or iPhone.</p>
+          </div>
+          <div class="p-2 border border-black dark:border-neutral-600 bg-gray-50 dark:bg-neutral-800 flex items-start gap-2">
+            <span class="font-black bg-black text-white px-1.5 py-0.5 text-[10px]">2</span>
+            <p>Tap the <strong>Share</strong> button at the top/bottom of Safari (the square box with an arrow pointing up <span class="border border-black px-1 text-[10px] font-bold">⎋↑</span>).</p>
+          </div>
+          <div class="p-2 border border-black dark:border-neutral-600 bg-gray-50 dark:bg-neutral-800 flex items-start gap-2">
+            <span class="font-black bg-black text-white px-1.5 py-0.5 text-[10px]">3</span>
+            <p>Scroll down and tap <strong>"Add to Home Screen"</strong> (➕).</p>
+          </div>
+          <div class="p-2 border border-black dark:border-neutral-600 bg-gray-50 dark:bg-neutral-800 flex items-start gap-2">
+            <span class="font-black bg-black text-white px-1.5 py-0.5 text-[10px]">4</span>
+            <p>Tap <strong>"Add"</strong> in the top right corner. The ExcelMaths app icon will now appear on your home screen!</p>
+          </div>
+        </div>
+
+        <!-- Android Instructions -->
+        <div id="installGuideAndroid" class="hidden space-y-2.5 text-xs text-gray-800 dark:text-neutral-200">
+          <div class="p-2 border border-black dark:border-neutral-600 bg-gray-50 dark:bg-neutral-800 flex items-start gap-2">
+            <span class="font-black bg-black text-white px-1.5 py-0.5 text-[10px]">1</span>
+            <p>Open this website in <strong>Google Chrome</strong>.</p>
+          </div>
+          <div class="p-2 border border-black dark:border-neutral-600 bg-gray-50 dark:bg-neutral-800 flex items-start gap-2">
+            <span class="font-black bg-black text-white px-1.5 py-0.5 text-[10px]">2</span>
+            <p>Tap the <strong>three dots (⋮)</strong> menu in the upper-right corner.</p>
+          </div>
+          <div class="p-2 border border-black dark:border-neutral-600 bg-gray-50 dark:bg-neutral-800 flex items-start gap-2">
+            <span class="font-black bg-black text-white px-1.5 py-0.5 text-[10px]">3</span>
+            <p>Select <strong>"Install app"</strong> or <strong>"Add to Home screen"</strong> and tap Install.</p>
+          </div>
+        </div>
+
+        <!-- Desktop Instructions -->
+        <div id="installGuideDesktop" class="hidden space-y-2.5 text-xs text-gray-800 dark:text-neutral-200">
+          <div class="p-2 border border-black dark:border-neutral-600 bg-gray-50 dark:bg-neutral-800 flex items-start gap-2">
+            <span class="font-black bg-black text-white px-1.5 py-0.5 text-[10px]">1</span>
+            <p>In Chrome or Edge, look at the right side of the address bar at the top.</p>
+          </div>
+          <div class="p-2 border border-black dark:border-neutral-600 bg-gray-50 dark:bg-neutral-800 flex items-start gap-2">
+            <span class="font-black bg-black text-white px-1.5 py-0.5 text-[10px]">2</span>
+            <p>Click the <strong>Install Icon</strong> (<span class="font-bold">🖥️ or ⊕</span>) or click Browser Menu (⋮) → <strong>"Install ExcelMathsWithLucas"</strong>.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-5 text-right">
+        <button 
+          type="button" 
+          onclick="closeInstallModal()" 
+          class="px-4 py-2 border-2 border-black dark:border-white bg-black dark:bg-white text-white dark:text-black text-xs font-bold uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer"
+        >
+          Got It, Back to Study
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- ================= FOCUS LOCKDOWN SETUP MODAL ================= -->
   <div id="focusSetupModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white dark:bg-neutral-900 border-4 border-black dark:border-neutral-200 w-full max-w-md p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] font-mono-code">
@@ -267,10 +367,10 @@
     </div>
   </div>
 
-  <!-- ================= CLEAN TOP NAVIGATION BAR ================= -->
+  <!-- ================= CLEAN SPACIOUS TOP BAR ================= -->
   <header id="mainHeader" class="h-14 sm:h-16 bg-white dark:bg-neutral-900 border-b-2 border-black dark:border-neutral-700 flex items-center justify-between px-3 sm:px-6 sticky top-0 z-30 shrink-0 gap-2">
     
-    <!-- LEFT: Menu Toggle + Permanent Website Branding & Context -->
+    <!-- LEFT: Menu Toggle + Uncrowded Permanent Brand Logo & Name -->
     <div class="flex items-center gap-2 sm:gap-3.5 min-w-0">
       <button 
         type="button" 
@@ -283,7 +383,7 @@
         <span id="sidebarBtnText" class="hidden sm:inline">MENU</span>
       </button>
 
-      <!-- Unblocked Site Identity -->
+      <!-- Website Title & Current Topic Tracker -->
       <div class="flex items-center gap-2 min-w-0 cursor-pointer select-none" onclick="selectHomeView()" title="Back to Home Dashboard">
         <img 
           src="1793377076129_edit_6603537396491.jpg" 
@@ -307,11 +407,23 @@
       </div>
     </div>
 
-    <!-- RIGHT: Core Study Tools & More Settings Menu -->
+    <!-- RIGHT: Core Utilities + PROMINENT INSTALL APP BUTTON -->
     <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
       
+      <!-- ALWAYS VISIBLE INSTALL BUTTON -->
+      <button 
+        type="button" 
+        id="topNavInstallBtn"
+        onclick="openInstallModal()" 
+        title="Install ExcelMaths to your Home Screen / Desktop"
+        class="flex items-center gap-1 bg-emerald-400 hover:bg-emerald-300 text-black px-2 sm:px-3 py-1 sm:py-1.5 border-2 border-black font-mono-code text-xs font-black uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px] cursor-pointer"
+      >
+        <span>📲</span>
+        <span id="topNavInstallText">INSTALL</span>
+      </button>
+
       <!-- Streak Badge -->
-      <div id="streakBadge" title="Your Daily Study Streak!" class="flex items-center gap-1 bg-orange-400 text-black px-2 sm:px-2.5 py-1 border-2 border-black font-mono-code text-xs font-black uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+      <div id="streakBadge" title="Your Daily Study Streak!" class="flex items-center gap-1 bg-orange-400 text-black px-2 sm:px-2.5 py-1 sm:py-1.5 border-2 border-black font-mono-code text-xs font-black uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
         <span class="animate-bounce">🔥</span>
         <span id="streakCountText">1 DAY</span>
       </div>
@@ -322,7 +434,7 @@
         id="scratchpadToggleBtn"
         onclick="toggleScratchpadDrawer()" 
         title="Open Digital Working Canvas"
-        class="flex items-center gap-1 bg-cyan-300 hover:bg-cyan-400 text-black px-2 sm:px-2.5 py-1 border-2 border-black font-mono-code text-xs font-bold uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer"
+        class="flex items-center gap-1 bg-cyan-300 hover:bg-cyan-400 text-black px-2 sm:px-2.5 py-1 sm:py-1.5 border-2 border-black font-mono-code text-xs font-bold uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer"
       >
         <span>✏️</span>
         <span class="hidden md:inline">CANVAS</span>
@@ -334,7 +446,7 @@
         id="formulaToggleBtn"
         onclick="toggleFormulaDrawer()" 
         title="Official SEAB Formulas"
-        class="flex items-center gap-1 bg-amber-300 hover:bg-amber-400 text-black px-2 sm:px-2.5 py-1 border-2 border-black font-mono-code text-xs font-bold uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer"
+        class="flex items-center gap-1 bg-amber-300 hover:bg-amber-400 text-black px-2 sm:px-2.5 py-1 sm:py-1.5 border-2 border-black font-mono-code text-xs font-bold uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer"
       >
         <span>📐</span>
         <span class="hidden md:inline">FORMULAS</span>
@@ -346,20 +458,20 @@
         id="focusLockdownBtn"
         onclick="openFocusSetupModal()" 
         title="Start Lockdown Study Mode"
-        class="flex items-center gap-1 bg-red-500 hover:bg-red-400 text-white px-2 sm:px-2.5 py-1 border-2 border-black font-mono-code text-xs font-black uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer"
+        class="flex items-center gap-1 bg-red-500 hover:bg-red-400 text-white px-2 sm:px-2.5 py-1 sm:py-1.5 border-2 border-black font-mono-code text-xs font-black uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer"
       >
         <span>🔒</span>
         <span class="hidden lg:inline">LOCKDOWN</span>
       </button>
 
-      <!-- Clean Overflow Dropdown for Secondary Tools & Admin -->
+      <!-- Secondary Tools & Settings Dropdown -->
       <div class="relative">
         <button 
           type="button" 
           id="headerMenuToggleBtn" 
           onclick="toggleHeaderMenu(event)" 
           title="Tools & Settings"
-          class="flex items-center gap-1 bg-white dark:bg-neutral-800 text-black dark:text-neutral-100 hover:bg-gray-100 dark:hover:bg-neutral-700 px-2 sm:px-2.5 py-1 border-2 border-black dark:border-neutral-300 font-mono-code text-xs font-bold uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer"
+          class="flex items-center gap-1 bg-white dark:bg-neutral-800 text-black dark:text-neutral-100 hover:bg-gray-100 dark:hover:bg-neutral-700 px-2 sm:px-2.5 py-1 sm:py-1.5 border-2 border-black dark:border-neutral-300 font-mono-code text-xs font-bold uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer"
         >
           <span>⚙️</span>
           <span class="hidden sm:inline">MORE</span>
@@ -391,17 +503,6 @@
               <span>Theme Mode</span>
             </span>
             <span id="darkModeText" class="text-[10px] uppercase text-gray-500 dark:text-neutral-400">NIGHT</span>
-          </button>
-
-          <!-- PWA Install -->
-          <button 
-            type="button" 
-            id="installPwaBtn"
-            onclick="triggerPwaInstall(); closeHeaderMenu();" 
-            class="hidden w-full items-center gap-2 p-2 border border-black bg-emerald-300 hover:bg-emerald-200 text-black font-bold uppercase cursor-pointer"
-          >
-            <span>📲</span>
-            <span>Install App</span>
           </button>
 
           <!-- Fullscreen Media -->
@@ -529,6 +630,28 @@
       <!-- VIEW 1: HOME PAGE -->
       <section id="homeViewContainer" class="w-full max-w-4xl mx-auto p-4 sm:p-8 flex flex-col gap-6 pb-40">
         <div class="bg-white dark:bg-neutral-900 border-4 border-black dark:border-neutral-700 p-6 sm:p-10 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] text-center flex flex-col items-center">
+
+          <!-- Prominent Installation Invitation Banner -->
+          <div class="w-full border-4 border-black dark:border-emerald-400 bg-emerald-300 dark:bg-emerald-950 p-4 sm:p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-left font-mono-code mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="text-3xl">📲</span>
+              <div class="min-w-0">
+                <span class="text-[10px] font-black uppercase text-emerald-900 dark:text-emerald-300 block tracking-widest">
+                  APP INSTALLATION AVAILABLE
+                </span>
+                <p class="text-xs sm:text-sm font-black text-black dark:text-neutral-100 leading-snug">
+                  Install ExcelMaths on your iPad, iPhone, Android, or Laptop for full screen study without browser bars!
+                </p>
+              </div>
+            </div>
+            <button 
+              type="button" 
+              onclick="openInstallModal()" 
+              class="px-4 py-2 border-2 border-black dark:border-neutral-200 bg-black text-white dark:bg-white dark:text-black text-xs font-black uppercase hover:bg-neutral-800 cursor-pointer shrink-0 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+            >
+              Install App Now 🚀
+            </button>
+          </div>
 
           <div class="w-full border-4 border-black dark:border-amber-400 bg-amber-200 dark:bg-neutral-800 p-4 sm:p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-left font-mono-code mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div class="flex items-center gap-3 min-w-0">
@@ -1167,11 +1290,12 @@
       }
     });
 
-    /* ================= PWA SETUP & MANIFEST INJECTION ================= */
+    /* ================= UNIVERSAL PWA & APP INSTALL ENGINE ================= */
     let deferredPrompt = null;
 
     function initPWA() {
-      const manifest = {
+      // 1. Data-URI Self-Contained Web App Manifest (Works without separate static file)
+      const manifestData = {
         name: "ExcelMathsWithLucas",
         short_name: "ExcelMaths",
         description: "O-Level Additional Mathematics Interactive Study Portal",
@@ -1190,54 +1314,102 @@
         ]
       };
 
-      const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+      const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/manifest+json' });
       const manifestURL = URL.createObjectURL(manifestBlob);
       const manifestLink = document.createElement('link');
       manifestLink.rel = 'manifest';
       manifestLink.href = manifestURL;
       document.head.appendChild(manifestLink);
 
+      // 2. Check if already running in Installed Standalone App Mode
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+      if (isStandalone) {
+        const topInstallText = document.getElementById('topNavInstallText');
+        const topInstallBtn = document.getElementById('topNavInstallBtn');
+        if (topInstallText) topInstallText.textContent = "INSTALLED";
+        if (topInstallBtn) {
+          topInstallBtn.classList.remove('bg-emerald-400');
+          topInstallBtn.classList.add('bg-neutral-200', 'dark:bg-neutral-800', 'text-gray-600', 'dark:text-neutral-300');
+          topInstallBtn.title = "App is already installed and running in full screen!";
+        }
+      }
+
+      // 3. Capture native install prompt (Android, Chrome Desktop, Edge)
       window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
-        const installBtn = document.getElementById('installPwaBtn');
-        if (installBtn) {
-          installBtn.classList.remove('hidden');
-          installBtn.classList.add('flex');
-        }
+        const nativeSection = document.getElementById('nativeInstallSection');
+        if (nativeSection) nativeSection.classList.remove('hidden');
       });
+    }
 
-      if ('serviceWorker' in navigator) {
-        const swCode = `
-          self.addEventListener('install', (e) => { self.skipWaiting(); });
-          self.addEventListener('activate', (e) => { e.waitUntil(clients.claim()); });
-          self.addEventListener('fetch', (e) => {
-            e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
-          });
-        `;
-        const swBlob = new Blob([swCode], { type: 'application/javascript' });
-        navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(() => {});
+    function openInstallModal() {
+      const modal = document.getElementById('installAppModal');
+      if (!modal) return;
+      modal.classList.remove('hidden');
+
+      // Auto detect user device to show relevant tab first
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      const isAndroid = /Android/.test(navigator.userAgent);
+
+      if (isIOS) {
+        switchInstallTab('ios');
+      } else if (isAndroid) {
+        switchInstallTab('android');
+      } else {
+        switchInstallTab('desktop');
       }
     }
 
-    function triggerPwaInstall() {
+    function closeInstallModal() {
+      const modal = document.getElementById('installAppModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function switchInstallTab(tabKey) {
+      const iosGuide = document.getElementById('installGuideIos');
+      const androidGuide = document.getElementById('installGuideAndroid');
+      const desktopGuide = document.getElementById('installGuideDesktop');
+
+      const iosBtn = document.getElementById('tabIosBtn');
+      const androidBtn = document.getElementById('tabAndroidBtn');
+      const desktopBtn = document.getElementById('tabDesktopBtn');
+
+      if (iosGuide) iosGuide.classList.add('hidden');
+      if (androidGuide) androidGuide.classList.add('hidden');
+      if (desktopGuide) desktopGuide.classList.add('hidden');
+
+      const activeBtnClasses = "px-3 py-1.5 border-t-2 border-l-2 border-r-2 border-black dark:border-neutral-400 bg-black text-white dark:bg-white dark:text-black";
+      const inactiveBtnClasses = "px-3 py-1.5 border-t-2 border-l-2 border-r-2 border-transparent text-gray-600 dark:text-neutral-400";
+
+      if (iosBtn) iosBtn.className = inactiveBtnClasses;
+      if (androidBtn) androidBtn.className = inactiveBtnClasses;
+      if (desktopBtn) desktopBtn.className = inactiveBtnClasses;
+
+      if (tabKey === 'ios') {
+        if (iosGuide) iosGuide.classList.remove('hidden');
+        if (iosBtn) iosBtn.className = activeBtnClasses;
+      } else if (tabKey === 'android') {
+        if (androidGuide) androidGuide.classList.remove('hidden');
+        if (androidBtn) androidBtn.className = activeBtnClasses;
+      } else if (tabKey === 'desktop') {
+        if (desktopGuide) desktopGuide.classList.remove('hidden');
+        if (desktopBtn) desktopBtn.className = activeBtnClasses;
+      }
+    }
+
+    function runNativeInstall() {
       if (deferredPrompt) {
         deferredPrompt.prompt();
         deferredPrompt.userChoice.then((choiceResult) => {
           if (choiceResult.outcome === 'accepted') {
             showToast("Installing ExcelMaths App!");
+            closeInstallModal();
           }
           deferredPrompt = null;
-          const installBtn = document.getElementById('installPwaBtn');
-          if (installBtn) installBtn.classList.add('hidden');
         });
       } else {
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-        if (isIOS) {
-          alert("To install on iPad/iPhone:\n1. Tap the Share button in Safari (square with arrow up)\n2. Tap 'Add to Home Screen'\n3. Launch ExcelMaths with full screen app experience!");
-        } else {
-          showToast("Tap browser menu (⋮) -> 'Install App' or 'Add to Home Screen'.");
-        }
+        alert("Follow the steps below to finish installation on your device!");
       }
     }
 
@@ -1677,7 +1849,7 @@
 
       if (lockdownBar) lockdownBar.classList.add('hidden');
       if (focusBtn) {
-        focusBtn.className = "flex items-center gap-1 bg-red-500 hover:bg-red-400 text-white px-2 sm:px-2.5 py-1 border-2 border-black font-mono-code text-xs font-black uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer";
+        focusBtn.className = "flex items-center gap-1 bg-red-500 hover:bg-red-400 text-white px-2 sm:px-2.5 py-1 sm:py-1.5 border-2 border-black font-mono-code text-xs font-black uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer";
         focusBtn.innerHTML = '<span>🔒</span><span class="hidden lg:inline">LOCKDOWN</span>';
       }
       if (floatWa) floatWa.classList.remove('hidden');
