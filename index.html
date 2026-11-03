@@ -267,142 +267,191 @@
     </div>
   </div>
 
-  <!-- Top Sticky Navigation Bar -->
-  <header id="mainHeader" class="h-14 sm:h-16 bg-white dark:bg-neutral-900 border-b-2 border-black dark:border-neutral-700 flex items-center justify-between px-3 sm:px-6 sticky top-0 z-30 shrink-0">
-    <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+  <!-- ================= CLEAN TOP NAVIGATION BAR ================= -->
+  <header id="mainHeader" class="h-14 sm:h-16 bg-white dark:bg-neutral-900 border-b-2 border-black dark:border-neutral-700 flex items-center justify-between px-3 sm:px-6 sticky top-0 z-30 shrink-0 gap-2">
+    
+    <!-- LEFT: Menu Toggle + Permanent Website Branding & Context -->
+    <div class="flex items-center gap-2 sm:gap-3.5 min-w-0">
       <button 
         type="button" 
         id="toggleSidebarBtn" 
         onclick="toggleSidebar()"
-        class="px-2.5 sm:px-3 py-1.5 border-2 border-black dark:border-neutral-300 font-mono-code text-xs sm:text-sm font-bold uppercase tracking-wider bg-white dark:bg-neutral-800 dark:text-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors flex items-center gap-1.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] shrink-0 cursor-pointer"
+        title="Toggle Topics Menu"
+        class="px-2.5 py-1.5 border-2 border-black dark:border-neutral-300 font-mono-code text-xs font-bold uppercase tracking-wider bg-white dark:bg-neutral-800 dark:text-white hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors flex items-center gap-1 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] shrink-0 cursor-pointer"
       >
         <span>☰</span>
-        <span id="sidebarBtnText">HIDE MENU</span>
+        <span id="sidebarBtnText" class="hidden sm:inline">MENU</span>
       </button>
 
-      <div class="flex items-center gap-2.5 min-w-0 cursor-pointer" onclick="selectHomeView()">
+      <!-- Unblocked Site Identity -->
+      <div class="flex items-center gap-2 min-w-0 cursor-pointer select-none" onclick="selectHomeView()" title="Back to Home Dashboard">
         <img 
           src="1793377076129_edit_6603537396491.jpg" 
           alt="ExcelMaths Logo" 
-          class="w-8 h-8 rounded-full border border-black dark:border-white object-cover hidden sm:block shrink-0"
+          class="w-8 h-8 rounded-full border-2 border-black dark:border-white object-cover shrink-0"
+          onerror="this.style.display='none'"
         />
         <div class="min-w-0 flex flex-col justify-center">
-          <div class="flex items-center gap-2">
-            <span id="pinnedChapterBadge" class="text-[10px] font-mono-code font-bold bg-black text-white dark:bg-white dark:text-black px-1.5 py-0.5 uppercase tracking-wider shrink-0">
+          <span class="font-mono-code font-black text-xs sm:text-sm md:text-base tracking-tight text-black dark:text-white uppercase whitespace-nowrap">
+            EXCELMATHS<span class="text-emerald-600 dark:text-emerald-400">WITHLUCAS</span>
+          </span>
+          <div class="flex items-center gap-1.5 min-w-0">
+            <span id="pinnedChapterBadge" class="text-[9px] font-mono-code font-bold bg-black text-white dark:bg-white dark:text-black px-1.5 py-0.5 uppercase tracking-wider shrink-0 rounded-sm">
               HOME
             </span>
-            <h1 id="pinnedChapterTitle" class="text-xs sm:text-base font-extrabold uppercase tracking-tight truncate font-mono-code">
+            <span id="pinnedChapterTitle" class="text-[10px] sm:text-[11px] font-mono-code font-bold text-gray-500 dark:text-neutral-400 truncate uppercase">
               WELCOME
-            </h1>
+            </span>
           </div>
-          <p class="text-[9px] sm:text-[10px] font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-widest truncate hidden sm:block">
-            EXCELMATHSWITHLUCAS APP
-          </p>
         </div>
       </div>
     </div>
 
-    <!-- Header Actions -->
+    <!-- RIGHT: Core Study Tools & More Settings Menu -->
     <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
-      <!-- PWA Install Button -->
-      <button 
-        type="button" 
-        id="installPwaBtn"
-        onclick="triggerPwaInstall()" 
-        class="hidden items-center gap-1 bg-emerald-400 hover:bg-emerald-300 text-black px-2 sm:px-2.5 py-1 border-2 border-black font-mono-code text-xs font-black uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer"
-      >
-        <span>📲</span>
-        <span class="hidden sm:inline">INSTALL</span>
-      </button>
-
-      <button 
-        type="button" 
-        id="focusLockdownBtn"
-        onclick="openFocusSetupModal()" 
-        title="Start Lockdown Study Mode"
-        class="flex items-center gap-1 bg-red-500 hover:bg-red-400 text-white px-2 sm:px-3 py-1 sm:py-1.5 border-2 border-black font-mono-code text-xs font-black uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px] cursor-pointer"
-      >
-        <span>🔒</span>
-        <span class="hidden md:inline">LOCKDOWN</span>
-      </button>
-
+      
+      <!-- Streak Badge -->
       <div id="streakBadge" title="Your Daily Study Streak!" class="flex items-center gap-1 bg-orange-400 text-black px-2 sm:px-2.5 py-1 border-2 border-black font-mono-code text-xs font-black uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
         <span class="animate-bounce">🔥</span>
         <span id="streakCountText">1 DAY</span>
       </div>
 
+      <!-- Quick Canvas -->
       <button 
         type="button" 
         id="scratchpadToggleBtn"
         onclick="toggleScratchpadDrawer()" 
-        class="flex items-center gap-1 bg-cyan-300 hover:bg-cyan-400 text-black px-2 sm:px-2.5 py-1 sm:py-1.5 border-2 border-black font-mono-code text-xs font-bold uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer"
+        title="Open Digital Working Canvas"
+        class="flex items-center gap-1 bg-cyan-300 hover:bg-cyan-400 text-black px-2 sm:px-2.5 py-1 border-2 border-black font-mono-code text-xs font-bold uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer"
       >
         <span>✏️</span>
-        <span class="hidden lg:inline">SCRATCHPAD</span>
-      </button>
-      
-      <button 
-        type="button" 
-        id="darkModeToggleBtn"
-        onclick="toggleDarkMode()" 
-        class="flex items-center gap-1 bg-neutral-200 dark:bg-neutral-800 text-black dark:text-neutral-100 px-2 py-1 sm:py-1.5 border-2 border-black dark:border-neutral-300 font-mono-code text-xs font-bold uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer"
-      >
-        <span id="darkModeIcon">🌙</span>
-        <span id="darkModeText" class="hidden xl:inline">NIGHT</span>
+        <span class="hidden md:inline">CANVAS</span>
       </button>
 
+      <!-- Quick Formulas -->
       <button 
         type="button" 
         id="formulaToggleBtn"
         onclick="toggleFormulaDrawer()" 
-        class="flex items-center gap-1 bg-amber-300 hover:bg-amber-400 text-black px-2 py-1 sm:py-1.5 border-2 border-black font-mono-code text-xs font-bold uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer"
+        title="Official SEAB Formulas"
+        class="flex items-center gap-1 bg-amber-300 hover:bg-amber-400 text-black px-2 sm:px-2.5 py-1 border-2 border-black font-mono-code text-xs font-bold uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer"
       >
         <span>📐</span>
-        <span class="hidden lg:inline">A4 FORMULAS</span>
+        <span class="hidden md:inline">FORMULAS</span>
       </button>
 
-      <div id="studentChip" class="hidden items-center gap-1 border-2 border-black dark:border-neutral-400 px-2 py-1 bg-gray-50 dark:bg-neutral-800 font-mono-code text-xs shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-        <span id="studentChipName" class="font-bold text-[11px] truncate max-w-[70px]">STUDENT</span>
-        <button type="button" onclick="studentSignOut()" class="text-[10px] text-red-600 dark:text-red-400 font-bold uppercase underline ml-1 cursor-pointer">Lock</button>
+      <!-- Focus Lockdown -->
+      <button 
+        type="button" 
+        id="focusLockdownBtn"
+        onclick="openFocusSetupModal()" 
+        title="Start Lockdown Study Mode"
+        class="flex items-center gap-1 bg-red-500 hover:bg-red-400 text-white px-2 sm:px-2.5 py-1 border-2 border-black font-mono-code text-xs font-black uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer"
+      >
+        <span>🔒</span>
+        <span class="hidden lg:inline">LOCKDOWN</span>
+      </button>
+
+      <!-- Clean Overflow Dropdown for Secondary Tools & Admin -->
+      <div class="relative">
+        <button 
+          type="button" 
+          id="headerMenuToggleBtn" 
+          onclick="toggleHeaderMenu(event)" 
+          title="Tools & Settings"
+          class="flex items-center gap-1 bg-white dark:bg-neutral-800 text-black dark:text-neutral-100 hover:bg-gray-100 dark:hover:bg-neutral-700 px-2 sm:px-2.5 py-1 border-2 border-black dark:border-neutral-300 font-mono-code text-xs font-bold uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer"
+        >
+          <span>⚙️</span>
+          <span class="hidden sm:inline">MORE</span>
+          <span id="teacherActiveIndicator" class="hidden w-2 h-2 rounded-full bg-emerald-500"></span>
+        </button>
+
+        <div 
+          id="headerMenuDropdown" 
+          class="hidden absolute right-0 top-full mt-2 w-56 sm:w-64 bg-white dark:bg-neutral-900 border-2 border-black dark:border-neutral-300 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.9)] p-2 z-50 flex flex-col gap-1.5 font-mono-code text-xs"
+        >
+          <!-- Active Student Chip -->
+          <div id="studentChip" class="hidden items-center justify-between p-2 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500">
+            <div class="flex items-center gap-1.5 min-w-0">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+              <span id="studentChipName" class="font-bold text-[11px] truncate text-black dark:text-white">STUDENT</span>
+            </div>
+            <button type="button" onclick="studentSignOut()" class="text-[10px] text-red-600 dark:text-red-400 font-bold uppercase underline shrink-0 cursor-pointer">Lock</button>
+          </div>
+
+          <!-- Night / Day Theme -->
+          <button 
+            type="button" 
+            id="darkModeToggleBtn"
+            onclick="toggleDarkMode(); closeHeaderMenu();" 
+            class="w-full flex items-center justify-between p-2 border border-black dark:border-neutral-700 hover:bg-gray-100 dark:hover:bg-neutral-800 text-left font-bold text-black dark:text-white cursor-pointer"
+          >
+            <span class="flex items-center gap-2">
+              <span id="darkModeIcon">🌙</span>
+              <span>Theme Mode</span>
+            </span>
+            <span id="darkModeText" class="text-[10px] uppercase text-gray-500 dark:text-neutral-400">NIGHT</span>
+          </button>
+
+          <!-- PWA Install -->
+          <button 
+            type="button" 
+            id="installPwaBtn"
+            onclick="triggerPwaInstall(); closeHeaderMenu();" 
+            class="hidden w-full items-center gap-2 p-2 border border-black bg-emerald-300 hover:bg-emerald-200 text-black font-bold uppercase cursor-pointer"
+          >
+            <span>📲</span>
+            <span>Install App</span>
+          </button>
+
+          <!-- Fullscreen Media -->
+          <button 
+            type="button" 
+            id="expandMediaBtn" 
+            onclick="toggleMediaFullscreen(); closeHeaderMenu();" 
+            class="hidden w-full items-center gap-2 p-2 border border-black dark:border-neutral-700 hover:bg-gray-100 dark:hover:bg-neutral-800 text-black dark:text-white font-bold uppercase cursor-pointer"
+          >
+            <span>⛶</span>
+            <span>Fullscreen Media</span>
+          </button>
+
+          <div class="border-t border-gray-200 dark:border-neutral-700 my-1"></div>
+
+          <!-- Teacher Controls Section -->
+          <div class="px-1 text-[10px] font-bold text-gray-500 dark:text-neutral-400 uppercase">
+            Teacher Controls
+          </div>
+
+          <button 
+            type="button" 
+            id="teacherAuthBtn" 
+            onclick="closeHeaderMenu(); handleTeacherAuthClick();" 
+            class="w-full text-left p-2 border border-black dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-800 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black font-bold uppercase cursor-pointer"
+          >
+            TEACHER LOGIN
+          </button>
+
+          <button 
+            type="button" 
+            id="editTextToggle" 
+            onclick="toggleEditTextMode()" 
+            class="hidden w-full items-center justify-between p-2 border border-black bg-amber-100 dark:bg-amber-950/60 font-bold uppercase text-black dark:text-amber-200 cursor-pointer"
+          >
+            <span>Rename Titles</span>
+            <span id="editTextStatus" class="text-red-600 font-black">OFF</span>
+          </button>
+
+          <button 
+            type="button" 
+            id="teacherExportBtn" 
+            onclick="exportPortalConfiguration(); closeHeaderMenu();" 
+            class="hidden w-full items-center gap-2 p-2 border border-black bg-emerald-200 text-black font-bold uppercase cursor-pointer"
+          >
+            <span>💾</span>
+            <span>Export Data</span>
+          </button>
+        </div>
       </div>
-
-      <button 
-        type="button" 
-        id="editTextToggle" 
-        onclick="toggleEditTextMode()" 
-        class="hidden text-xs font-mono-code font-bold uppercase border-2 border-black dark:border-white px-2 py-1 bg-white dark:bg-neutral-800 text-black dark:text-white cursor-pointer"
-      >
-        EDIT: <span id="editTextStatus" class="text-red-600 font-black">OFF</span>
-      </button>
-
-      <button 
-        type="button" 
-        id="teacherExportBtn" 
-        onclick="exportPortalConfiguration()" 
-        title="Export all Portal Chapters & Tabs as JSON"
-        class="hidden text-xs font-mono-code font-bold uppercase border-2 border-black dark:border-white px-2 py-1 bg-emerald-300 text-black cursor-pointer"
-      >
-        EXPORT DATA
-      </button>
-
-      <button 
-        type="button" 
-        id="expandMediaBtn" 
-        onclick="toggleMediaFullscreen()" 
-        class="hidden text-xs font-mono-code font-bold uppercase border-2 border-black dark:border-neutral-300 px-2 py-1 bg-white dark:bg-neutral-800 text-black dark:text-white cursor-pointer"
-      >
-        <span>EXPAND</span>
-      </button>
-
-      <button 
-        type="button" 
-        id="teacherAuthBtn" 
-        onclick="handleTeacherAuthClick()" 
-        class="text-xs font-mono-code font-bold uppercase bg-black text-white dark:bg-white dark:text-black px-2.5 py-1 sm:py-1.5 border-2 border-black cursor-pointer shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
-      >
-        TEACHER LOGIN
-      </button>
     </div>
   </header>
 
@@ -1009,7 +1058,7 @@
 
   </div>
 
-  <!-- FLOATING WHATSAPP BUTTON (Raised & High Z-Index to avoid being blocked by Netlify) -->
+  <!-- FLOATING WHATSAPP BUTTON -->
   <div id="floatingWhatsAppContainer" class="fixed bottom-16 sm:bottom-20 right-4 z-[9999] pointer-events-auto">
     <a 
       id="floatingWhatsAppBtn"
@@ -1091,6 +1140,32 @@
 
     const FORMULA_SHEET_IMAGE_SRC = "IMG_00691fac-85d6-44d7-9a1a-2c5e7a45bedb.png";
     let currentStudent = null;
+
+    /* ================= HEADER DROPDOWN SYSTEM ================= */
+    function toggleHeaderMenu(e) {
+      if (e) e.stopPropagation();
+      const menu = document.getElementById('headerMenuDropdown');
+      if (menu) {
+        menu.classList.toggle('hidden');
+      }
+    }
+
+    function closeHeaderMenu() {
+      const menu = document.getElementById('headerMenuDropdown');
+      if (menu) {
+        menu.classList.add('hidden');
+      }
+    }
+
+    document.addEventListener('click', (e) => {
+      const menu = document.getElementById('headerMenuDropdown');
+      const btn = document.getElementById('headerMenuToggleBtn');
+      if (menu && !menu.classList.contains('hidden')) {
+        if (!menu.contains(e.target) && !btn.contains(e.target)) {
+          menu.classList.add('hidden');
+        }
+      }
+    });
 
     /* ================= PWA SETUP & MANIFEST INJECTION ================= */
     let deferredPrompt = null;
@@ -1561,7 +1636,7 @@
       if (focusBtn) {
         focusBtn.classList.remove('bg-red-500', 'hover:bg-red-400');
         focusBtn.classList.add('bg-neutral-800', 'text-emerald-400');
-        focusBtn.innerHTML = '<span>🔒</span><span class="hidden md:inline">IN LOCKDOWN</span>';
+        focusBtn.innerHTML = '<span>🔒</span><span class="hidden lg:inline">IN LOCKDOWN</span>';
       }
       if (floatWa) floatWa.classList.add('hidden');
 
@@ -1602,8 +1677,8 @@
 
       if (lockdownBar) lockdownBar.classList.add('hidden');
       if (focusBtn) {
-        focusBtn.className = "flex items-center gap-1 bg-red-500 hover:bg-red-400 text-white px-2 sm:px-3 py-1 sm:py-1.5 border-2 border-black font-mono-code text-xs font-black uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px] cursor-pointer";
-        focusBtn.innerHTML = '<span>🔒</span><span class="hidden md:inline">LOCKDOWN</span>';
+        focusBtn.className = "flex items-center gap-1 bg-red-500 hover:bg-red-400 text-white px-2 sm:px-2.5 py-1 border-2 border-black font-mono-code text-xs font-black uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer";
+        focusBtn.innerHTML = '<span>🔒</span><span class="hidden lg:inline">LOCKDOWN</span>';
       }
       if (floatWa) floatWa.classList.remove('hidden');
 
@@ -2627,10 +2702,10 @@
 
       if (isCurrentlyCollapsed) {
         sidebar.classList.remove('collapsed');
-        if (btnText) btnText.textContent = "HIDE MENU";
+        if (btnText) btnText.textContent = "HIDE";
       } else {
         sidebar.classList.add('collapsed');
-        if (btnText) btnText.textContent = "SHOW MENU";
+        if (btnText) btnText.textContent = "MENU";
       }
     }
 
@@ -2709,12 +2784,20 @@
       const teacherAddBar = document.getElementById('teacherAddChapterBar');
       const teacherExportBtn = document.getElementById('teacherExportBtn');
       const manageTabsBtn = document.getElementById('teacherManageTabsBtn');
+      const indicator = document.getElementById('teacherActiveIndicator');
 
       if (teacherAuthBtn) teacherAuthBtn.textContent = "TEACHER LOGOUT";
-      if (editTextToggle) editTextToggle.classList.remove('hidden');
+      if (editTextToggle) {
+        editTextToggle.classList.remove('hidden');
+        editTextToggle.classList.add('flex');
+      }
       if (teacherAddBar) teacherAddBar.classList.remove('hidden');
-      if (teacherExportBtn) teacherExportBtn.classList.remove('hidden');
+      if (teacherExportBtn) {
+        teacherExportBtn.classList.remove('hidden');
+        teacherExportBtn.classList.add('flex');
+      }
       if (manageTabsBtn) manageTabsBtn.classList.remove('hidden');
+      if (indicator) indicator.classList.remove('hidden');
 
       showToast('Teacher master mode unlocked! Edit controls active.');
     }
@@ -2730,6 +2813,7 @@
       const teacherExportBtn = document.getElementById('teacherExportBtn');
       const manageTabsBtn = document.getElementById('teacherManageTabsBtn');
       const chTitle = document.getElementById('currentChapterTitle');
+      const indicator = document.getElementById('teacherActiveIndicator');
 
       if (teacherAuthBtn) teacherAuthBtn.textContent = "TEACHER LOGIN";
       if (editTextToggle) editTextToggle.classList.add('hidden');
@@ -2741,6 +2825,7 @@
       if (teacherExportBtn) teacherExportBtn.classList.add('hidden');
       if (manageTabsBtn) manageTabsBtn.classList.add('hidden');
       if (chTitle) chTitle.contentEditable = "false";
+      if (indicator) indicator.classList.add('hidden');
 
       showToast('Teacher mode locked.');
     }
