@@ -623,7 +623,7 @@
       <section id="homeViewContainer" class="w-full max-w-4xl mx-auto p-4 sm:p-8 flex flex-col gap-6 pb-40">
         <div class="bg-white dark:bg-neutral-900 border-4 border-black dark:border-neutral-700 p-6 sm:p-10 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] text-center flex flex-col items-center">
 
-          <!-- Prominent Installation Invitation Banner -->
+          <!-- Installation Invitation Banner -->
           <div class="w-full border-4 border-black dark:border-emerald-400 bg-emerald-300 dark:bg-emerald-950 p-4 sm:p-5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-left font-mono-code mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div class="flex items-center gap-3 min-w-0">
               <span class="text-3xl">📲</span>
@@ -692,9 +692,9 @@
             </h1>
           </div>
 
-          <!-- ================= HOMEPAGE PORTAL NAVIGATION VIDEO CARD ================= -->
+          <!-- ================= HOMEPAGE PORTAL NAVIGATION VIDEO CARD (TEACHER CODE CONTROLLED) ================= -->
           <div class="w-full border-4 border-black dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] font-mono-code mb-6 text-left overflow-hidden">
-            <div class="bg-black text-white p-3.5 sm:p-4 border-b-2 border-black flex flex-wrap items-center justify-between gap-2">
+            <div class="bg-black text-white p-3.5 sm:p-4 border-b-2 border-black flex items-center justify-between gap-2">
               <div class="flex items-center gap-2">
                 <span class="text-xl sm:text-2xl">🎬</span>
                 <div>
@@ -702,42 +702,16 @@
                   <p class="text-[10px] text-gray-400 font-bold uppercase">Watch Lucas walk you through worksheets, split screen &amp; marking</p>
                 </div>
               </div>
-
-              <!-- Upload Video Actions -->
-              <div class="flex items-center gap-2">
-                <input 
-                  type="file" 
-                  id="guideVideoFileInput" 
-                  accept="video/*" 
-                  class="hidden" 
-                  onchange="handleGuideVideoUpload(event)"
-                />
-                <button 
-                  type="button" 
-                  onclick="document.getElementById('guideVideoFileInput').click()" 
-                  class="px-2.5 sm:px-3 py-1 bg-cyan-300 hover:bg-cyan-200 text-black text-[11px] font-black uppercase border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center gap-1 cursor-pointer"
-                  title="Upload video directly from iPad, phone or computer"
-                >
-                  <span>📤</span>
-                  <span>Upload Video File</span>
-                </button>
-                <button 
-                  type="button" 
-                  onclick="setGuideVideoUrlPrompt()" 
-                  class="px-2.5 sm:px-3 py-1 bg-neutral-800 hover:bg-neutral-700 text-white text-[11px] font-bold uppercase border border-neutral-600 flex items-center gap-1 cursor-pointer"
-                  title="Paste a YouTube, Google Drive or MP4 URL"
-                >
-                  <span>🔗</span>
-                  <span class="hidden sm:inline">Set Link</span>
-                </button>
-              </div>
+              <span class="text-[10px] font-bold bg-neutral-800 text-emerald-300 border border-neutral-700 px-2 py-0.5 uppercase hidden sm:inline">
+                WALKTHROUGH
+              </span>
             </div>
 
             <!-- Video Player Display Container -->
             <div class="bg-black relative w-full aspect-video min-h-[220px] sm:min-h-[380px] flex items-center justify-center overflow-hidden">
               <video 
                 id="portalGuideVideo" 
-                class="w-full h-full object-contain" 
+                class="w-full h-full object-contain hidden" 
                 controls 
                 playsinline 
                 preload="metadata"
@@ -753,35 +727,21 @@
 
               <div id="guideVideoEmptyState" class="hidden absolute inset-0 bg-neutral-900/95 flex flex-col items-center justify-center p-6 text-center text-white">
                 <span class="text-4xl sm:text-5xl mb-3">📹</span>
-                <h4 class="text-sm sm:text-base font-black uppercase text-amber-300 mb-1">NO ONBOARDING VIDEO ATTACHED YET</h4>
-                <p class="text-xs text-gray-300 max-w-md mb-4 leading-relaxed">
-                  Click <strong>"Upload Video File"</strong> above to select a video straight from your device, or click <strong>"Set Link"</strong> to paste a YouTube / MP4 video link.
+                <h4 class="text-sm sm:text-base font-black uppercase text-amber-300 mb-1">PORTAL WALKTHROUGH VIDEO</h4>
+                <p class="text-xs text-gray-300 max-w-md leading-relaxed">
+                  Video file is currently being configured in the portal codebase.
                 </p>
-                <button 
-                  type="button" 
-                  onclick="document.getElementById('guideVideoFileInput').click()" 
-                  class="px-4 py-2 bg-emerald-400 hover:bg-emerald-300 text-black text-xs font-black uppercase border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] cursor-pointer"
-                >
-                  📤 Select Video File Now
-                </button>
               </div>
             </div>
 
-            <!-- Guide Video Metadata & Clear Option -->
-            <div id="guideVideoFooter" class="p-3 bg-gray-50 dark:bg-neutral-800 border-t-2 border-black flex flex-wrap items-center justify-between gap-2 text-xs">
+            <div class="p-3 bg-gray-50 dark:bg-neutral-800 border-t-2 border-black flex items-center justify-between text-xs">
               <div class="flex items-center gap-2">
                 <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span id="guideVideoStatusText" class="font-bold text-gray-800 dark:text-neutral-200 text-[11px] truncate max-w-xs sm:max-w-md">
-                  Active Onboarding Guide Video
+                <span class="font-bold text-gray-800 dark:text-neutral-200 text-[11px] uppercase tracking-wide">
+                  Official Onboarding Walkthrough by Lucas
                 </span>
               </div>
-              <button 
-                type="button" 
-                onclick="clearGuideVideo()" 
-                class="text-[10px] text-red-600 dark:text-red-400 hover:underline uppercase font-bold cursor-pointer"
-              >
-                Remove / Reset Video
-              </button>
+              <span class="text-[10px] text-gray-500 font-bold uppercase">HD Video</span>
             </div>
           </div>
 
@@ -1339,6 +1299,13 @@
   <script>
     const MASTER_PIN = "94668661";
 
+    /* =========================================================================
+       HOMEPAGE ONBOARDING VIDEO (CODE CONTROLLED)
+       Change this variable to your video file path or URL:
+       Example: "portal-walkthrough.mp4" OR "https://example.com/video.mp4"
+       ========================================================================= */
+    const HOMEPAGE_GUIDE_VIDEO_SRC = "portal-walkthrough.mp4";
+
     const AUTHORIZED_STUDENTS = [
       { code: "10293847", name: "Alex", greeting: "Welcome Alex To ExcelMathsWithLucas" },
       { code: "88234190", name: "Jaris", greeting: "Welcome Jaris To ExcelMathsWithLucas" },
@@ -1348,163 +1315,37 @@
     const FORMULA_SHEET_IMAGE_SRC = "IMG_00691fac-85d6-44d7-9a1a-2c5e7a45bedb.png";
     let currentStudent = null;
 
-    /* ================= INDEXEDDB STORAGE FOR LARGE HOMEPAGE VIDEO FILES ================= */
-    const DB_NAME = "ExcelMathsMediaDB";
-    const DB_VERSION = 1;
-    const STORE_NAME = "videos";
-
-    function openMediaDB() {
-      return new Promise((resolve, reject) => {
-        const req = indexedDB.open(DB_NAME, DB_VERSION);
-        req.onupgradeneeded = (e) => {
-          const db = e.target.result;
-          if (!db.objectStoreNames.contains(STORE_NAME)) {
-            db.createObjectStore(STORE_NAME);
-          }
-        };
-        req.onsuccess = () => resolve(req.result);
-        req.onerror = () => reject(req.error);
-      });
-    }
-
-    async function saveGuideVideoBlob(fileBlob, fileName) {
-      try {
-        const db = await openMediaDB();
-        const tx = db.transaction(STORE_NAME, "readwrite");
-        tx.objectStore(STORE_NAME).put({ blob: fileBlob, name: fileName, updatedAt: Date.now() }, "homepage_guide_video");
-        return new Promise((resolve, reject) => {
-          tx.oncomplete = () => resolve();
-          tx.onerror = () => reject(tx.error);
-        });
-      } catch (err) {
-        console.error("IndexedDB Save Failed", err);
-      }
-    }
-
-    async function getGuideVideoBlob() {
-      try {
-        const db = await openMediaDB();
-        const tx = db.transaction(STORE_NAME, "readonly");
-        const req = tx.objectStore(STORE_NAME).get("homepage_guide_video");
-        return new Promise((resolve) => {
-          req.onsuccess = () => resolve(req.result || null);
-          req.onerror = () => resolve(null);
-        });
-      } catch (err) {
-        return null;
-      }
-    }
-
-    async function removeGuideVideoBlob() {
-      try {
-        const db = await openMediaDB();
-        const tx = db.transaction(STORE_NAME, "readwrite");
-        tx.objectStore(STORE_NAME).delete("homepage_guide_video");
-      } catch (err) {}
-    }
-
-    /* ================= HOMEPAGE GUIDE VIDEO CONTROLLER ================= */
-    let activeGuideObjectUrl = null;
-
-    async function loadHomepageGuideVideo() {
+    /* ================= HOMEPAGE GUIDE VIDEO ENGINE ================= */
+    function loadHomepageGuideVideo() {
       const videoEl = document.getElementById('portalGuideVideo');
       const iframeEl = document.getElementById('portalGuideIframe');
       const emptyState = document.getElementById('guideVideoEmptyState');
-      const statusText = document.getElementById('guideVideoStatusText');
 
       if (!videoEl || !iframeEl) return;
 
-      // 1. Check if user uploaded a file into IndexedDB
-      const record = await getGuideVideoBlob();
-      if (record && record.blob) {
-        if (activeGuideObjectUrl) URL.revokeObjectURL(activeGuideObjectUrl);
-        activeGuideObjectUrl = URL.createObjectURL(record.blob);
+      if (!HOMEPAGE_GUIDE_VIDEO_SRC || HOMEPAGE_GUIDE_VIDEO_SRC.trim() === '') {
+        videoEl.classList.add('hidden');
+        iframeEl.classList.add('hidden');
+        if (emptyState) emptyState.classList.remove('hidden');
+        return;
+      }
 
+      const cleanUrl = HOMEPAGE_GUIDE_VIDEO_SRC.trim();
+      const formatted = formatResourceUrl(cleanUrl, 'video');
+
+      if (emptyState) emptyState.classList.add('hidden');
+
+      if (isDirectVideoFile(cleanUrl)) {
         iframeEl.classList.add('hidden');
         iframeEl.src = '';
         videoEl.classList.remove('hidden');
-        videoEl.src = activeGuideObjectUrl;
+        videoEl.src = formatted;
         videoEl.load();
-
-        if (emptyState) emptyState.classList.add('hidden');
-        if (statusText) statusText.textContent = `Video File: ${record.name || 'Uploaded Portal Walkthrough'}`;
-        return;
-      }
-
-      // 2. Otherwise check for saved URL (e.g. YouTube, Drive, MP4 URL)
-      const savedUrl = localStorage.getItem('portal_homepage_video_url');
-      if (savedUrl && savedUrl.trim()) {
-        const formatted = formatResourceUrl(savedUrl.trim(), 'video');
-        if (isDirectVideoFile(savedUrl.trim())) {
-          iframeEl.classList.add('hidden');
-          iframeEl.src = '';
-          videoEl.classList.remove('hidden');
-          videoEl.src = formatted;
-          videoEl.load();
-        } else {
-          videoEl.classList.add('hidden');
-          videoEl.pause();
-          iframeEl.classList.remove('hidden');
-          iframeEl.src = formatted;
-        }
-
-        if (emptyState) emptyState.classList.add('hidden');
-        if (statusText) statusText.textContent = `Video Stream: ${savedUrl.trim()}`;
-        return;
-      }
-
-      // 3. Fallback: Display empty state invitation
-      videoEl.classList.add('hidden');
-      videoEl.pause();
-      iframeEl.classList.add('hidden');
-      iframeEl.src = '';
-      if (emptyState) emptyState.classList.remove('hidden');
-      if (statusText) statusText.textContent = "No walkthrough video uploaded yet";
-    }
-
-    async function handleGuideVideoUpload(event) {
-      const file = event.target.files && event.target.files[0];
-      if (!file) return;
-
-      showToast(`Uploading "${file.name}"...`);
-      try {
-        await saveGuideVideoBlob(file, file.name);
-        localStorage.removeItem('portal_homepage_video_url');
-        await loadHomepageGuideVideo();
-        showToast("🎉 Walkthrough video uploaded and saved to portal!");
-      } catch (err) {
-        console.error(err);
-        alert("Could not save video file locally. You can also paste an online video link via 'Set Link'.");
-      }
-      event.target.value = '';
-    }
-
-    function setGuideVideoUrlPrompt() {
-      const current = localStorage.getItem('portal_homepage_video_url') || '';
-      const input = prompt("Paste your walkthrough video link (YouTube, MP4, Google Drive):", current);
-      if (input === null) return;
-
-      const trimmed = input.trim();
-      if (trimmed) {
-        removeGuideVideoBlob();
-        localStorage.setItem('portal_homepage_video_url', trimmed);
-        loadHomepageGuideVideo();
-        showToast("Video link updated!");
       } else {
-        clearGuideVideo();
-      }
-    }
-
-    async function clearGuideVideo() {
-      if (confirm("Are you sure you want to remove the portal walkthrough video?")) {
-        await removeGuideVideoBlob();
-        localStorage.removeItem('portal_homepage_video_url');
-        if (activeGuideObjectUrl) {
-          URL.revokeObjectURL(activeGuideObjectUrl);
-          activeGuideObjectUrl = null;
-        }
-        await loadHomepageGuideVideo();
-        showToast("Walkthrough video removed.");
+        videoEl.classList.add('hidden');
+        videoEl.pause();
+        iframeEl.classList.remove('hidden');
+        iframeEl.src = formatted;
       }
     }
 
