@@ -210,7 +210,7 @@
 
   <!-- ================= UNIVERSAL INSTALL APP MODAL ================= -->
   <div id="installAppModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-neutral-900 border-4 border-black dark:border-neutral-200 w-full max-w-lg p-5 sm:p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] font-mono-code relative">
+    <div class="bg-white dark:bg-neutral-900 border-4 border-black dark:border-neutral-200 w-full max-w-lg p-5 sm:p-6 shadow-[8px_8px_0px_0px_rgba(0,0,1)] font-mono-code relative">
       <button 
         type="button" 
         onclick="closeInstallModal()" 
@@ -402,7 +402,7 @@
     </div>
 
     <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
-      <!-- DEDICATED TOP MENU WHATSAPP BUTTON (ALWAYS ACCESSIBLE, NO OVERLAY OBSTRUCTION) -->
+      <!-- DEDICATED TOP MENU WHATSAPP BUTTON (ALWAYS ACCESSIBLE) -->
       <a 
         id="topNavWhatsAppBtn"
         href="https://wa.me/6581980012?text=Hi%20Lucas!%20I'm%20submitting%20my%20work%20to%20be%20marked%20or%20I%20have%20a%20question." 
@@ -502,7 +502,7 @@
 
           <button 
             type="button" 
-            id="darkModeToggleBtn"
+            id="darkModeToggleBtn" 
             onclick="toggleDarkMode(); closeHeaderMenu();" 
             class="w-full flex items-center justify-between p-2 border border-black dark:border-neutral-700 hover:bg-gray-100 dark:hover:bg-neutral-800 text-left font-bold text-black dark:text-white cursor-pointer"
           >
@@ -1006,7 +1006,7 @@
               <span>◫</span>
               <span>TWO-PANE STUDY MODE ACTIVE</span>
             </span>
-            <span class="text-[10px] text-neutral-600 dark:text-neutral-400">Curved graphs protected • Draw &amp; hold to snap lines/shapes • Use 🖐️ MOVE to drag</span>
+            <span class="text-[10px] text-neutral-600 dark:text-neutral-400">✨ Auto-Correct active • Pause to snap shape • 🖐️ MOVE to drag</span>
           </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -1050,7 +1050,8 @@
               <div id="splitRightCanvasView" class="flex-1 bg-neutral-950 relative flex flex-col overflow-hidden">
                 <div class="p-2 bg-neutral-900 border-b border-neutral-800 flex flex-wrap items-center justify-between gap-1.5 text-xs text-white shrink-0">
                   <div class="flex items-center gap-1 text-[10px] flex-wrap">
-                    <button type="button" onclick="setSplitShapeMode('pen')" id="splitToolPenBtn" class="px-2 py-0.5 bg-emerald-500 text-black font-black uppercase rounded shadow-sm" title="Pen (Hold 0.4s to snap to straight lines/shapes)">✏️ PEN</button>
+                    <button type="button" onclick="setSplitShapeMode('pen')" id="splitToolPenBtn" class="px-2 py-0.5 bg-emerald-500 text-black font-black uppercase rounded shadow-sm" title="Smart Pen: Auto-detects lines & shapes">✏️ PEN</button>
+                    <button type="button" onclick="toggleAutoShapeMode('split')" id="splitAutoShapeToggleBtn" class="px-2 py-0.5 bg-cyan-400 text-black font-black uppercase rounded shadow-sm" title="Toggle Auto-Shape Correction">✨ AUTO: ON</button>
                     <button type="button" onclick="setSplitShapeMode('move')" id="splitToolMoveBtn" class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" title="Move & Reposition any shape">🖐️ MOVE</button>
                     <button type="button" onclick="setSplitShapeMode('line')" id="splitToolLineBtn" class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" title="100% Straight Line with Axis Snapping">📏 LINE</button>
                     <button type="button" onclick="setSplitShapeMode('circle')" id="splitToolCircleBtn" class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" title="Perfect Circle / Locus">⭕ CIRCLE</button>
@@ -1137,7 +1138,7 @@
           <span class="text-base">✏️</span>
           <div class="truncate">
             <h3 class="font-black text-xs uppercase tracking-tight truncate">DIGITAL WORKING CANVAS</h3>
-            <span class="text-[9px] font-bold uppercase block text-neutral-800">DRAW &amp; HOLD QUICKSHAPE • MOVE SHAPES • STYLUS</span>
+            <span class="text-[9px] font-bold uppercase block text-neutral-800">SMART SHAPE CORRECTION • MOVE SHAPES • STYLUS</span>
           </div>
         </div>
         <button type="button" onclick="toggleScratchpadDrawer()" class="font-black px-2 py-0.5 bg-black text-white hover:bg-neutral-800 text-xs transition cursor-pointer shrink-0 ml-2">
@@ -1149,7 +1150,8 @@
       <div class="p-2.5 bg-neutral-800 border-b border-neutral-700 flex flex-col gap-2 font-mono-code text-xs text-white shrink-0">
         <div class="flex flex-wrap items-center justify-between gap-1.5">
           <div class="flex items-center gap-1 text-[11px] flex-wrap">
-            <button type="button" onclick="setDrawerShapeMode('pen')" id="drawerToolPenBtn" class="px-2.5 py-1 bg-emerald-500 text-black font-black uppercase rounded shadow-sm" title="Pen: Hold 0.4s to snap to straight lines/shapes">✏️ PEN</button>
+            <button type="button" onclick="setDrawerShapeMode('pen')" id="drawerToolPenBtn" class="px-2.5 py-1 bg-emerald-500 text-black font-black uppercase rounded shadow-sm" title="Smart Pen: Auto-detects lines & shapes">✏️ PEN</button>
+            <button type="button" onclick="toggleAutoShapeMode('drawer')" id="drawerAutoShapeToggleBtn" class="px-2 py-1 bg-cyan-400 text-black font-black uppercase rounded shadow-sm" title="Toggle Auto-Shape Correction">✨ AUTO: ON</button>
             <button type="button" onclick="setDrawerShapeMode('move')" id="drawerToolMoveBtn" class="px-2.5 py-1 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" title="Move & Reposition any shape or curve">🖐️ MOVE</button>
             <button type="button" onclick="setDrawerShapeMode('line')" id="drawerToolLineBtn" class="px-2.5 py-1 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" title="100% Straight Line (Snaps to 0° & 90° axes)">📏 LINE</button>
             <button type="button" onclick="setDrawerShapeMode('circle')" id="drawerToolCircleBtn" class="px-2.5 py-1 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" title="Perfect Circle / Locus">⭕ CIRCLE</button>
@@ -1217,9 +1219,9 @@
           <canvas id="scratchpadCanvas" class="w-full h-full block"></canvas>
         </div>
         <div class="bg-amber-100 dark:bg-amber-950/60 border-t-2 border-black p-2.5 text-[11px] font-mono-code text-black dark:text-amber-200 shrink-0 mt-2">
-          <p class="font-black uppercase mb-1">⚡ QuickShape &amp; Move Guide:</p>
+          <p class="font-black uppercase mb-1">⚡ Smart Auto-Correct &amp; Move Guide:</p>
           <p class="text-[10px] text-gray-700 dark:text-neutral-300 leading-tight">
-            Draw a line or shape and hold for 0.4s: it snaps to a crisp line, circle or box. Draw wavy sine/cosine graphs: they stay smooth curves without flattening! Use <strong class="font-bold text-black dark:text-white">🖐️ MOVE</strong> to drag any object.
+            Draw a line, circle, or rectangle and simply lift your pen: it automatically snaps to the perfect geometric shape! Or pause for 0.35s before lifting. Trigonometric waves and math curves remain smooth. Use <strong class="font-bold text-black dark:text-white">🖐️ MOVE</strong> to drag any object.
           </p>
         </div>
       </div>
@@ -1376,7 +1378,34 @@
       }
     }
 
-    /* ================= GEOMETRY & QUICKSHAPE RECOGNITION ================= */
+    /* ================= AUTO-SHAPE STATE & RECOGNITION ENGINE ================= */
+    let isDrawerAutoShapeOn = true;
+    let isSplitAutoShapeOn = true;
+
+    function toggleAutoShapeMode(target) {
+      if (target === 'drawer') {
+        isDrawerAutoShapeOn = !isDrawerAutoShapeOn;
+        const btn = document.getElementById('drawerAutoShapeToggleBtn');
+        if (btn) {
+          btn.textContent = isDrawerAutoShapeOn ? '✨ AUTO: ON' : '✨ AUTO: OFF';
+          btn.className = isDrawerAutoShapeOn 
+            ? "px-2 py-1 bg-cyan-400 text-black font-black uppercase rounded shadow-sm"
+            : "px-2 py-1 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded";
+        }
+        showToast(isDrawerAutoShapeOn ? "Auto-Shape: ON" : "Auto-Shape: OFF (Pure Freehand)");
+      } else if (target === 'split') {
+        isSplitAutoShapeOn = !isSplitAutoShapeOn;
+        const btn = document.getElementById('splitAutoShapeToggleBtn');
+        if (btn) {
+          btn.textContent = isSplitAutoShapeOn ? '✨ AUTO: ON' : '✨ AUTO: OFF';
+          btn.className = isSplitAutoShapeOn 
+            ? "px-2 py-0.5 bg-cyan-400 text-black font-black uppercase rounded shadow-sm"
+            : "px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded";
+        }
+        showToast(isSplitAutoShapeOn ? "Split Auto-Shape: ON" : "Split Auto-Shape: OFF");
+      }
+    }
+
     function snapLineCoordinates(x0, y0, x1, y1) {
       const dx = x1 - x0;
       const dy = y1 - y0;
@@ -1385,7 +1414,7 @@
 
       const angle = Math.atan2(dy, dx) * (180 / Math.PI);
       const snapAngles = [0, 45, 90, 135, 180, -180, -135, -90, -45];
-      const threshold = 7.5; // snaps smoothly to horizontal and vertical axes
+      const threshold = 10; // snaps smoothly to primary axes
 
       for (let sa of snapAngles) {
         if (Math.abs(angle - sa) < threshold || Math.abs(angle - (sa + 360)) < threshold || Math.abs(angle - (sa - 360)) < threshold) {
@@ -1430,8 +1459,8 @@
       return cur;
     }
 
-    // Intelligent Shape Detection:
-    // Recognizes straight lines & shapes reliably while preserving mathematical wave graphs (sine, cosine, tangent)
+    // High-Accuracy Geometry Recognition
+    // Returns perfect shape object { type: 'line' | 'circle' | 'rect' } or null
     function recognizeShapeFromPoints(pts) {
       if (!pts || pts.length < 5) return null;
       const start = pts[0];
@@ -1441,15 +1470,15 @@
       let totalLen = 0;
       let minX = pts[0].x, maxX = pts[0].x, minY = pts[0].y, maxY = pts[0].y;
       for (let i = 1; i < pts.length; i++) {
-        totalLen += Math.hypot(pts[i].x - pts[i-1].x, pts[i].y - pts[i-1].y);
+        totalLen += Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y);
         minX = Math.min(minX, pts[i].x); maxX = Math.max(maxX, pts[i].x);
         minY = Math.min(minY, pts[i].y); maxY = Math.max(maxY, pts[i].y);
       }
 
-      if (totalLen < 20) return null;
+      if (totalLen < 25) return null;
 
-      // 1. Check for Closed Shapes (Circle, Ellipse, Rectangle)
-      const isClosed = directDist < Math.max(45, totalLen * 0.28) && totalLen > 50;
+      // 1. Closed Shapes (Circle, Rectangle / Square)
+      const isClosed = (directDist < Math.max(50, totalLen * 0.32)) && totalLen > 55;
       if (isClosed) {
         const w = maxX - minX;
         const h = maxY - minY;
@@ -1463,17 +1492,18 @@
           rDiff += Math.abs(d - avgR);
         }
         const avgDeviation = rDiff / pts.length;
-        const ratio = Math.min(w, h) / (Math.max(w, h) || 1);
+        const aspect = Math.min(w, h) / (Math.max(w, h) || 1);
 
-        if (ratio > 0.65 && avgDeviation < avgR * 0.38) {
+        // Check for Circle vs Rectangle
+        if (aspect > 0.60 && avgDeviation < avgR * 0.38) {
           return { type: 'circle', cx: cx, cy: cy, r: avgR };
-        } else {
+        } else if (w > 20 && h > 20) {
           return { type: 'rect', x: minX, y: minY, w: w, h: h };
         }
       }
 
-      // 2. Open Strokes: Distinguish Straight Lines vs. Curved Trigonometric Graphs
-      if (directDist < 25) return null;
+      // 2. Open Shapes: Straight Line vs Curves/Oscillations
+      if (directDist < 20) return null;
 
       let maxDev = 0;
       for (let p of pts) {
@@ -1481,12 +1511,12 @@
         if (d > maxDev) maxDev = d;
       }
 
-      // Count zero-crossings across the baseline chord to detect oscillating waves (sine, cosine)
+      // Detect deliberate trigonometric / wave oscillations
       let signChanges = 0;
       let lastSign = 0;
       for (let p of pts) {
         const sDist = signedDistToLine(p, start, end);
-        if (Math.abs(sDist) > 10) {
+        if (Math.abs(sDist) > 8) {
           const curSign = sDist > 0 ? 1 : -1;
           if (lastSign !== 0 && curSign !== lastSign) {
             signChanges++;
@@ -1495,18 +1525,15 @@
         }
       }
 
-      const lengthRatio = totalLen / (directDist || 1);
-
-      // If it oscillates across the chord with multiple waves, it is a trig curve -> keep as curve!
+      // If it oscillates across chord with 2+ changes, preserve as a smooth wave graph
       if (signChanges >= 2) {
-        return {
-          type: 'stroke',
-          points: smoothPoints(pts, 2)
-        };
+        return null;
       }
 
-      // If it is intended to be a straight line (reasonably straight with normal hand wobble)
-      if (lengthRatio < 1.25 && maxDev <= Math.max(24, directDist * 0.16)) {
+      const lengthRatio = totalLen / (directDist || 1);
+
+      // Recognize straight line with natural hand wobble allowance
+      if (lengthRatio < 1.30 && maxDev <= Math.max(28, directDist * 0.22)) {
         const snapped = snapLineCoordinates(start.x, start.y, end.x, end.y);
         return {
           type: 'line',
@@ -1517,11 +1544,7 @@
         };
       }
 
-      // Otherwise, it's a deliberate parabolic curve or curved graph -> smooth gently, do not flatten
-      return {
-        type: 'stroke',
-        points: smoothPoints(pts, 2)
-      };
+      return null;
     }
 
     function hitTestObject(obj, x, y) {
@@ -1623,7 +1646,7 @@
     let canvas, ctx;
     let isDrawing = false;
     let currentColor = '#10b981';
-    let drawerCurrentTool = 'pen'; // 'pen', 'move', 'line', 'circle', 'rect', 'eraser'
+    let drawerCurrentTool = 'pen';
     let drawerPenThickness = 3;
     let drawerEraserThickness = 20;
     let isStylusOnlyMode = false;
@@ -1634,6 +1657,7 @@
     let drawerCurrentStrokePoints = [];
     let drawerStartX = 0, drawerStartY = 0;
     let drawerLastMoveX = 0, drawerLastMoveY = 0;
+    let drawerHoldAnchorX = 0, drawerHoldAnchorY = 0;
 
     let drawerHoldTimer = null;
     let drawerSnappedShape = null;
@@ -1682,10 +1706,12 @@
       canvas.addEventListener('pointerleave', handleDrawerPointerUp);
     }
 
-    function scheduleDrawerHoldCheck() {
+    function resetDrawerHoldTimer() {
       clearTimeout(drawerHoldTimer);
+      if (!isDrawerAutoShapeOn || drawerCurrentTool !== 'pen') return;
+
       drawerHoldTimer = setTimeout(() => {
-        if (isDrawing && drawerCurrentTool === 'pen' && drawerCurrentStrokePoints.length > 5) {
+        if (isDrawing && drawerCurrentStrokePoints.length >= 6) {
           const detected = recognizeShapeFromPoints(drawerCurrentStrokePoints);
           if (detected) {
             drawerSnappedShape = detected;
@@ -1693,13 +1719,12 @@
             drawerSnappedShape.thickness = drawerPenThickness;
             redrawDrawerCanvas();
             renderSingleObject(ctx, drawerSnappedShape, false);
-            if (detected.type === 'line') showToast("📏 100% Straight Line Snapped!");
+            if (detected.type === 'line') showToast("📏 Straight Line Snapped!");
             else if (detected.type === 'circle') showToast("⭕ Perfect Circle Snapped!");
             else if (detected.type === 'rect') showToast("▢ Perfect Rectangle Snapped!");
-            else showToast("🌊 Smooth Curve Polished!");
           }
         }
-      }, 380);
+      }, 350);
     }
 
     function handleDrawerPointerDown(e) {
@@ -1713,6 +1738,8 @@
       drawerStartY = y;
       drawerLastMoveX = x;
       drawerLastMoveY = y;
+      drawerHoldAnchorX = x;
+      drawerHoldAnchorY = y;
       drawerSnappedShape = null;
 
       if (drawerCurrentTool === 'move') {
@@ -1738,7 +1765,7 @@
 
       saveDrawerState();
       drawerCurrentStrokePoints = [{ x, y }];
-      scheduleDrawerHoldCheck();
+      resetDrawerHoldTimer();
       try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
     }
 
@@ -1771,7 +1798,14 @@
 
       if (drawerCurrentTool === 'pen') {
         drawerCurrentStrokePoints.push({ x: currX, y: currY });
-        scheduleDrawerHoldCheck();
+
+        // Filter out microscopic touch tremor so hold-to-snap fires reliably
+        const moveDist = Math.hypot(currX - drawerHoldAnchorX, currY - drawerHoldAnchorY);
+        if (moveDist > 12) {
+          drawerHoldAnchorX = currX;
+          drawerHoldAnchorY = currY;
+          resetDrawerHoldTimer();
+        }
 
         if (drawerSnappedShape) {
           redrawDrawerCanvas();
@@ -1833,12 +1867,28 @@
         drawerSnappedShape = null;
       } else if (drawerCurrentTool === 'pen') {
         if (drawerCurrentStrokePoints.length > 1) {
-          drawerObjects.push({
-            type: 'stroke',
-            points: [...drawerCurrentStrokePoints],
-            color: currentColor,
-            thickness: drawerPenThickness
-          });
+          // Instant Auto-Correct Shape Check upon stroke lift
+          let finalShape = null;
+          if (isDrawerAutoShapeOn && drawerCurrentStrokePoints.length >= 6) {
+            finalShape = recognizeShapeFromPoints(drawerCurrentStrokePoints);
+          }
+
+          if (finalShape) {
+            finalShape.color = currentColor;
+            finalShape.thickness = drawerPenThickness;
+            drawerObjects.push(finalShape);
+            if (finalShape.type === 'line') showToast("📏 Straight Line Auto-Corrected!");
+            else if (finalShape.type === 'circle') showToast("⭕ Circle Auto-Corrected!");
+            else if (finalShape.type === 'rect') showToast("▢ Rectangle Auto-Corrected!");
+          } else {
+            // Freehand stroke or smooth math curve
+            drawerObjects.push({
+              type: 'stroke',
+              points: smoothPoints(drawerCurrentStrokePoints, 1),
+              color: currentColor,
+              thickness: drawerPenThickness
+            });
+          }
         }
       } else if (drawerCurrentTool === 'line' || drawerCurrentTool === 'circle' || drawerCurrentTool === 'rect') {
         const rect = canvas.getBoundingClientRect();
@@ -1897,7 +1947,7 @@
       if (tool === 'move') {
         showToast("🖐️ MOVE mode: Tap & drag any graph or shape!");
       } else if (tool === 'pen') {
-        showToast("✏️ PEN mode: Hold 0.4s to snap lines & shapes!");
+        showToast("✏️ Smart Pen: Lines & shapes auto-correct!");
       }
       redrawDrawerCanvas();
     }
@@ -1977,6 +2027,7 @@
     let splitCurrentStrokePoints = [];
     let splitStartX = 0, splitStartY = 0;
     let splitLastMoveX = 0, splitLastMoveY = 0;
+    let splitHoldAnchorX = 0, splitHoldAnchorY = 0;
     let splitHoldTimer = null;
     let splitSnappedShape = null;
 
@@ -2024,10 +2075,12 @@
       splitCanvas.addEventListener('pointerleave', handleSplitPointerUp);
     }
 
-    function scheduleSplitHoldCheck() {
+    function resetSplitHoldTimer() {
       clearTimeout(splitHoldTimer);
+      if (!isSplitAutoShapeOn || splitCurrentTool !== 'pen') return;
+
       splitHoldTimer = setTimeout(() => {
-        if (isSplitDrawing && splitCurrentTool === 'pen' && splitCurrentStrokePoints.length > 5) {
+        if (isSplitDrawing && splitCurrentStrokePoints.length >= 6) {
           const detected = recognizeShapeFromPoints(splitCurrentStrokePoints);
           if (detected) {
             splitSnappedShape = detected;
@@ -2035,13 +2088,12 @@
             splitSnappedShape.thickness = splitPenThickness;
             redrawSplitCanvas();
             renderSingleObject(splitCtx, splitSnappedShape, false);
-            if (detected.type === 'line') showToast("📏 100% Straight Line Snapped!");
+            if (detected.type === 'line') showToast("📏 Straight Line Snapped!");
             else if (detected.type === 'circle') showToast("⭕ Perfect Circle Snapped!");
             else if (detected.type === 'rect') showToast("▢ Perfect Rectangle Snapped!");
-            else showToast("🌊 Smooth Curve Polished!");
           }
         }
-      }, 380);
+      }, 350);
     }
 
     function handleSplitPointerDown(e) {
@@ -2055,6 +2107,8 @@
       splitStartY = y;
       splitLastMoveX = x;
       splitLastMoveY = y;
+      splitHoldAnchorX = x;
+      splitHoldAnchorY = y;
       splitSnappedShape = null;
 
       if (splitCurrentTool === 'move') {
@@ -2080,7 +2134,7 @@
 
       saveSplitState();
       splitCurrentStrokePoints = [{ x, y }];
-      scheduleSplitHoldCheck();
+      resetSplitHoldTimer();
       try { splitCanvas.setPointerCapture(e.pointerId); } catch (err) {}
     }
 
@@ -2113,7 +2167,13 @@
 
       if (splitCurrentTool === 'pen') {
         splitCurrentStrokePoints.push({ x: currX, y: currY });
-        scheduleSplitHoldCheck();
+
+        const moveDist = Math.hypot(currX - splitHoldAnchorX, currY - splitHoldAnchorY);
+        if (moveDist > 12) {
+          splitHoldAnchorX = currX;
+          splitHoldAnchorY = currY;
+          resetSplitHoldTimer();
+        }
 
         if (splitSnappedShape) {
           redrawSplitCanvas();
@@ -2174,12 +2234,26 @@
         splitSnappedShape = null;
       } else if (splitCurrentTool === 'pen') {
         if (splitCurrentStrokePoints.length > 1) {
-          splitObjects.push({
-            type: 'stroke',
-            points: [...splitCurrentStrokePoints],
-            color: splitCanvasColor,
-            thickness: splitPenThickness
-          });
+          let finalShape = null;
+          if (isSplitAutoShapeOn && splitCurrentStrokePoints.length >= 6) {
+            finalShape = recognizeShapeFromPoints(splitCurrentStrokePoints);
+          }
+
+          if (finalShape) {
+            finalShape.color = splitCanvasColor;
+            finalShape.thickness = splitPenThickness;
+            splitObjects.push(finalShape);
+            if (finalShape.type === 'line') showToast("📏 Straight Line Auto-Corrected!");
+            else if (finalShape.type === 'circle') showToast("⭕ Circle Auto-Corrected!");
+            else if (finalShape.type === 'rect') showToast("▢ Rectangle Auto-Corrected!");
+          } else {
+            splitObjects.push({
+              type: 'stroke',
+              points: smoothPoints(splitCurrentStrokePoints, 1),
+              color: splitCanvasColor,
+              thickness: splitPenThickness
+            });
+          }
         }
       } else if (splitCurrentTool === 'line' || splitCurrentTool === 'circle' || splitCurrentTool === 'rect') {
         const rect = splitCanvas.getBoundingClientRect();
@@ -2191,7 +2265,7 @@
           splitObjects.push({ type: 'line', x1: splitStartX, y1: splitStartY, x2: snapped.x, y2: snapped.y, color: splitCanvasColor, thickness: splitPenThickness });
         } else if (splitCurrentTool === 'circle') {
           const r = Math.hypot(endX - splitStartX, endY - splitStartY) / 2;
-          splitObjects.push({ type: 'circle', cx: (splitStartX + endX) / 2, cy: (splitStartY + endY) / 2, r, color: splitCanvasColor, thickness: splitPenThickness });
+          splitObjects.push({ type: 'circle', cx: (drawerStartX + endX) / 2, cy: (drawerStartY + endY) / 2, r, color: splitCanvasColor, thickness: splitPenThickness });
         } else if (splitCurrentTool === 'rect') {
           splitObjects.push({ type: 'rect', x: Math.min(splitStartX, endX), y: Math.min(splitStartY, endY), w: Math.abs(endX - splitStartX), h: Math.abs(endY - splitStartY), color: splitCanvasColor, thickness: splitPenThickness });
         }
@@ -2238,7 +2312,7 @@
       if (tool === 'move') {
         showToast("🖐️ MOVE mode: Tap & drag any graph or shape!");
       } else if (tool === 'pen') {
-        showToast("✏️ PEN mode: Hold 0.4s to snap lines & shapes!");
+        showToast("✏️ Smart Pen: Lines & shapes auto-correct!");
       }
       redrawSplitCanvas();
     }
