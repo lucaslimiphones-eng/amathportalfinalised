@@ -112,6 +112,14 @@
       cursor: crosshair;
     }
 
+    /* Sharp, High-Visibility Graph Paper Grid */
+    .math-grid {
+      background-size: 24px 24px !important;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.16) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.16) 1px, transparent 1px) !important;
+    }
+
     #mediaContainer:fullscreen,
     #mediaContainer:-webkit-full-screen,
     #mediaContainer:-moz-full-screen,
@@ -184,7 +192,7 @@
         <button 
           type="button" 
           onclick="verifyStudentPin()" 
-          class="w-full py-3 border-2 border-black dark:border-white bg-black dark:bg-white text-white dark:text-black text-xs font-bold uppercase tracking-wider shadow-[3px_3px_0px_0px_rgba(0,0,1)] hover:bg-neutral-800 dark:hover:bg-neutral-200 cursor-pointer"
+          class="w-full py-3 border-2 border-black dark:border-white bg-black dark:bg-white text-white dark:text-black text-xs font-bold uppercase tracking-wider shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:bg-neutral-800 dark:hover:bg-neutral-200 cursor-pointer"
         >
           Unlock Portal →
         </button>
@@ -202,7 +210,7 @@
 
   <!-- ================= UNIVERSAL INSTALL APP MODAL ================= -->
   <div id="installAppModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-neutral-900 border-4 border-black dark:border-neutral-200 w-full max-w-lg p-5 sm:p-6 shadow-[8px_8px_0px_0px_rgba(0,0,1)] font-mono-code relative">
+    <div class="bg-white dark:bg-neutral-900 border-4 border-black dark:border-neutral-200 w-full max-w-lg p-5 sm:p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] font-mono-code relative">
       <button 
         type="button" 
         onclick="closeInstallModal()" 
@@ -394,7 +402,7 @@
     </div>
 
     <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
-      <!-- DEDICATED TOP MENU WHATSAPP BUTTON (NO OBSTRUCTIVE FLOATING OVERLAY) -->
+      <!-- DEDICATED TOP MENU WHATSAPP BUTTON (ALWAYS ACCESSIBLE, NO OVERLAY OBSTRUCTION) -->
       <a 
         id="topNavWhatsAppBtn"
         href="https://wa.me/6581980012?text=Hi%20Lucas!%20I'm%20submitting%20my%20work%20to%20be%20marked%20or%20I%20have%20a%20question." 
@@ -1162,7 +1170,7 @@
             <button type="button" onclick="setCanvasColor('#38bdf8')" class="w-5 h-5 rounded-full bg-sky-400 border border-white hover:scale-110 transition"></button>
             <button type="button" onclick="setCanvasColor('#facc15')" class="w-5 h-5 rounded-full bg-yellow-400 border border-white hover:scale-110 transition"></button>
             <button type="button" onclick="setCanvasColor('#ffffff')" class="w-5 h-5 rounded-full bg-white border border-neutral-400 hover:scale-110 transition"></button>
-            <button type="button" onclick="setCanvasColor('#f87171')" class="w-5 h-5 rounded-full bg-red-400 border border-white hover:scale-110 transition"></button>
+            <button type="button" onclick="setCanvasColor('#f87171')" class="w-5 h-5 rounded-full bg-red-400 border border-neutral-400 hover:scale-110 transition"></button>
           </div>
 
           <div class="flex items-center gap-1.5 flex-wrap">
@@ -1336,24 +1344,1363 @@
     const FORMULA_SHEET_IMAGE_SRC = "IMG_00691fac-85d6-44d7-9a1a-2c5e7a45bedb.png";
     let currentStudent = null;
 
-    /* ================= CANVAS DIRECT GRID RENDERER ================= */
-    function drawCanvasGrid(cCtx, width, height) {
-      if (!cCtx || width <= 0 || height <= 0) return;
+    /* ================= GRID TOGGLE SYSTEM ================= */
+    let isDrawerGridOn = false;
+    let isSplitGridOn = false;
+
+    function toggleCanvasGrid(target) {
+      if (target === 'drawer') {
+        const canvasEl = document.getElementById('scratchpadCanvas');
+        const wrapperEl = document.getElementById('scratchpadInnerWrapper');
+        const status = document.getElementById('drawerGridStatusText');
+        isDrawerGridOn = !isDrawerGridOn;
+        if (canvasEl) canvasEl.classList.toggle('math-grid', isDrawerGridOn);
+        if (wrapperEl) wrapperEl.classList.toggle('math-grid', isDrawerGridOn);
+        if (status) {
+          status.textContent = isDrawerGridOn ? 'ON' : 'OFF';
+          status.className = isDrawerGridOn ? 'text-emerald-400 font-black' : 'text-gray-400 font-black';
+        }
+        showToast(isDrawerGridOn ? "Drawer Math Grid: ON" : "Drawer Math Grid: OFF");
+      } else if (target === 'split') {
+        const canvasEl = document.getElementById('splitScratchCanvas');
+        const wrapperEl = document.getElementById('splitCanvasWrapper');
+        const status = document.getElementById('splitGridStatusText');
+        isSplitGridOn = !isSplitGridOn;
+        if (canvasEl) canvasEl.classList.toggle('math-grid', isSplitGridOn);
+        if (wrapperEl) wrapperEl.classList.toggle('math-grid', isSplitGridOn);
+        if (status) {
+          status.textContent = isSplitGridOn ? 'ON' : 'OFF';
+          status.className = isSplitGridOn ? 'text-emerald-400 font-black' : 'text-gray-400 font-black';
+        }
+        showToast(isSplitGridOn ? "Split Math Grid: ON" : "Split Math Grid: OFF");
+      }
+    }
+
+    /* ================= GEOMETRY & QUICKSHAPE RECOGNITION ================= */
+    function snapLineCoordinates(x0, y0, x1, y1) {
+      const dx = x1 - x0;
+      const dy = y1 - y0;
+      const dist = Math.hypot(dx, dy);
+      if (dist < 10) return { x: x1, y: y1 };
+
+      const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+      const snapAngles = [0, 45, 90, 135, 180, -180, -135, -90, -45];
+      const threshold = 7.5; // snaps smoothly to horizontal and vertical axes
+
+      for (let sa of snapAngles) {
+        if (Math.abs(angle - sa) < threshold || Math.abs(angle - (sa + 360)) < threshold || Math.abs(angle - (sa - 360)) < threshold) {
+          const rad = sa * (Math.PI / 180);
+          return {
+            x: x0 + Math.cos(rad) * dist,
+            y: y0 + Math.sin(rad) * dist
+          };
+        }
+      }
+      return { x: x1, y: y1 };
+    }
+
+    function distToSegment(p, v, w) {
+      const l2 = (w.x - v.x) ** 2 + (w.y - v.y) ** 2;
+      if (l2 === 0) return Math.hypot(p.x - v.x, p.y - v.y);
+      let t = ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
+      t = Math.max(0, Math.min(1, t));
+      return Math.hypot(p.x - (v.x + t * (w.x - v.x)), p.y - (v.y + t * (w.y - v.y)));
+    }
+
+    function signedDistToLine(p, v, w) {
+      const num = (w.y - v.y) * p.x - (w.x - v.x) * p.y + w.x * v.y - w.y * v.x;
+      const den = Math.hypot(w.y - v.y, w.x - v.x);
+      return den === 0 ? 0 : num / den;
+    }
+
+    function smoothPoints(pts, iterations = 2) {
+      if (!pts || pts.length <= 4) return pts;
+      let cur = pts.map(p => ({ x: p.x, y: p.y }));
+      for (let it = 0; it < iterations; it++) {
+        let next = [cur[0]];
+        for (let i = 1; i < cur.length - 1; i++) {
+          next.push({
+            x: 0.25 * cur[i - 1].x + 0.5 * cur[i].x + 0.25 * cur[i + 1].x,
+            y: 0.25 * cur[i - 1].y + 0.5 * cur[i].y + 0.25 * cur[i + 1].y
+          });
+        }
+        next.push(cur[cur.length - 1]);
+        cur = next;
+      }
+      return cur;
+    }
+
+    // Intelligent Shape Detection:
+    // Recognizes straight lines & shapes reliably while preserving mathematical wave graphs (sine, cosine, tangent)
+    function recognizeShapeFromPoints(pts) {
+      if (!pts || pts.length < 5) return null;
+      const start = pts[0];
+      const end = pts[pts.length - 1];
+      const directDist = Math.hypot(end.x - start.x, end.y - start.y);
+
+      let totalLen = 0;
+      let minX = pts[0].x, maxX = pts[0].x, minY = pts[0].y, maxY = pts[0].y;
+      for (let i = 1; i < pts.length; i++) {
+        totalLen += Math.hypot(pts[i].x - pts[i-1].x, pts[i].y - pts[i-1].y);
+        minX = Math.min(minX, pts[i].x); maxX = Math.max(maxX, pts[i].x);
+        minY = Math.min(minY, pts[i].y); maxY = Math.max(maxY, pts[i].y);
+      }
+
+      if (totalLen < 20) return null;
+
+      // 1. Check for Closed Shapes (Circle, Ellipse, Rectangle)
+      const isClosed = directDist < Math.max(45, totalLen * 0.28) && totalLen > 50;
+      if (isClosed) {
+        const w = maxX - minX;
+        const h = maxY - minY;
+        const cx = (minX + maxX) / 2;
+        const cy = (minY + maxY) / 2;
+        const avgR = (w + h) / 4;
+
+        let rDiff = 0;
+        for (let p of pts) {
+          const d = Math.hypot(p.x - cx, p.y - cy);
+          rDiff += Math.abs(d - avgR);
+        }
+        const avgDeviation = rDiff / pts.length;
+        const ratio = Math.min(w, h) / (Math.max(w, h) || 1);
+
+        if (ratio > 0.65 && avgDeviation < avgR * 0.38) {
+          return { type: 'circle', cx: cx, cy: cy, r: avgR };
+        } else {
+          return { type: 'rect', x: minX, y: minY, w: w, h: h };
+        }
+      }
+
+      // 2. Open Strokes: Distinguish Straight Lines vs. Curved Trigonometric Graphs
+      if (directDist < 25) return null;
+
+      let maxDev = 0;
+      for (let p of pts) {
+        const d = distToSegment(p, start, end);
+        if (d > maxDev) maxDev = d;
+      }
+
+      // Count zero-crossings across the baseline chord to detect oscillating waves (sine, cosine)
+      let signChanges = 0;
+      let lastSign = 0;
+      for (let p of pts) {
+        const sDist = signedDistToLine(p, start, end);
+        if (Math.abs(sDist) > 10) {
+          const curSign = sDist > 0 ? 1 : -1;
+          if (lastSign !== 0 && curSign !== lastSign) {
+            signChanges++;
+          }
+          lastSign = curSign;
+        }
+      }
+
+      const lengthRatio = totalLen / (directDist || 1);
+
+      // If it oscillates across the chord with multiple waves, it is a trig curve -> keep as curve!
+      if (signChanges >= 2) {
+        return {
+          type: 'stroke',
+          points: smoothPoints(pts, 2)
+        };
+      }
+
+      // If it is intended to be a straight line (reasonably straight with normal hand wobble)
+      if (lengthRatio < 1.25 && maxDev <= Math.max(24, directDist * 0.16)) {
+        const snapped = snapLineCoordinates(start.x, start.y, end.x, end.y);
+        return {
+          type: 'line',
+          x1: start.x,
+          y1: start.y,
+          x2: snapped.x,
+          y2: snapped.y
+        };
+      }
+
+      // Otherwise, it's a deliberate parabolic curve or curved graph -> smooth gently, do not flatten
+      return {
+        type: 'stroke',
+        points: smoothPoints(pts, 2)
+      };
+    }
+
+    function hitTestObject(obj, x, y) {
+      const tol = (obj.thickness || 3) + 12;
+      if (obj.type === 'line') {
+        return distToSegment({ x, y }, { x: obj.x1, y: obj.y1 }, { x: obj.x2, y: obj.y2 }) <= tol;
+      } else if (obj.type === 'circle') {
+        const d = Math.hypot(x - obj.cx, y - obj.cy);
+        return Math.abs(d - obj.r) <= tol || d <= obj.r;
+      } else if (obj.type === 'rect') {
+        return x >= obj.x - tol && x <= obj.x + obj.w + tol && y >= obj.y - tol && y <= obj.y + obj.h + tol;
+      } else if (obj.type === 'stroke') {
+        for (let i = 1; i < obj.points.length; i++) {
+          if (distToSegment({ x, y }, obj.points[i - 1], obj.points[i]) <= tol) return true;
+        }
+      }
+      return false;
+    }
+
+    function moveObjectBy(obj, dx, dy) {
+      if (obj.type === 'line') {
+        obj.x1 += dx; obj.y1 += dy;
+        obj.x2 += dx; obj.y2 += dy;
+      } else if (obj.type === 'circle') {
+        obj.cx += dx; obj.cy += dy;
+      } else if (obj.type === 'rect') {
+        obj.x += dx; obj.y += dy;
+      } else if (obj.type === 'stroke') {
+        for (let pt of obj.points) {
+          pt.x += dx; pt.y += dy;
+        }
+      }
+    }
+
+    function renderSingleObject(cCtx, obj, isSelected = false) {
       cCtx.save();
-      cCtx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-      cCtx.lineWidth = 1;
-      const step = 24;
-      cCtx.beginPath();
-      for (let x = step; x < width; x += step) {
-        cCtx.moveTo(x + 0.5, 0);
-        cCtx.lineTo(x + 0.5, height);
+      cCtx.strokeStyle = obj.color;
+      cCtx.lineWidth = obj.thickness;
+      cCtx.lineCap = 'round';
+      cCtx.lineJoin = 'round';
+
+      if (obj.type === 'stroke') {
+        if (obj.points && obj.points.length > 0) {
+          cCtx.beginPath();
+          cCtx.moveTo(obj.points[0].x, obj.points[0].y);
+          for (let i = 1; i < obj.points.length; i++) {
+            cCtx.lineTo(obj.points[i].x, obj.points[i].y);
+          }
+          cCtx.stroke();
+        }
+      } else if (obj.type === 'line') {
+        cCtx.beginPath();
+        cCtx.moveTo(obj.x1, obj.y1);
+        cCtx.lineTo(obj.x2, obj.y2);
+        cCtx.stroke();
+      } else if (obj.type === 'circle') {
+        cCtx.beginPath();
+        cCtx.arc(obj.cx, obj.cy, Math.max(1, obj.r), 0, 2 * Math.PI);
+        cCtx.stroke();
+      } else if (obj.type === 'rect') {
+        cCtx.beginPath();
+        cCtx.strokeRect(obj.x, obj.y, obj.w, obj.h);
       }
-      for (let y = step; y < height; y += step) {
-        cCtx.moveTo(0, y + 0.5);
-        cCtx.lineTo(width, y + 0.5);
+
+      if (isSelected) {
+        cCtx.strokeStyle = '#38bdf8';
+        cCtx.lineWidth = 1.5;
+        cCtx.setLineDash([4, 4]);
+        const bbox = getObjectBoundingBox(obj);
+        if (bbox) {
+          cCtx.strokeRect(bbox.x - 6, bbox.y - 6, bbox.w + 12, bbox.h + 12);
+        }
       }
-      cCtx.stroke();
       cCtx.restore();
+    }
+
+    function getObjectBoundingBox(obj) {
+      if (obj.type === 'line') {
+        const x = Math.min(obj.x1, obj.x2);
+        const y = Math.min(obj.y1, obj.y2);
+        return { x, y, w: Math.abs(obj.x2 - obj.x1), h: Math.abs(obj.y2 - obj.y1) };
+      } else if (obj.type === 'circle') {
+        return { x: obj.cx - obj.r, y: obj.cy - obj.r, w: obj.r * 2, h: obj.r * 2 };
+      } else if (obj.type === 'rect') {
+        return { x: obj.x, y: obj.y, w: obj.w, h: obj.h };
+      } else if (obj.type === 'stroke') {
+        if (!obj.points || obj.points.length === 0) return null;
+        let minX = obj.points[0].x, maxX = obj.points[0].x, minY = obj.points[0].y, maxY = obj.points[0].y;
+        for (let p of obj.points) {
+          minX = Math.min(minX, p.x); maxX = Math.max(maxX, p.x);
+          minY = Math.min(minY, p.y); maxY = Math.max(maxY, p.y);
+        }
+        return { x: minX, y: minY, w: maxX - minX, h: maxY - minY };
+      }
+      return null;
+    }
+
+    /* ================= DRAWER NOTEPAD SYSTEM ================= */
+    let canvas, ctx;
+    let isDrawing = false;
+    let currentColor = '#10b981';
+    let drawerCurrentTool = 'pen'; // 'pen', 'move', 'line', 'circle', 'rect', 'eraser'
+    let drawerPenThickness = 3;
+    let drawerEraserThickness = 20;
+    let isStylusOnlyMode = false;
+
+    let drawerObjects = [];
+    let drawerUndoStack = [];
+    let drawerSelectedObj = null;
+    let drawerCurrentStrokePoints = [];
+    let drawerStartX = 0, drawerStartY = 0;
+    let drawerLastMoveX = 0, drawerLastMoveY = 0;
+
+    let drawerHoldTimer = null;
+    let drawerSnappedShape = null;
+
+    function redrawDrawerCanvas() {
+      if (!ctx || !canvas) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let obj of drawerObjects) {
+        renderSingleObject(ctx, obj, obj === drawerSelectedObj);
+      }
+    }
+
+    function saveDrawerState() {
+      drawerUndoStack.push(JSON.parse(JSON.stringify(drawerObjects)));
+      if (drawerUndoStack.length > 25) drawerUndoStack.shift();
+    }
+
+    function undoDrawerCanvas() {
+      if (drawerUndoStack.length === 0) return;
+      drawerObjects = drawerUndoStack.pop();
+      drawerSelectedObj = null;
+      redrawDrawerCanvas();
+      showToast("Undone!");
+    }
+
+    function clearScratchpadCanvas() {
+      saveDrawerState();
+      drawerObjects = [];
+      drawerSelectedObj = null;
+      redrawDrawerCanvas();
+      showToast("Scratchpad cleared!");
+    }
+
+    function initScratchpadCanvas() {
+      canvas = document.getElementById('scratchpadCanvas');
+      if (!canvas) return;
+      ctx = canvas.getContext('2d');
+
+      resizeScratchpadCanvas();
+      window.addEventListener('resize', resizeScratchpadCanvas);
+
+      canvas.addEventListener('pointerdown', handleDrawerPointerDown);
+      canvas.addEventListener('pointermove', handleDrawerPointerMove);
+      canvas.addEventListener('pointerup', handleDrawerPointerUp);
+      canvas.addEventListener('pointercancel', handleDrawerPointerUp);
+      canvas.addEventListener('pointerleave', handleDrawerPointerUp);
+    }
+
+    function scheduleDrawerHoldCheck() {
+      clearTimeout(drawerHoldTimer);
+      drawerHoldTimer = setTimeout(() => {
+        if (isDrawing && drawerCurrentTool === 'pen' && drawerCurrentStrokePoints.length > 5) {
+          const detected = recognizeShapeFromPoints(drawerCurrentStrokePoints);
+          if (detected) {
+            drawerSnappedShape = detected;
+            drawerSnappedShape.color = currentColor;
+            drawerSnappedShape.thickness = drawerPenThickness;
+            redrawDrawerCanvas();
+            renderSingleObject(ctx, drawerSnappedShape, false);
+            if (detected.type === 'line') showToast("📏 100% Straight Line Snapped!");
+            else if (detected.type === 'circle') showToast("⭕ Perfect Circle Snapped!");
+            else if (detected.type === 'rect') showToast("▢ Perfect Rectangle Snapped!");
+            else showToast("🌊 Smooth Curve Polished!");
+          }
+        }
+      }, 380);
+    }
+
+    function handleDrawerPointerDown(e) {
+      if (isStylusOnlyMode && e.pointerType !== 'pen') return;
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      isDrawing = true;
+      drawerStartX = x;
+      drawerStartY = y;
+      drawerLastMoveX = x;
+      drawerLastMoveY = y;
+      drawerSnappedShape = null;
+
+      if (drawerCurrentTool === 'move') {
+        saveDrawerState();
+        drawerSelectedObj = null;
+        for (let i = drawerObjects.length - 1; i >= 0; i--) {
+          if (hitTestObject(drawerObjects[i], x, y)) {
+            drawerSelectedObj = drawerObjects[i];
+            break;
+          }
+        }
+        redrawDrawerCanvas();
+        try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
+        return;
+      }
+
+      if (drawerCurrentTool === 'eraser') {
+        saveDrawerState();
+        eraseAtPointDrawer(x, y);
+        try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
+        return;
+      }
+
+      saveDrawerState();
+      drawerCurrentStrokePoints = [{ x, y }];
+      scheduleDrawerHoldCheck();
+      try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
+    }
+
+    function handleDrawerPointerMove(e) {
+      if (!isDrawing) return;
+      if (isStylusOnlyMode && e.pointerType !== 'pen') return;
+      const rect = canvas.getBoundingClientRect();
+      const currX = e.clientX - rect.left;
+      const currY = e.clientY - rect.top;
+
+      if (drawerCurrentTool === 'move') {
+        if (drawerSelectedObj) {
+          const dx = currX - drawerLastMoveX;
+          const dy = currY - drawerLastMoveY;
+          moveObjectBy(drawerSelectedObj, dx, dy);
+          drawerLastMoveX = currX;
+          drawerLastMoveY = currY;
+          redrawDrawerCanvas();
+        }
+        return;
+      }
+
+      if (drawerCurrentTool === 'eraser') {
+        eraseAtPointDrawer(currX, currY);
+        return;
+      }
+
+      drawerLastMoveX = currX;
+      drawerLastMoveY = currY;
+
+      if (drawerCurrentTool === 'pen') {
+        drawerCurrentStrokePoints.push({ x: currX, y: currY });
+        scheduleDrawerHoldCheck();
+
+        if (drawerSnappedShape) {
+          redrawDrawerCanvas();
+          renderSingleObject(ctx, drawerSnappedShape, false);
+        } else {
+          redrawDrawerCanvas();
+          ctx.save();
+          ctx.strokeStyle = currentColor;
+          ctx.lineWidth = drawerPenThickness;
+          ctx.lineCap = 'round';
+          ctx.lineJoin = 'round';
+          ctx.beginPath();
+          ctx.moveTo(drawerCurrentStrokePoints[0].x, drawerCurrentStrokePoints[0].y);
+          for (let i = 1; i < drawerCurrentStrokePoints.length; i++) {
+            ctx.lineTo(drawerCurrentStrokePoints[i].x, drawerCurrentStrokePoints[i].y);
+          }
+          ctx.stroke();
+          ctx.restore();
+        }
+        return;
+      }
+
+      // Explicit shapes preview
+      if (drawerCurrentTool !== 'pen') {
+        redrawDrawerCanvas();
+        let preview = null;
+
+        if (drawerCurrentTool === 'line') {
+          const snapped = snapLineCoordinates(drawerStartX, drawerStartY, currX, currY);
+          preview = { type: 'line', x1: drawerStartX, y1: drawerStartY, x2: snapped.x, y2: snapped.y, color: currentColor, thickness: drawerPenThickness };
+        } else if (drawerCurrentTool === 'circle') {
+          const r = Math.hypot(currX - drawerStartX, currY - drawerStartY) / 2;
+          const cx = (drawerStartX + currX) / 2;
+          const cy = (drawerStartY + currY) / 2;
+          preview = { type: 'circle', cx, cy, r, color: currentColor, thickness: drawerPenThickness };
+        } else if (drawerCurrentTool === 'rect') {
+          preview = { type: 'rect', x: Math.min(drawerStartX, currX), y: Math.min(drawerStartY, currY), w: Math.abs(currX - drawerStartX), h: Math.abs(currY - drawerStartY), color: currentColor, thickness: drawerPenThickness };
+        }
+
+        if (preview) {
+          renderSingleObject(ctx, preview, false);
+        }
+      }
+    }
+
+    function handleDrawerPointerUp(e) {
+      if (!isDrawing) return;
+      isDrawing = false;
+      clearTimeout(drawerHoldTimer);
+
+      if (drawerCurrentTool === 'move') {
+        redrawDrawerCanvas();
+        try { canvas.releasePointerCapture(e.pointerId); } catch (err) {}
+        return;
+      }
+
+      if (drawerSnappedShape) {
+        drawerObjects.push(drawerSnappedShape);
+        drawerSnappedShape = null;
+      } else if (drawerCurrentTool === 'pen') {
+        if (drawerCurrentStrokePoints.length > 1) {
+          drawerObjects.push({
+            type: 'stroke',
+            points: [...drawerCurrentStrokePoints],
+            color: currentColor,
+            thickness: drawerPenThickness
+          });
+        }
+      } else if (drawerCurrentTool === 'line' || drawerCurrentTool === 'circle' || drawerCurrentTool === 'rect') {
+        const rect = canvas.getBoundingClientRect();
+        const endX = e.clientX - rect.left;
+        const endY = e.clientY - rect.top;
+
+        if (drawerCurrentTool === 'line') {
+          const snapped = snapLineCoordinates(drawerStartX, drawerStartY, endX, endY);
+          drawerObjects.push({ type: 'line', x1: drawerStartX, y1: drawerStartY, x2: snapped.x, y2: snapped.y, color: currentColor, thickness: drawerPenThickness });
+        } else if (drawerCurrentTool === 'circle') {
+          const r = Math.hypot(endX - drawerStartX, endY - drawerStartY) / 2;
+          drawerObjects.push({ type: 'circle', cx: (drawerStartX + endX) / 2, cy: (drawerStartY + endY) / 2, r, color: currentColor, thickness: drawerPenThickness });
+        } else if (drawerCurrentTool === 'rect') {
+          drawerObjects.push({ type: 'rect', x: Math.min(drawerStartX, endX), y: Math.min(drawerStartY, endY), w: Math.abs(endX - drawerStartX), h: Math.abs(endY - drawerStartY), color: currentColor, thickness: drawerPenThickness });
+        }
+      }
+
+      drawerCurrentStrokePoints = [];
+      redrawDrawerCanvas();
+      try { canvas.releasePointerCapture(e.pointerId); } catch (err) {}
+    }
+
+    function eraseAtPointDrawer(x, y) {
+      const initLen = drawerObjects.length;
+      drawerObjects = drawerObjects.filter(obj => !hitTestObject(obj, x, y));
+      if (drawerObjects.length !== initLen) redrawDrawerCanvas();
+    }
+
+    function setDrawerShapeMode(tool) {
+      drawerCurrentTool = tool;
+      const penBtn = document.getElementById('drawerToolPenBtn');
+      const moveBtn = document.getElementById('drawerToolMoveBtn');
+      const lineBtn = document.getElementById('drawerToolLineBtn');
+      const circleBtn = document.getElementById('drawerToolCircleBtn');
+      const rectBtn = document.getElementById('drawerToolRectBtn');
+      const eraserBtn = document.getElementById('drawerEraserModeBtn');
+
+      const btns = [
+        { key: 'pen', el: penBtn },
+        { key: 'move', el: moveBtn },
+        { key: 'line', el: lineBtn },
+        { key: 'circle', el: circleBtn },
+        { key: 'rect', el: rectBtn },
+        { key: 'eraser', el: eraserBtn }
+      ];
+
+      btns.forEach(b => {
+        if (!b.el) return;
+        if (b.key === tool) {
+          b.el.className = "px-2.5 py-1 bg-emerald-500 text-black font-black uppercase rounded shadow-sm";
+        } else {
+          b.el.className = "px-2.5 py-1 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded";
+        }
+      });
+
+      if (tool === 'move') {
+        showToast("🖐️ MOVE mode: Tap & drag any graph or shape!");
+      } else if (tool === 'pen') {
+        showToast("✏️ PEN mode: Hold 0.4s to snap lines & shapes!");
+      }
+      redrawDrawerCanvas();
+    }
+
+    function resizeScratchpadCanvas() {
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return;
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+      redrawDrawerCanvas();
+    }
+
+    function setCanvasColor(color) {
+      currentColor = color;
+      if (drawerCurrentTool === 'eraser') setDrawerShapeMode('pen');
+    }
+
+    function toggleScratchpadDrawer() {
+      const drawer = document.getElementById('scratchpadDrawer');
+      const formulaDrawer = document.getElementById('formulaDrawer');
+      const btn = document.getElementById('scratchpadToggleBtn');
+      if (!drawer) return;
+
+      const isOpen = drawer.classList.contains('open');
+      if (isOpen) {
+        drawer.classList.remove('open');
+        if (btn) btn.classList.remove('ring-2', 'ring-black');
+      } else {
+        if (formulaDrawer && formulaDrawer.classList.contains('open')) formulaDrawer.classList.remove('open');
+        drawer.classList.add('open');
+        if (btn) btn.classList.add('ring-2', 'ring-black');
+        setTimeout(resizeScratchpadCanvas, 320);
+      }
+    }
+
+    function downloadScratchpadPNG() {
+      if (!canvas) return;
+      const link = document.createElement('a');
+      link.download = `A-Math_Working_${Date.now()}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      showToast("Saved working as image!");
+    }
+
+    function sendScratchpadToLucas() {
+      const studentName = currentStudent ? currentStudent.name : 'Student';
+      const encoded = encodeURIComponent(`Hi Lucas, I am ${studentName}! I just saved my digital scratchpad working. Sending the photo over for checking!`);
+      window.open(`https://wa.me/6581980012?text=${encoded}`, '_blank');
+    }
+
+    function updateDrawerThickness(val) {
+      const parsed = parseInt(val, 10);
+      const label = document.getElementById('drawerSizeValueLabel');
+      if (label) label.textContent = `${parsed}px`;
+
+      if (drawerCurrentTool === 'eraser') {
+        drawerEraserThickness = parsed;
+      } else {
+        drawerPenThickness = parsed;
+      }
+    }
+
+    /* ================= SPLIT SCREEN STATE & ENGINE ================= */
+    let isSplitScreenActive = false;
+    let splitRightSelectedValue = 'notepad';
+    let splitCanvas, splitCtx;
+    let isSplitDrawing = false;
+    let splitCanvasColor = '#10b981';
+    let splitPenThickness = 3;
+    let splitEraserThickness = 20;
+    let splitCurrentTool = 'pen';
+
+    let splitObjects = [];
+    let splitUndoStack = [];
+    let splitSelectedObj = null;
+    let splitCurrentStrokePoints = [];
+    let splitStartX = 0, splitStartY = 0;
+    let splitLastMoveX = 0, splitLastMoveY = 0;
+    let splitHoldTimer = null;
+    let splitSnappedShape = null;
+
+    function redrawSplitCanvas() {
+      if (!splitCtx || !splitCanvas) return;
+      splitCtx.clearRect(0, 0, splitCanvas.width, splitCanvas.height);
+      for (let obj of splitObjects) {
+        renderSingleObject(splitCtx, obj, obj === splitSelectedObj);
+      }
+    }
+
+    function saveSplitState() {
+      splitUndoStack.push(JSON.parse(JSON.stringify(splitObjects)));
+      if (splitUndoStack.length > 25) splitUndoStack.shift();
+    }
+
+    function undoSplitCanvas() {
+      if (splitUndoStack.length === 0) return;
+      splitObjects = splitUndoStack.pop();
+      splitSelectedObj = null;
+      redrawSplitCanvas();
+      showToast("Undone!");
+    }
+
+    function clearSplitCanvas() {
+      saveSplitState();
+      splitObjects = [];
+      splitSelectedObj = null;
+      redrawSplitCanvas();
+      showToast("Split canvas cleared!");
+    }
+
+    function initSplitScratchCanvas() {
+      splitCanvas = document.getElementById('splitScratchCanvas');
+      if (!splitCanvas) return;
+      splitCtx = splitCanvas.getContext('2d');
+
+      resizeSplitScratchCanvas();
+      window.addEventListener('resize', resizeSplitScratchCanvas);
+
+      splitCanvas.addEventListener('pointerdown', handleSplitPointerDown);
+      splitCanvas.addEventListener('pointermove', handleSplitPointerMove);
+      splitCanvas.addEventListener('pointerup', handleSplitPointerUp);
+      splitCanvas.addEventListener('pointercancel', handleSplitPointerUp);
+      splitCanvas.addEventListener('pointerleave', handleSplitPointerUp);
+    }
+
+    function scheduleSplitHoldCheck() {
+      clearTimeout(splitHoldTimer);
+      splitHoldTimer = setTimeout(() => {
+        if (isSplitDrawing && splitCurrentTool === 'pen' && splitCurrentStrokePoints.length > 5) {
+          const detected = recognizeShapeFromPoints(splitCurrentStrokePoints);
+          if (detected) {
+            splitSnappedShape = detected;
+            splitSnappedShape.color = splitCanvasColor;
+            splitSnappedShape.thickness = splitPenThickness;
+            redrawSplitCanvas();
+            renderSingleObject(splitCtx, splitSnappedShape, false);
+            if (detected.type === 'line') showToast("📏 100% Straight Line Snapped!");
+            else if (detected.type === 'circle') showToast("⭕ Perfect Circle Snapped!");
+            else if (detected.type === 'rect') showToast("▢ Perfect Rectangle Snapped!");
+            else showToast("🌊 Smooth Curve Polished!");
+          }
+        }
+      }, 380);
+    }
+
+    function handleSplitPointerDown(e) {
+      if (isStylusOnlyMode && e.pointerType !== 'pen') return;
+      const rect = splitCanvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      isSplitDrawing = true;
+      splitStartX = x;
+      splitStartY = y;
+      splitLastMoveX = x;
+      splitLastMoveY = y;
+      splitSnappedShape = null;
+
+      if (splitCurrentTool === 'move') {
+        saveSplitState();
+        splitSelectedObj = null;
+        for (let i = splitObjects.length - 1; i >= 0; i--) {
+          if (hitTestObject(splitObjects[i], x, y)) {
+            splitSelectedObj = splitObjects[i];
+            break;
+          }
+        }
+        redrawSplitCanvas();
+        try { splitCanvas.setPointerCapture(e.pointerId); } catch (err) {}
+        return;
+      }
+
+      if (splitCurrentTool === 'eraser') {
+        saveSplitState();
+        eraseAtPointSplit(x, y);
+        try { splitCanvas.setPointerCapture(e.pointerId); } catch (err) {}
+        return;
+      }
+
+      saveSplitState();
+      splitCurrentStrokePoints = [{ x, y }];
+      scheduleSplitHoldCheck();
+      try { splitCanvas.setPointerCapture(e.pointerId); } catch (err) {}
+    }
+
+    function handleSplitPointerMove(e) {
+      if (!isSplitDrawing) return;
+      if (isStylusOnlyMode && e.pointerType !== 'pen') return;
+      const rect = splitCanvas.getBoundingClientRect();
+      const currX = e.clientX - rect.left;
+      const currY = e.clientY - rect.top;
+
+      if (splitCurrentTool === 'move') {
+        if (splitSelectedObj) {
+          const dx = currX - splitLastMoveX;
+          const dy = currY - splitLastMoveY;
+          moveObjectBy(splitSelectedObj, dx, dy);
+          splitLastMoveX = currX;
+          splitLastMoveY = currY;
+          redrawSplitCanvas();
+        }
+        return;
+      }
+
+      if (splitCurrentTool === 'eraser') {
+        eraseAtPointSplit(currX, currY);
+        return;
+      }
+
+      splitLastMoveX = currX;
+      splitLastMoveY = currY;
+
+      if (splitCurrentTool === 'pen') {
+        splitCurrentStrokePoints.push({ x: currX, y: currY });
+        scheduleSplitHoldCheck();
+
+        if (splitSnappedShape) {
+          redrawSplitCanvas();
+          renderSingleObject(splitCtx, splitSnappedShape, false);
+        } else {
+          redrawSplitCanvas();
+          splitCtx.save();
+          splitCtx.strokeStyle = splitCanvasColor;
+          splitCtx.lineWidth = splitPenThickness;
+          splitCtx.lineCap = 'round';
+          splitCtx.lineJoin = 'round';
+          splitCtx.beginPath();
+          splitCtx.moveTo(splitCurrentStrokePoints[0].x, splitCurrentStrokePoints[0].y);
+          for (let i = 1; i < splitCurrentStrokePoints.length; i++) {
+            splitCtx.lineTo(splitCurrentStrokePoints[i].x, splitCurrentStrokePoints[i].y);
+          }
+          splitCtx.stroke();
+          splitCtx.restore();
+        }
+        return;
+      }
+
+      if (splitCurrentTool !== 'pen') {
+        redrawSplitCanvas();
+        let preview = null;
+
+        if (splitCurrentTool === 'line') {
+          const snapped = snapLineCoordinates(splitStartX, splitStartY, currX, currY);
+          preview = { type: 'line', x1: splitStartX, y1: splitStartY, x2: snapped.x, y2: snapped.y, color: splitCanvasColor, thickness: splitPenThickness };
+        } else if (splitCurrentTool === 'circle') {
+          const r = Math.hypot(currX - splitStartX, currY - splitStartY) / 2;
+          const cx = (splitStartX + currX) / 2;
+          const cy = (splitStartY + currY) / 2;
+          preview = { type: 'circle', cx, cy, r, color: splitCanvasColor, thickness: splitPenThickness };
+        } else if (splitCurrentTool === 'rect') {
+          preview = { type: 'rect', x: Math.min(splitStartX, currX), y: Math.min(splitStartY, currY), w: Math.abs(currX - splitStartX), h: Math.abs(currY - splitStartY), color: splitCanvasColor, thickness: splitPenThickness };
+        }
+
+        if (preview) {
+          renderSingleObject(splitCtx, preview, false);
+        }
+      }
+    }
+
+    function handleSplitPointerUp(e) {
+      if (!isSplitDrawing) return;
+      isSplitDrawing = false;
+      clearTimeout(splitHoldTimer);
+
+      if (splitCurrentTool === 'move') {
+        redrawSplitCanvas();
+        try { splitCanvas.releasePointerCapture(e.pointerId); } catch (err) {}
+        return;
+      }
+
+      if (splitSnappedShape) {
+        splitObjects.push(splitSnappedShape);
+        splitSnappedShape = null;
+      } else if (splitCurrentTool === 'pen') {
+        if (splitCurrentStrokePoints.length > 1) {
+          splitObjects.push({
+            type: 'stroke',
+            points: [...splitCurrentStrokePoints],
+            color: splitCanvasColor,
+            thickness: splitPenThickness
+          });
+        }
+      } else if (splitCurrentTool === 'line' || splitCurrentTool === 'circle' || splitCurrentTool === 'rect') {
+        const rect = splitCanvas.getBoundingClientRect();
+        const endX = e.clientX - rect.left;
+        const endY = e.clientY - rect.top;
+
+        if (splitCurrentTool === 'line') {
+          const snapped = snapLineCoordinates(splitStartX, splitStartY, endX, endY);
+          splitObjects.push({ type: 'line', x1: splitStartX, y1: splitStartY, x2: snapped.x, y2: snapped.y, color: splitCanvasColor, thickness: splitPenThickness });
+        } else if (splitCurrentTool === 'circle') {
+          const r = Math.hypot(endX - splitStartX, endY - splitStartY) / 2;
+          splitObjects.push({ type: 'circle', cx: (splitStartX + endX) / 2, cy: (splitStartY + endY) / 2, r, color: splitCanvasColor, thickness: splitPenThickness });
+        } else if (splitCurrentTool === 'rect') {
+          splitObjects.push({ type: 'rect', x: Math.min(splitStartX, endX), y: Math.min(splitStartY, endY), w: Math.abs(endX - splitStartX), h: Math.abs(endY - splitStartY), color: splitCanvasColor, thickness: splitPenThickness });
+        }
+      }
+
+      splitCurrentStrokePoints = [];
+      redrawSplitCanvas();
+      try { splitCanvas.releasePointerCapture(e.pointerId); } catch (err) {}
+    }
+
+    function eraseAtPointSplit(x, y) {
+      const initLen = splitObjects.length;
+      splitObjects = splitObjects.filter(obj => !hitTestObject(obj, x, y));
+      if (splitObjects.length !== initLen) redrawSplitCanvas();
+    }
+
+    function setSplitShapeMode(tool) {
+      splitCurrentTool = tool;
+      const penBtn = document.getElementById('splitToolPenBtn');
+      const moveBtn = document.getElementById('splitToolMoveBtn');
+      const lineBtn = document.getElementById('splitToolLineBtn');
+      const circleBtn = document.getElementById('splitToolCircleBtn');
+      const rectBtn = document.getElementById('splitToolRectBtn');
+      const eraserBtn = document.getElementById('splitEraserModeBtn');
+
+      const btns = [
+        { key: 'pen', el: penBtn },
+        { key: 'move', el: moveBtn },
+        { key: 'line', el: lineBtn },
+        { key: 'circle', el: circleBtn },
+        { key: 'rect', el: rectBtn },
+        { key: 'eraser', el: eraserBtn }
+      ];
+
+      btns.forEach(b => {
+        if (!b.el) return;
+        if (b.key === tool) {
+          b.el.className = "px-2 py-0.5 bg-emerald-500 text-black font-black uppercase rounded shadow-sm";
+        } else {
+          b.el.className = "px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded";
+        }
+      });
+
+      if (tool === 'move') {
+        showToast("🖐️ MOVE mode: Tap & drag any graph or shape!");
+      } else if (tool === 'pen') {
+        showToast("✏️ PEN mode: Hold 0.4s to snap lines & shapes!");
+      }
+      redrawSplitCanvas();
+    }
+
+    function resizeSplitScratchCanvas() {
+      if (!splitCanvas) return;
+      const rect = splitCanvas.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return;
+      splitCanvas.width = rect.width;
+      splitCanvas.height = rect.height;
+      redrawSplitCanvas();
+    }
+
+    function setSplitCanvasColor(color) {
+      splitCanvasColor = color;
+      if (splitCurrentTool === 'eraser') setSplitShapeMode('pen');
+    }
+
+    function updateSplitThickness(val) {
+      const parsed = parseInt(val, 10);
+      const label = document.getElementById('splitSizeValueLabel');
+      if (label) label.textContent = `${parsed}px`;
+
+      if (splitCurrentTool === 'eraser') {
+        splitEraserThickness = parsed;
+      } else {
+        splitPenThickness = parsed;
+      }
+    }
+
+    /* ================= PWA & APP NAVIGATION CORE ================= */
+    let deferredPrompt = null;
+
+    function initPWA() {
+      const manifestData = {
+        name: "ExcelMathsWithLucas",
+        short_name: "ExcelMaths",
+        start_url: window.location.pathname || "./",
+        scope: window.location.pathname ? window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1) : "./",
+        display: "standalone",
+        display_override: ["window-controls-overlay", "standalone", "minimal-ui"],
+        background_color: "#0a0a0a",
+        theme_color: "#0a0a0a",
+        orientation: "any",
+        description: "Official Additional Mathematics Practice Portal & Video System",
+        icons: [
+          { src: "54009.jpg", sizes: "192x192", type: "image/jpeg", purpose: "any" },
+          { src: "54009.jpg", sizes: "512x512", type: "image/jpeg", purpose: "any maskable" }
+        ]
+      };
+
+      const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/manifest+json' });
+      const manifestURL = URL.createObjectURL(manifestBlob);
+      const manifestLink = document.createElement('link');
+      manifestLink.rel = 'manifest';
+      manifestLink.href = manifestURL;
+      document.head.appendChild(manifestLink);
+
+      if ('serviceWorker' in navigator) {
+        const swScript = `
+          const CACHE_NAME = 'excelmaths-v1';
+          self.addEventListener('install', (e) => { self.skipWaiting(); });
+          self.addEventListener('activate', (e) => { e.waitUntil(clients.claim()); });
+          self.addEventListener('fetch', (e) => {
+            e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+          });
+        `;
+        try {
+          const swBlob = new Blob([swScript], { type: 'text/javascript' });
+          const swUrl = URL.createObjectURL(swBlob);
+          navigator.serviceWorker.register(swUrl).catch(() => {});
+        } catch (e) {}
+      }
+
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        const nativeSection = document.getElementById('nativeInstallSection');
+        if (nativeSection) nativeSection.classList.remove('hidden');
+      });
+    }
+
+    async function triggerUniversalInstall() {
+      if (deferredPrompt) {
+        try {
+          deferredPrompt.prompt();
+          const choice = await deferredPrompt.userChoice;
+          if (choice && choice.outcome === 'accepted') {
+            showToast("Installing ExcelMaths App!");
+          }
+          deferredPrompt = null;
+          return;
+        } catch (err) {}
+      }
+      openInstallModal();
+    }
+
+    function openInstallModal() {
+      const modal = document.getElementById('installAppModal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeInstallModal() {
+      const modal = document.getElementById('installAppModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function switchInstallTab(tabKey) {
+      const iosGuide = document.getElementById('installGuideIos');
+      const androidGuide = document.getElementById('installGuideAndroid');
+      const desktopGuide = document.getElementById('installGuideDesktop');
+
+      const iosBtn = document.getElementById('tabIosBtn');
+      const androidBtn = document.getElementById('tabAndroidBtn');
+      const desktopBtn = document.getElementById('tabDesktopBtn');
+
+      if (iosGuide) iosGuide.classList.add('hidden');
+      if (androidGuide) androidGuide.classList.add('hidden');
+      if (desktopGuide) desktopGuide.classList.add('hidden');
+
+      const activeBtnClasses = "px-3 py-1.5 border-t-2 border-l-2 border-r-2 border-black dark:border-neutral-400 bg-black text-white dark:bg-white dark:text-black";
+      const inactiveBtnClasses = "px-3 py-1.5 border-t-2 border-l-2 border-r-2 border-transparent text-gray-600 dark:text-neutral-400";
+
+      if (iosBtn) iosBtn.className = inactiveBtnClasses;
+      if (androidBtn) androidBtn.className = inactiveBtnClasses;
+      if (desktopBtn) desktopBtn.className = inactiveBtnClasses;
+
+      if (tabKey === 'ios') {
+        if (iosGuide) iosGuide.classList.remove('hidden');
+        if (iosBtn) iosBtn.className = activeBtnClasses;
+      } else if (tabKey === 'android') {
+        if (androidGuide) androidGuide.classList.remove('hidden');
+        if (androidBtn) androidBtn.className = activeBtnClasses;
+      } else if (tabKey === 'desktop') {
+        if (desktopGuide) desktopGuide.classList.remove('hidden');
+        if (desktopBtn) desktopBtn.className = activeBtnClasses;
+      }
+    }
+
+    function runNativeInstall() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+      } else {
+        alert("Follow the on-screen steps to install to your device!");
+      }
+    }
+
+    function toggleSplitScreenMode() {
+      isSplitScreenActive = !isSplitScreenActive;
+      const singlePane = document.getElementById('singlePaneControls');
+      const splitPane = document.getElementById('splitScreenContainer');
+      const btnText = document.getElementById('splitScreenBtnText');
+      const toggleBtn = document.getElementById('splitScreenToggleBtn');
+
+      if (isSplitScreenActive) {
+        if (singlePane) singlePane.classList.add('hidden');
+        if (splitPane) {
+          splitPane.classList.remove('hidden');
+          splitPane.classList.add('flex');
+        }
+        if (btnText) btnText.textContent = "SINGLE SCREEN";
+        if (toggleBtn) {
+          toggleBtn.className = "px-3 py-1.5 border-2 border-black dark:border-neutral-300 bg-black text-white dark:bg-white dark:text-black font-mono-code text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,1)] cursor-pointer flex items-center gap-1.5";
+        }
+        setupSplitScreenPanes();
+        setTimeout(initSplitScratchCanvas, 150);
+        showToast("Split Screen Active: Move & Draw enabled!");
+      } else {
+        if (splitPane) {
+          splitPane.classList.add('hidden');
+          splitPane.classList.remove('flex');
+        }
+        if (singlePane) singlePane.classList.remove('hidden');
+        if (btnText) btnText.textContent = "SPLIT SCREEN";
+        if (toggleBtn) {
+          toggleBtn.className = "px-3 py-1.5 border-2 border-black dark:border-neutral-300 bg-cyan-300 dark:bg-cyan-500 text-black font-mono-code text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,1)] hover:bg-cyan-200 cursor-pointer flex items-center gap-1.5";
+        }
+        showToast("Returned to single screen mode.");
+      }
+    }
+
+    function setupSplitScreenPanes() {
+      if (currentChapterIndex === null) return;
+      const ch = chapters[currentChapterIndex];
+      const leftSelect = document.getElementById('splitLeftTabSelect');
+      const rightSelect = document.getElementById('splitRightTabSelect');
+      if (!leftSelect || !rightSelect) return;
+
+      leftSelect.innerHTML = '';
+      rightSelect.innerHTML = `<option value="notepad">📝 NOTEPAD (DIGITAL CANVAS)</option>`;
+
+      ch.tabs.forEach(t => {
+        const optLeft = document.createElement('option');
+        optLeft.value = t.id;
+        optLeft.textContent = t.title;
+        if (t.id === activeTabId) optLeft.selected = true;
+        leftSelect.appendChild(optLeft);
+
+        const optRight = document.createElement('option');
+        optRight.value = t.id;
+        optRight.textContent = `${t.type === 'video' ? '🎬' : '📄'} ${t.title}`;
+        rightSelect.appendChild(optRight);
+      });
+
+      if (activeTabId && leftSelect.querySelector(`option[value="${activeTabId}"]`)) {
+        leftSelect.value = activeTabId;
+      }
+      switchSplitLeftTab(leftSelect.value);
+      switchSplitRightTab(splitRightSelectedValue);
+    }
+
+    function switchSplitLeftTab(tabId) {
+      if (currentChapterIndex === null) return;
+      const ch = chapters[currentChapterIndex];
+      const tab = ch.tabs.find(t => t.id === tabId);
+      const iframe = document.getElementById('splitLeftIframe');
+      const video = document.getElementById('splitLeftVideo');
+      const placeholder = document.getElementById('splitLeftPlaceholder');
+      const openBtn = document.getElementById('splitLeftOpenBtn');
+
+      if (tab && tab.url && tab.url.trim() !== '') {
+        const rawUrl = tab.url.trim();
+        const formattedUrl = formatResourceUrl(rawUrl, tab.type);
+
+        if (openBtn) openBtn.href = rawUrl;
+        if (placeholder) placeholder.classList.add('hidden');
+
+        if (tab.type === 'video' && isDirectVideoFile(rawUrl)) {
+          if (iframe) { iframe.classList.add('hidden'); iframe.src = ''; }
+          if (video) {
+            video.classList.remove('hidden');
+            video.src = formattedUrl;
+            video.load();
+          }
+        } else {
+          if (video) { video.classList.add('hidden'); video.pause(); }
+          if (iframe) {
+            iframe.classList.remove('hidden');
+            iframe.src = formattedUrl;
+          }
+        }
+      } else {
+        if (video) { video.classList.add('hidden'); video.pause(); }
+        if (iframe) { iframe.classList.add('hidden'); iframe.src = ''; }
+        if (placeholder) placeholder.classList.remove('hidden');
+        if (openBtn) openBtn.href = '#';
+      }
+    }
+
+    function switchSplitRightTab(selectedKey) {
+      splitRightSelectedValue = selectedKey;
+      const canvasView = document.getElementById('splitRightCanvasView');
+      const contentView = document.getElementById('splitRightContentView');
+      const video = document.getElementById('splitRightVideo');
+      const iframe = document.getElementById('splitRightIframe');
+      const placeholder = document.getElementById('splitRightPlaceholder');
+      const undoBtn = document.getElementById('splitCanvasUndoBtn');
+      const clearBtn = document.getElementById('splitCanvasClearBtn');
+
+      if (selectedKey === 'notepad') {
+        if (contentView) contentView.classList.add('hidden');
+        if (video) { video.pause(); video.classList.add('hidden'); }
+        if (iframe) { iframe.src = ''; iframe.classList.add('hidden'); }
+        if (canvasView) canvasView.classList.remove('hidden');
+        if (undoBtn) undoBtn.classList.remove('hidden');
+        if (clearBtn) clearBtn.classList.remove('hidden');
+        setTimeout(resizeSplitScratchCanvas, 100);
+      } else {
+        if (canvasView) canvasView.classList.add('hidden');
+        if (undoBtn) undoBtn.classList.add('hidden');
+        if (clearBtn) clearBtn.classList.add('hidden');
+        if (contentView) contentView.classList.remove('hidden');
+
+        if (currentChapterIndex !== null) {
+          const ch = chapters[currentChapterIndex];
+          const tab = ch.tabs.find(t => t.id === selectedKey);
+
+          if (tab && tab.url && tab.url.trim() !== '') {
+            const rawUrl = tab.url.trim();
+            const formattedUrl = formatResourceUrl(rawUrl, tab.type);
+
+            if (placeholder) placeholder.classList.add('hidden');
+
+            if (tab.type === 'video' && isDirectVideoFile(rawUrl)) {
+              if (iframe) { iframe.classList.add('hidden'); iframe.src = ''; }
+              if (video) {
+                video.classList.remove('hidden');
+                video.src = formattedUrl;
+                video.load();
+              }
+            } else {
+              if (video) { video.classList.add('hidden'); video.pause(); }
+              if (iframe) {
+                iframe.classList.remove('hidden');
+                iframe.src = formattedUrl;
+              }
+            }
+          } else {
+            if (video) { video.classList.add('hidden'); video.pause(); }
+            if (iframe) { iframe.classList.add('hidden'); iframe.src = ''; }
+            if (placeholder) placeholder.classList.remove('hidden');
+          }
+        }
+      }
+    }
+
+    function toggleStylusOnlyMode() {
+      isStylusOnlyMode = !isStylusOnlyMode;
+      const statusText = document.getElementById('stylusOnlyStatusText');
+      const splitStatusText = document.getElementById('splitStylusOnlyStatusText');
+      const val = isStylusOnlyMode ? 'ON' : 'OFF';
+      const cls = isStylusOnlyMode ? 'text-emerald-400 font-black' : 'text-gray-400 font-black';
+
+      if (statusText) { statusText.textContent = val; statusText.className = cls; }
+      if (splitStatusText) { splitStatusText.textContent = val; splitStatusText.className = cls; }
+      showToast(isStylusOnlyMode ? "Stylus Only Enabled: Palm touches blocked!" : "Stylus Only Disabled: Finger & Stylus active.");
+    }
+
+    function loadHomepageGuideVideo() {
+      const videoEl = document.getElementById('portalGuideVideo');
+      const iframeEl = document.getElementById('portalGuideIframe');
+      const emptyState = document.getElementById('guideVideoEmptyState');
+
+      if (!videoEl || !iframeEl) return;
+      if (!HOMEPAGE_GUIDE_VIDEO_SRC || HOMEPAGE_GUIDE_VIDEO_SRC.trim() === '') {
+        videoEl.classList.add('hidden');
+        iframeEl.classList.add('hidden');
+        if (emptyState) emptyState.classList.remove('hidden');
+        return;
+      }
+
+      const cleanUrl = HOMEPAGE_GUIDE_VIDEO_SRC.trim();
+      const formatted = formatResourceUrl(cleanUrl, 'video');
+      if (emptyState) emptyState.classList.add('hidden');
+
+      if (isDirectVideoFile(cleanUrl)) {
+        iframeEl.classList.add('hidden');
+        iframeEl.src = '';
+        videoEl.classList.remove('hidden');
+        videoEl.src = formatted;
+        videoEl.load();
+      } else {
+        videoEl.classList.add('hidden');
+        videoEl.pause();
+        iframeEl.classList.remove('hidden');
+        iframeEl.src = formatted;
+      }
+    }
+
+    function toggleHeaderMenu(e) {
+      if (e) e.stopPropagation();
+      const menu = document.getElementById('headerMenuDropdown');
+      if (menu) menu.classList.toggle('hidden');
+    }
+
+    function closeHeaderMenu() {
+      const menu = document.getElementById('headerMenuDropdown');
+      if (menu) menu.classList.add('hidden');
+    }
+
+    document.addEventListener('click', (e) => {
+      const menu = document.getElementById('headerMenuDropdown');
+      const btn = document.getElementById('headerMenuToggleBtn');
+      if (menu && !menu.classList.contains('hidden')) {
+        if (!menu.contains(e.target) && !btn.contains(e.target)) {
+          menu.classList.add('hidden');
+        }
+      }
+    });
+
+    /* ================= FOCUS LOCKDOWN STATE & ENGINE ================= */
+    let focusTimerInterval = null;
+    let focusTimeRemaining = 0;
+    let isLockdownActive = false;
+
+    function openFocusSetupModal() {
+      const modal = document.getElementById('focusSetupModal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeFocusSetupModal() {
+      const modal = document.getElementById('focusSetupModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function selectFocusPreset(minutes) {
+      const customInput = document.getElementById('customFocusInput');
+      if (customInput) customInput.value = minutes;
+      document.querySelectorAll('.focus-preset-btn').forEach(btn => {
+        if (btn.textContent.trim().toLowerCase() === `${minutes}m`) {
+          btn.className = "focus-preset-btn px-2 py-2 border-2 border-black dark:border-neutral-400 bg-emerald-400 text-black text-xs font-black uppercase";
+        } else {
+          btn.className = "focus-preset-btn px-2 py-2 border-2 border-black dark:border-neutral-400 bg-white dark:bg-neutral-800 text-xs font-black uppercase text-black dark:text-white";
+        }
+      });
+    }
+
+    function startFocusLockdown() {
+      const customInput = document.getElementById('customFocusInput');
+      let minutes = parseInt(customInput ? customInput.value : '25', 10);
+      if (isNaN(minutes) || minutes < 1) minutes = 1;
+      if (minutes > 180) minutes = 180;
+
+      focusTimeRemaining = minutes * 60;
+      isLockdownActive = true;
+      closeFocusSetupModal();
+
+      const lockdownBar = document.getElementById('focusLockdownBar');
+      const focusBtn = document.getElementById('focusLockdownBtn');
+
+      if (lockdownBar) lockdownBar.classList.remove('hidden');
+      if (focusBtn) {
+        focusBtn.classList.remove('bg-red-500', 'hover:bg-red-400');
+        focusBtn.classList.add('bg-neutral-800', 'text-emerald-400');
+        focusBtn.innerHTML = '<span>🔒</span><span class="hidden lg:inline">IN LOCKDOWN</span>';
+      }
+
+      updateFocusTimerUI();
+      clearInterval(focusTimerInterval);
+      focusTimerInterval = setInterval(() => {
+        focusTimeRemaining--;
+        updateFocusTimerUI();
+        if (focusTimeRemaining <= 0) {
+          endFocusLockdown(true);
+        }
+      }, 1000);
+
+      showToast(`🔒 Focus Lockdown Active: ${minutes} Minutes!`);
+    }
+
+    function updateFocusTimerUI() {
+      const display = document.getElementById('focusTimeRemainingDisplay');
+      if (!display) return;
+      const m = Math.floor(focusTimeRemaining / 60);
+      const s = focusTimeRemaining % 60;
+      display.textContent = `${m < 10 ? '0' + m : m}:${s < 10 ? '0' + s : s}`;
+    }
+
+    function confirmExitFocusLockdown() {
+      if (confirm("End your focus sprint early?")) {
+        endFocusLockdown(false);
+      }
+    }
+
+    function endFocusLockdown(completedSuccessfully) {
+      clearInterval(focusTimerInterval);
+      isLockdownActive = false;
+
+      const lockdownBar = document.getElementById('focusLockdownBar');
+      const focusBtn = document.getElementById('focusLockdownBtn');
+
+      if (lockdownBar) lockdownBar.classList.add('hidden');
+      if (focusBtn) {
+        focusBtn.className = "flex items-center gap-1 bg-red-500 hover:bg-red-400 text-white px-2 sm:px-2.5 py-1 sm:py-1.5 border-2 border-black font-mono-code text-xs font-black uppercase shadow-[2px_2px_0px_0px_rgba(0,0,1)] cursor-pointer";
+        focusBtn.innerHTML = '<span>🔒</span><span class="hidden lg:inline">LOCKDOWN</span>';
+      }
+
+      if (completedSuccessfully) {
+        showToast("🏆 FOCUS SPRINT COMPLETE! Outstanding discipline!");
+      } else {
+        showToast("Focus mode ended.");
+      }
     }
 
     /* ================= MOTIVATIONAL & STREAK ENGINES ================= */
