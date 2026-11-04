@@ -401,6 +401,18 @@
     </div>
 
     <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+      <!-- TOP NAV WHATSAPP BUTTON (REPLACES FLOATING BOTTOM BUTTON) -->
+      <a 
+        id="topNavWhatsAppBtn"
+        href="https://wa.me/6581980012?text=Hi%20Lucas!%20I'm%20submitting%20my%20work%20to%20be%20marked%20or%20I%20have%20a%20question." 
+        target="_blank" 
+        title="Submit work or ask questions via WhatsApp (81980012)"
+        class="flex items-center gap-1 bg-emerald-400 hover:bg-emerald-300 text-black px-2 sm:px-2.5 py-1 sm:py-1.5 border-2 border-black font-mono-code text-xs font-black uppercase shadow-[2px_2px_0px_0px_rgba(0,0,1)] active:translate-x-[1px] active:translate-y-[1px] cursor-pointer"
+      >
+        <span class="text-sm">💬</span>
+        <span class="hidden sm:inline">WHATSAPP</span>
+      </a>
+
       <button 
         type="button" 
         id="topNavInstallBtn"
@@ -1157,7 +1169,7 @@
             <button type="button" onclick="setCanvasColor('#38bdf8')" class="w-5 h-5 rounded-full bg-sky-400 border border-white hover:scale-110 transition"></button>
             <button type="button" onclick="setCanvasColor('#facc15')" class="w-5 h-5 rounded-full bg-yellow-400 border border-white hover:scale-110 transition"></button>
             <button type="button" onclick="setCanvasColor('#ffffff')" class="w-5 h-5 rounded-full bg-white border border-neutral-400 hover:scale-110 transition"></button>
-            <button type="button" onclick="setCanvasColor('#f87171')" class="w-5 h-5 rounded-full bg-red-400 border border-white hover:scale-110 transition"></button>
+            <button type="button" onclick="setCanvasColor('#f87171')" class="w-5 h-5 rounded-full bg-red-400 border border-neutral-400 hover:scale-110 transition"></button>
           </div>
 
           <div class="flex items-center gap-1.5 flex-wrap">
@@ -1260,44 +1272,9 @@
 
   </div>
 
-  <!-- FLOATING WHATSAPP BUTTON (COLLAPSIBLE & AUTO-HIDING) -->
-  <div id="floatingWhatsAppContainer" class="fixed bottom-4 right-4 z-20 pointer-events-auto transition-all duration-300">
-    <div id="waBadgeFull" class="bg-emerald-400 hover:bg-emerald-300 text-black border-2 border-black pl-3 pr-2 py-2 rounded-full font-mono-code font-black text-xs uppercase tracking-wider shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center gap-2">
-      <a 
-        id="floatingWhatsAppBtn"
-        href="https://wa.me/6581980012?text=Hi%20Lucas!%20I'm%20submitting%20my%20work%20to%20be%20marked%20or%20I%20have%20a%20question." 
-        target="_blank" 
-        class="flex items-center gap-1.5 cursor-pointer"
-      >
-        <span class="text-base">💬</span>
-        <span class="hidden sm:inline">SUBMIT WORK (81980012)</span>
-        <span class="sm:hidden">WHATSAPP</span>
-      </a>
-      <button 
-        type="button" 
-        onclick="toggleWhatsAppBadgeMinimize(true)" 
-        title="Minimize WhatsApp Badge"
-        class="w-5 h-5 rounded-full bg-black/10 hover:bg-black/20 flex items-center justify-center text-black font-black text-[10px] cursor-pointer"
-      >
-        –
-      </button>
-    </div>
-
-    <!-- Collapsed Tiny WhatsApp Bubble -->
-    <button 
-      id="waBadgeMini" 
-      type="button" 
-      onclick="toggleWhatsAppBadgeMinimize(false)" 
-      title="Open WhatsApp Help"
-      class="hidden w-11 h-11 bg-emerald-400 hover:bg-emerald-300 text-black border-2 border-black rounded-full shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] items-center justify-center text-lg cursor-pointer"
-    >
-      💬
-    </button>
-  </div>
-
   <!-- PASSWORD PIN MODAL -->
   <div id="authModal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-3 sm:p-4">
-    <div class="bg-white dark:bg-neutral-900 border-4 border-black dark:border-neutral-300 w-full max-w-sm shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-5 flex flex-col font-mono-code">
+    <div class="bg-white dark:bg-neutral-900 border-4 border-black dark:border-neutral-300 w-full max-w-sm shadow-[8px_8px_0px_0px_rgba(0,0,1)] p-5 flex flex-col font-mono-code">
       <h3 class="font-black text-sm uppercase tracking-tight mb-1 text-black dark:text-white">TEACHER AUTHENTICATION</h3>
       <p class="text-[11px] text-gray-500 dark:text-neutral-400 mb-4">Enter master PIN to unlock text editing &amp; tabs studio.</p>
       
@@ -1366,32 +1343,6 @@
     const FORMULA_SHEET_IMAGE_SRC = "IMG_00691fac-85d6-44d7-9a1a-2c5e7a45bedb.png";
     let currentStudent = null;
 
-    /* ================= WHATSAPP FLOATING BADGE TOGGLE ================= */
-    function toggleWhatsAppBadgeMinimize(minimize) {
-      const full = document.getElementById('waBadgeFull');
-      const mini = document.getElementById('waBadgeMini');
-      if (minimize) {
-        if (full) full.classList.add('hidden');
-        if (mini) { mini.classList.remove('hidden'); mini.classList.add('flex'); }
-      } else {
-        if (mini) { mini.classList.add('hidden'); mini.classList.remove('flex'); }
-        if (full) full.classList.remove('hidden');
-      }
-    }
-
-    function syncWhatsAppBadgeVisibility() {
-      const container = document.getElementById('floatingWhatsAppContainer');
-      const drawer = document.getElementById('scratchpadDrawer');
-      const isDrawerOpen = drawer && drawer.classList.contains('open');
-
-      if (!container) return;
-      if (isLockdownActive || isDrawerOpen || isSplitScreenActive) {
-        container.classList.add('hidden');
-      } else {
-        container.classList.remove('hidden');
-      }
-    }
-
     /* ================= GEOMETRY & CURVED GRAPH PRESERVATION ENGINE ================= */
     function snapLineCoordinates(x0, y0, x1, y1) {
       const dx = x1 - x0;
@@ -1423,7 +1374,6 @@
       return Math.hypot(p.x - (v.x + t * (w.x - v.x)), p.y - (v.y + t * (w.y - v.y)));
     }
 
-    // Refines math curves gently without destroying natural peaks & inflection points
     function smoothPoints(pts, iterations = 2) {
       if (!pts || pts.length <= 4) return pts;
       let cur = pts.map(p => ({ x: p.x, y: p.y }));
@@ -1441,7 +1391,6 @@
       return cur;
     }
 
-    // Strict shape classifier: PROTECTS trig, parabolic and curved functions
     function recognizeShapeFromPoints(pts) {
       if (!pts || pts.length < 6) return null;
       const start = pts[0];
@@ -1482,7 +1431,6 @@
         }
       }
 
-      // Check for strict straight line deviation
       let maxDev = 0;
       for (let p of pts) {
         const d = distToSegment(p, start, end);
@@ -1491,7 +1439,6 @@
 
       const lengthRatio = totalLen / (directDist || 1);
 
-      // ONLY snap to straight line if nearly flat across the entire stroke
       if (lengthRatio < 1.08 && maxDev < 10 && (maxDev / (directDist || 1)) < 0.06) {
         const snapped = snapLineCoordinates(start.x, start.y, end.x, end.y);
         return {
@@ -1503,7 +1450,6 @@
         };
       }
 
-      // If curvature detected, preserve the wave
       return {
         type: 'stroke',
         points: smoothPoints(pts, 2)
@@ -1609,7 +1555,7 @@
     let canvas, ctx;
     let isDrawing = false;
     let currentColor = '#10b981';
-    let drawerCurrentTool = 'pen'; // 'pen', 'move', 'line', 'circle', 'rect', 'eraser'
+    let drawerCurrentTool = 'pen';
     let drawerPenThickness = 3;
     let drawerEraserThickness = 20;
     let isStylusOnlyMode = false;
@@ -1735,14 +1681,10 @@
       drawerLastMoveX = currX;
       drawerLastMoveY = currY;
 
-      // Always continue appending ink points without cutting off
       if (drawerCurrentTool === 'pen') {
         drawerCurrentStrokePoints.push({ x: currX, y: currY });
-
-        // Reset stationary hold timer
         clearTimeout(drawerHoldTimer);
 
-        // Only start hold timer if movement has paused at the end
         if (distMoved < 3) {
           drawerHoldTimer = setTimeout(() => {
             if (isDrawing && drawerCurrentStrokePoints.length > 8) {
@@ -1780,7 +1722,6 @@
         return;
       }
 
-      // Explicit shapes preview
       if (drawerCurrentTool !== 'pen') {
         redrawDrawerCanvas();
         let preview = null;
@@ -1918,7 +1859,6 @@
         if (btn) btn.classList.add('ring-2', 'ring-black');
         setTimeout(resizeScratchpadCanvas, 320);
       }
-      syncWhatsAppBadgeVisibility();
     }
 
     function downloadScratchpadPNG() {
@@ -1956,7 +1896,7 @@
     let splitCanvasColor = '#10b981';
     let splitPenThickness = 3;
     let splitEraserThickness = 20;
-    let splitCurrentTool = 'pen'; // 'pen', 'move', 'line', 'circle', 'rect', 'eraser'
+    let splitCurrentTool = 'pen';
 
     let splitObjects = [];
     let splitUndoStack = [];
@@ -2173,7 +2113,7 @@
           const snapped = snapLineCoordinates(splitStartX, splitStartY, endX, endY);
           splitObjects.push({ type: 'line', x1: splitStartX, y1: splitStartY, x2: snapped.x, y2: snapped.y, color: splitCanvasColor, thickness: splitPenThickness });
         } else if (splitCurrentTool === 'circle') {
-          const r = Math.hypot(endX - splitStartX, endY - splitStartY) / 2;
+          const r = Math.hypot(endX - splitStartX, endY - drawerStartY) / 2;
           splitObjects.push({ type: 'circle', cx: (splitStartX + endX) / 2, cy: (splitStartY + endY) / 2, r, color: splitCanvasColor, thickness: splitPenThickness });
         } else if (splitCurrentTool === 'rect') {
           splitObjects.push({ type: 'rect', x: Math.min(splitStartX, endX), y: Math.min(splitStartY, endY), w: Math.abs(endX - splitStartX), h: Math.abs(endY - splitStartY), color: splitCanvasColor, thickness: splitPenThickness });
@@ -2401,7 +2341,6 @@
         }
         showToast("Returned to single screen mode.");
       }
-      syncWhatsAppBadgeVisibility();
     }
 
     function setupSplitScreenPanes() {
@@ -2659,7 +2598,6 @@
         focusBtn.classList.add('bg-neutral-800', 'text-emerald-400');
         focusBtn.innerHTML = '<span>🔒</span><span class="hidden lg:inline">IN LOCKDOWN</span>';
       }
-      syncWhatsAppBadgeVisibility();
 
       updateFocusTimerUI();
       clearInterval(focusTimerInterval);
@@ -2700,7 +2638,6 @@
         focusBtn.className = "flex items-center gap-1 bg-red-500 hover:bg-red-400 text-white px-2 sm:px-2.5 py-1 sm:py-1.5 border-2 border-black font-mono-code text-xs font-black uppercase shadow-[2px_2px_0px_0px_rgba(0,0,1)] cursor-pointer";
         focusBtn.innerHTML = '<span>🔒</span><span class="hidden lg:inline">LOCKDOWN</span>';
       }
-      syncWhatsAppBadgeVisibility();
 
       if (completedSuccessfully) {
         showToast("🏆 FOCUS SPRINT COMPLETE! Outstanding discipline!");
@@ -2804,7 +2741,6 @@
           if (placeholder) placeholder.style.display = 'none';
         }
       }
-      syncWhatsAppBadgeVisibility();
     }
 
     /* ================= URL & EMBED HELPERS ================= */
@@ -3118,7 +3054,7 @@
 
     function updateDynamicWhatsAppLinks() {
       const studentName = currentStudent ? currentStudent.name : 'Student';
-      const floatingBtn = document.getElementById('floatingWhatsAppBtn');
+      const topNavWaBtn = document.getElementById('topNavWhatsAppBtn');
 
       let currentContext = "ExcelMaths Portal";
       if (currentChapterIndex !== null) {
@@ -3130,7 +3066,7 @@
       const encodedMsg = encodeURIComponent(`Hi Lucas, I am ${studentName}! I am submitting my work / have a question regarding: ${currentContext}.`);
       const url = `https://wa.me/6581980012?text=${encodedMsg}`;
 
-      if (floatingBtn) floatingBtn.href = url;
+      if (topNavWaBtn) topNavWaBtn.href = url;
     }
 
     /* MASTER CHAPTER REPOSITORY */
@@ -3266,7 +3202,6 @@
       initScratchpadCanvas();
       checkAndUpdateDailyStreak();
       loadHomepageGuideVideo();
-      syncWhatsAppBadgeVisibility();
     }
 
     function saveChaptersToStorage() {
@@ -3300,7 +3235,6 @@
       updateDynamicWhatsAppLinks();
       checkLastLessonResume();
       loadHomepageGuideVideo();
-      syncWhatsAppBadgeVisibility();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -3353,7 +3287,6 @@
       updateDynamicWhatsAppLinks();
 
       if (isSplitScreenActive) setupSplitScreenPanes();
-      syncWhatsAppBadgeVisibility();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
