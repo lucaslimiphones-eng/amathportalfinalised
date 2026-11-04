@@ -92,7 +92,6 @@
       min-width: 440px;
     }
     
-    /* Dynamic Resizable Widths for Digital Canvas Drawer */
     #scratchpadDrawer.open.size-standard {
       width: 550px;
       min-width: 550px;
@@ -129,7 +128,6 @@
       cursor: crosshair;
     }
 
-    /* Sharp, High-Visibility Graph Paper Grid */
     .math-grid {
       background-size: 24px 24px !important;
       background-image: 
@@ -1163,7 +1161,6 @@
         </div>
 
         <div class="flex items-center gap-1.5 shrink-0">
-          <!-- Canvas Width Resizing Controls -->
           <div class="flex items-center bg-black/10 rounded p-0.5 border border-black/30 text-[10px] font-black">
             <button type="button" onclick="setDrawerWorkspaceWidth('standard')" id="drawerSizeStdBtn" class="px-2 py-0.5 bg-black text-white rounded font-bold uppercase transition" title="Standard Width (550px)">550px</button>
             <button type="button" onclick="setDrawerWorkspaceWidth('wide')" id="drawerSizeWideBtn" class="px-2 py-0.5 text-black hover:bg-black/10 rounded font-bold uppercase transition" title="Wide Width (850px)">850px</button>
@@ -1251,7 +1248,7 @@
         <div class="bg-amber-100 dark:bg-amber-950/60 border-t-2 border-black p-2.5 text-[11px] font-mono-code text-black dark:text-amber-200 shrink-0 mt-2">
           <p class="font-black uppercase mb-1">⚡ Smart Auto-Correct &amp; Workspace Guide:</p>
           <p class="text-[10px] text-gray-700 dark:text-neutral-300 leading-tight">
-            Draw numbers and equations naturally! Shapes only form when your stroke endpoints genuinely connect and meet geometric thresholds. Use the <strong class="font-bold text-black dark:text-white">550px / 850px / FULL</strong> buttons in the header to expand your workspace.
+            Draw circles and shapes naturally! Circles are detected by full radial closure without turning into rectangles. Use <strong class="font-bold text-black dark:text-white">550px / 850px / FULL</strong> above to adjust canvas width.
           </p>
         </div>
       </div>
@@ -1546,7 +1543,7 @@
       return cur;
     }
 
-    /* Fixed Geometry Classifier: Strictly requires endpoints to touch and meets accurate geometry standards */
+    /* Fixed Geometry Classifier: Accurately isolates circles from rectangles */
     function recognizeShapeFromPoints(pts) {
       if (!pts || pts.length < 8) return null;
       const start = pts[0];
@@ -1566,48 +1563,63 @@
       const minDim = Math.min(w, h);
       const maxDim = Math.max(w, h);
 
-      // Normal small equation characters or short strokes will never be converted
       if (totalLen < 30) return null;
 
-      // ==========================================
-      // 1. CLOSED SHAPES (RECTANGLE & CIRCLE)
-      // Endpoints MUST truly touch ("touch tips")!
-      // ==========================================
-      const maxClosureGap = Math.min(18, minDim * 0.20, totalLen * 0.08);
-      const isClosed = (directDist <= maxClosureGap) && (minDim >= 26) && (totalLen >= 80);
+      // Centroid Calculation
+      let sumX = 0, sumY = 0;
+      for (let p of pts) {
+        sumX += p.x;
+        sumY += p.y;
+      }
+      const cx = sumX / pts.length;
+      const cy = sumY / pts.length;
 
-      if (isClosed) {
-        const cx = (minX + maxX) / 2;
-        const cy = (minY + maxY) / 2;
-        const avgR = (w + h) / 4;
+      // Angular sweep calculation: ensures the stroke swept at least ~90% (320 deg) around the center
+      let totalAngleSweep = 0;
+      let prevAngle = Math.atan2(pts[0].y - cy, pts[0].x - cx);
+      for (let i = 1; i < pts.length; i++) {
+        const curAngle = Math.atan2(pts[i].y - cy, pts[i].x - cx);
+        let dAngle = curAngle - prevAngle;
+        while (dAngle > Math.PI) dAngle -= 2 * Math.PI;
+        while (dAngle < -Math.PI) dAngle += 2 * Math.PI;
+        totalAngleSweep += dAngle;
+        prevAngle = curAngle;
+      }
+      const absSweep = Math.abs(totalAngleSweep);
+      const swept90Percent = absSweep >= 5.6; // ~320 degrees of rotation
+
+      // Check if endpoints are close enough to constitute a closed contour (gap <= 28% of size or 35px)
+      const isLoop = (swept90Percent || directDist <= Math.max(35, minDim * 0.28)) && (minDim >= 22) && (totalLen >= 65);
+
+      if (isLoop) {
         const aspect = minDim / (maxDim || 1);
 
-        // Calculate Shoelace enclosed polygon area
-        let shoelaceArea = 0;
-        for (let i = 0; i < pts.length; i++) {
-          const next = pts[(i + 1) % pts.length];
-          shoelaceArea += (pts[i].x * next.y - next.x * pts[i].y);
-        }
-        shoelaceArea = Math.abs(shoelaceArea) / 2;
-        const boxArea = w * h;
-        const fillRatio = shoelaceArea / (boxArea || 1);
-
-        // Radial coefficient of variation (stdR / meanR)
+        // Radial dispersion analysis
         let rSum = 0;
         for (let p of pts) {
           rSum += Math.hypot(p.x - cx, p.y - cy);
         }
         const meanR = rSum / pts.length;
 
-        let rVarSum = 0;
+        let rDevSum = 0;
         for (let p of pts) {
-          const d = Math.hypot(p.x - cx, p.y - cy);
-          rVarSum += (d - meanR) ** 2;
+          rDevSum += Math.abs(Math.hypot(p.x - cx, p.y - cy) - meanR);
         }
-        const stdR = Math.sqrt(rVarSum / pts.length);
-        const cvR = stdR / (meanR || 1);
+        const meanDevR = rDevSum / pts.length;
+        const normRadialDev = meanDevR / (meanR || 1);
 
-        // Check corner reach of the 4 bounding box corners
+        // Shoelace polygon area
+        let shoelaceArea = 0;
+        for (let i = 0; i < pts.length; i++) {
+          const next = pts[(i + 1) % pts.length];
+          shoelaceArea += (pts[i].x * next.y - next.x * pts[i].y);
+        }
+        shoelaceArea = Math.abs(shoelaceArea) / 2;
+
+        // Isoperimetric quotient (Circularity): 4 * PI * Area / Perimeter^2
+        const circularity = (4 * Math.PI * shoelaceArea) / ((totalLen * totalLen) || 1);
+
+        // Bounding-box corner inspection
         let dTL = Infinity, dTR = Infinity, dBR = Infinity, dBL = Infinity;
         for (let p of pts) {
           dTL = Math.min(dTL, Math.hypot(p.x - minX, p.y - minY));
@@ -1617,12 +1629,14 @@
         }
         const maxCornerDist = Math.max(dTL, dTR, dBR, dBL);
 
-        // --- RECTANGLE TEST ---
-        // A rectangle must:
-        // 1. Visit all 4 bounding box corners
-        // 2. Have points hug the 4 perimeter edges
-        // 3. Have perimeter close to 2*(w + h)
-        // 4. Fill at least 72% of the bounding box
+        // --- STEP 1: STRICT CIRCLE CHECK FIRST ---
+        // A circle has high circularity, low radial deviation, and rounded corners
+        if (aspect >= 0.70 && normRadialDev <= 0.16 && circularity >= 0.65) {
+          return { type: 'circle', cx: (minX + maxX) / 2, cy: (minY + maxY) / 2, r: (w + h) / 4 };
+        }
+
+        // --- STEP 2: RECTANGLE CHECK ---
+        // If it was not a circle, test if it visits the four corners and traces straight outer edges
         let boxEdgeDevSum = 0;
         for (let p of pts) {
           const distToEdge = Math.min(
@@ -1633,46 +1647,18 @@
           );
           boxEdgeDevSum += distToEdge;
         }
-        const avgBoxEdgeErr = boxEdgeDevSum / pts.length;
-        const normBoxErr = avgBoxEdgeErr / (minDim || 1);
-        const rectPerimeter = 2 * (w + h);
-        const perimeterRatio = totalLen / (rectPerimeter || 1);
+        const normBoxErr = (boxEdgeDevSum / pts.length) / (minDim || 1);
 
-        const isAccurateRect = (maxCornerDist <= minDim * 0.35) &&
-                               (normBoxErr <= 0.12) &&
-                               (perimeterRatio >= 0.78 && perimeterRatio <= 1.30) &&
-                               (fillRatio >= 0.72);
-
-        if (isAccurateRect) {
+        if (maxCornerDist <= minDim * 0.32 && normBoxErr <= 0.15 && directDist <= minDim * 0.35) {
           return { type: 'rect', x: minX, y: minY, w: w, h: h };
         }
 
-        // --- CIRCLE TEST ---
-        // A circle must:
-        // 1. Have aspect ratio >= 0.72 (roughly equal width and height)
-        // 2. Have low radial variation from center (cvR <= 0.12)
-        // 3. Have circumference close to 2 * PI * meanR
-        // 4. Fill roughly pi/4 (~0.785) of bounding box (0.62 to 0.88)
-        // 5. Corners of bounding box must be unfilled
-        const circlePerimeter = 2 * Math.PI * meanR;
-        const circlePerimeterRatio = totalLen / (circlePerimeter || 1);
-
-        const isAccurateCircle = (aspect >= 0.72) &&
-                                 (cvR <= 0.12) &&
-                                 (circlePerimeterRatio >= 0.78 && circlePerimeterRatio <= 1.30) &&
-                                 (fillRatio >= 0.62 && fillRatio <= 0.88) &&
-                                 (maxCornerDist >= minDim * 0.12);
-
-        if (isAccurateCircle) {
-          return { type: 'circle', cx: cx, cy: cy, r: avgR };
-        }
-
-        // If it's closed but neither an accurate rectangle nor circle, leave it as freehand
+        // Neither confirmed -> Keep as smooth hand-drawn stroke
         return null;
       }
 
       // ==========================================
-      // 2. OPEN STROKES (STRAIGHT LINE)
+      // 2. OPEN STROKES (STRAIGHT LINE CHECK)
       // ==========================================
       if (directDist < 25) return null;
 
@@ -1695,11 +1681,8 @@
         }
       }
 
-      // Preserve curves and wave graphs
       if (signChanges >= 2) return null;
 
-      // Strict straight line criteria:
-      // Must have length close to direct chord so handwriting is never flattened!
       const lengthRatio = totalLen / (directDist || 1);
       if (lengthRatio <= 1.08 && maxDev <= Math.max(6, directDist * 0.08)) {
         const snapped = snapLineCoordinates(start.x, start.y, end.x, end.y);
