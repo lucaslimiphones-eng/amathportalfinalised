@@ -1543,7 +1543,6 @@
       return cur;
     }
 
-    /* Fixed Geometry Classifier: Accurately isolates circles from rectangles */
     function recognizeShapeFromPoints(pts) {
       if (!pts || pts.length < 8) return null;
       const start = pts[0];
@@ -1565,7 +1564,6 @@
 
       if (totalLen < 30) return null;
 
-      // Centroid Calculation
       let sumX = 0, sumY = 0;
       for (let p of pts) {
         sumX += p.x;
@@ -1574,7 +1572,6 @@
       const cx = sumX / pts.length;
       const cy = sumY / pts.length;
 
-      // Angular sweep calculation: ensures the stroke swept at least ~90% (320 deg) around the center
       let totalAngleSweep = 0;
       let prevAngle = Math.atan2(pts[0].y - cy, pts[0].x - cx);
       for (let i = 1; i < pts.length; i++) {
@@ -1586,15 +1583,13 @@
         prevAngle = curAngle;
       }
       const absSweep = Math.abs(totalAngleSweep);
-      const swept90Percent = absSweep >= 5.6; // ~320 degrees of rotation
+      const swept90Percent = absSweep >= 5.6;
 
-      // Check if endpoints are close enough to constitute a closed contour (gap <= 28% of size or 35px)
       const isLoop = (swept90Percent || directDist <= Math.max(35, minDim * 0.28)) && (minDim >= 22) && (totalLen >= 65);
 
       if (isLoop) {
         const aspect = minDim / (maxDim || 1);
 
-        // Radial dispersion analysis
         let rSum = 0;
         for (let p of pts) {
           rSum += Math.hypot(p.x - cx, p.y - cy);
@@ -1608,7 +1603,6 @@
         const meanDevR = rDevSum / pts.length;
         const normRadialDev = meanDevR / (meanR || 1);
 
-        // Shoelace polygon area
         let shoelaceArea = 0;
         for (let i = 0; i < pts.length; i++) {
           const next = pts[(i + 1) % pts.length];
@@ -1616,10 +1610,8 @@
         }
         shoelaceArea = Math.abs(shoelaceArea) / 2;
 
-        // Isoperimetric quotient (Circularity): 4 * PI * Area / Perimeter^2
         const circularity = (4 * Math.PI * shoelaceArea) / ((totalLen * totalLen) || 1);
 
-        // Bounding-box corner inspection
         let dTL = Infinity, dTR = Infinity, dBR = Infinity, dBL = Infinity;
         for (let p of pts) {
           dTL = Math.min(dTL, Math.hypot(p.x - minX, p.y - minY));
@@ -1629,14 +1621,10 @@
         }
         const maxCornerDist = Math.max(dTL, dTR, dBR, dBL);
 
-        // --- STEP 1: STRICT CIRCLE CHECK FIRST ---
-        // A circle has high circularity, low radial deviation, and rounded corners
         if (aspect >= 0.70 && normRadialDev <= 0.16 && circularity >= 0.65) {
           return { type: 'circle', cx: (minX + maxX) / 2, cy: (minY + maxY) / 2, r: (w + h) / 4 };
         }
 
-        // --- STEP 2: RECTANGLE CHECK ---
-        // If it was not a circle, test if it visits the four corners and traces straight outer edges
         let boxEdgeDevSum = 0;
         for (let p of pts) {
           const distToEdge = Math.min(
@@ -1653,13 +1641,9 @@
           return { type: 'rect', x: minX, y: minY, w: w, h: h };
         }
 
-        // Neither confirmed -> Keep as smooth hand-drawn stroke
         return null;
       }
 
-      // ==========================================
-      // 2. OPEN STROKES (STRAIGHT LINE CHECK)
-      // ==========================================
       if (directDist < 25) return null;
 
       let maxDev = 0;
