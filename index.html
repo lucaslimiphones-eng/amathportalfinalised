@@ -993,7 +993,7 @@
               <span>◫</span>
               <span>TWO-PANE STUDY MODE ACTIVE</span>
             </span>
-            <span class="text-[10px] text-neutral-600 dark:text-neutral-400">Hold stylus for QuickShape • Tap MOVE to drag shapes</span>
+            <span class="text-[10px] text-neutral-600 dark:text-neutral-400">Hold stylus for QuickShape • Curved graphs protected from straightline lock</span>
           </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -1038,7 +1038,7 @@
                 <div class="p-2 bg-neutral-900 border-b border-neutral-800 flex flex-wrap items-center justify-between gap-1.5 text-xs text-white shrink-0">
                   <!-- Tool Picker with MOVE tool -->
                   <div class="flex items-center gap-1 text-[10px] flex-wrap">
-                    <button type="button" onclick="setSplitShapeMode('pen')" id="splitToolPenBtn" class="px-2 py-0.5 bg-emerald-500 text-black font-black uppercase rounded shadow-sm" title="Pen (Hold 0.4s to snap line/shape)">✏️ PEN</button>
+                    <button type="button" onclick="setSplitShapeMode('pen')" id="splitToolPenBtn" class="px-2 py-0.5 bg-emerald-500 text-black font-black uppercase rounded shadow-sm" title="Pen (Draw wavy graphs freely; holds preserve curves smoothly!)">✏️ PEN</button>
                     <button type="button" onclick="setSplitShapeMode('move')" id="splitToolMoveBtn" class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" title="Move & Reposition any shape">🖐️ MOVE</button>
                     <button type="button" onclick="setSplitShapeMode('line')" id="splitToolLineBtn" class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" title="100% Straight Line with Axis Snapping">📏 LINE</button>
                     <button type="button" onclick="setSplitShapeMode('circle')" id="splitToolCircleBtn" class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" title="Perfect Circle / Locus">⭕ CIRCLE</button>
@@ -1126,7 +1126,7 @@
           <span class="text-base">✏️</span>
           <div class="truncate">
             <h3 class="font-black text-xs uppercase tracking-tight truncate">DIGITAL WORKING CANVAS</h3>
-            <span class="text-[9px] font-bold uppercase block text-neutral-800">DRAW &amp; HOLD SNAP • MOVE SHAPES • STYLUS</span>
+            <span class="text-[9px] font-bold uppercase block text-neutral-800">TRIG CURVES PRESERVED • MOVE SHAPES • STYLUS</span>
           </div>
         </div>
         <button type="button" onclick="toggleScratchpadDrawer()" class="font-black px-2 py-0.5 bg-black text-white hover:bg-neutral-800 text-xs transition cursor-pointer shrink-0 ml-2">
@@ -1139,7 +1139,7 @@
         <!-- Row 1: Shape & Drawing Modes with MOVE -->
         <div class="flex flex-wrap items-center justify-between gap-1.5">
           <div class="flex items-center gap-1 text-[11px] flex-wrap">
-            <button type="button" onclick="setDrawerShapeMode('pen')" id="drawerToolPenBtn" class="px-2.5 py-1 bg-emerald-500 text-black font-black uppercase rounded shadow-sm" title="Pen: Draw line or loop & hold 0.4s to snap!">✏️ PEN</button>
+            <button type="button" onclick="setDrawerShapeMode('pen')" id="drawerToolPenBtn" class="px-2.5 py-1 bg-emerald-500 text-black font-black uppercase rounded shadow-sm" title="Pen: Draw sine/cosine curves freely without locking into a flat line!">✏️ PEN</button>
             <button type="button" onclick="setDrawerShapeMode('move')" id="drawerToolMoveBtn" class="px-2.5 py-1 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" title="Move & Reposition any shape or stroke">🖐️ MOVE</button>
             <button type="button" onclick="setDrawerShapeMode('line')" id="drawerToolLineBtn" class="px-2.5 py-1 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" title="100% Straight Line (Snaps to 0° & 90° axes)">📏 LINE</button>
             <button type="button" onclick="setDrawerShapeMode('circle')" id="drawerToolCircleBtn" class="px-2.5 py-1 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" title="Perfect Circle / Locus">⭕ CIRCLE</button>
@@ -1208,9 +1208,9 @@
           <canvas id="scratchpadCanvas" class="w-full h-full bg-neutral-900 border border-neutral-700 rounded shadow-inner"></canvas>
         </div>
         <div class="bg-amber-100 dark:bg-amber-950/60 border-t-2 border-black p-2.5 text-[11px] font-mono-code text-black dark:text-amber-200 shrink-0 mt-2">
-          <p class="font-black uppercase mb-1">⚡ Draw &amp; Hold QuickShapes:</p>
+          <p class="font-black uppercase mb-1">🌊 Trigonometry Graphing Mode Active:</p>
           <p class="text-[10px] text-gray-700 dark:text-neutral-300 leading-tight">
-            Draw a line or shape and <span class="font-bold underline text-black dark:text-white">hold your stylus still for 0.4s</span>. It will automatically snap to a perfect line/circle/box! Switch to <strong class="font-bold">🖐️ MOVE</strong> to drag any shape around.
+            Draw sine, cosine, tangent &amp; parabolic curves without straight-line flattening! Holding still on a wave will <strong class="text-black dark:text-white underline">polish it into a smooth mathematical curve</strong>. Use <strong class="font-bold">🖐️ MOVE</strong> to drag graphs across your axes.
           </p>
         </div>
       </div>
@@ -1348,7 +1348,7 @@
     const FORMULA_SHEET_IMAGE_SRC = "IMG_00691fac-85d6-44d7-9a1a-2c5e7a45bedb.png";
     let currentStudent = null;
 
-    /* ================= GEOMETRY & SHAPE MATH ENGINE ================= */
+    /* ================= GEOMETRY & CURVED GRAPH PRESERVATION ENGINE ================= */
     function snapLineCoordinates(x0, y0, x1, y1) {
       const dx = x1 - x0;
       const dy = y1 - y0;
@@ -1371,7 +1371,34 @@
       return { x: x1, y: y1 };
     }
 
-    // QuickShape recognition on stylus hold (Lines, Circles, Rectangles)
+    // Distance from point to line segment
+    function distToSegment(p, v, w) {
+      const l2 = (w.x - v.x) ** 2 + (w.y - v.y) ** 2;
+      if (l2 === 0) return Math.hypot(p.x - v.x, p.y - v.y);
+      let t = ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
+      t = Math.max(0, Math.min(1, t));
+      return Math.hypot(p.x - (v.x + t * (w.x - v.x)), p.y - (v.y + t * (w.y - v.y)));
+    }
+
+    // Multi-pass weighted moving-average smoothing for clean math waves (sine, cosine, quadratic)
+    function smoothPoints(pts, iterations = 2) {
+      if (!pts || pts.length <= 4) return pts;
+      let cur = pts.map(p => ({ x: p.x, y: p.y }));
+      for (let it = 0; it < iterations; it++) {
+        let next = [cur[0]];
+        for (let i = 1; i < cur.length - 1; i++) {
+          next.push({
+            x: 0.25 * cur[i - 1].x + 0.5 * cur[i].x + 0.25 * cur[i + 1].x,
+            y: 0.25 * cur[i - 1].y + 0.5 * cur[i].y + 0.25 * cur[i + 1].y
+          });
+        }
+        next.push(cur[cur.length - 1]);
+        cur = next;
+      }
+      return cur;
+    }
+
+    // QuickShape recognition: strictly checks linearity so sine/cosine waves never flatten
     function recognizeShapeFromPoints(pts) {
       if (!pts || pts.length < 5) return null;
       const start = pts[0];
@@ -1388,20 +1415,12 @@
         maxY = Math.max(maxY, pts[i].y);
       }
 
-      const isClosed = directDist < 40 || (totalLen > 50 && directDist / totalLen < 0.28);
+      if (totalLen === 0) return null;
 
-      if (!isClosed) {
-        // Open stroke -> 100% Straight Line
-        const snapped = snapLineCoordinates(start.x, start.y, end.x, end.y);
-        return {
-          type: 'line',
-          x1: start.x,
-          y1: start.y,
-          x2: snapped.x,
-          y2: snapped.y
-        };
-      } else {
-        // Closed stroke -> Circle/Ellipse or Rectangle
+      const isClosed = directDist < 35 || (totalLen > 60 && directDist / totalLen < 0.25);
+
+      if (isClosed) {
+        // Closed stroke -> Perfect Circle / Ellipse or Box
         const w = maxX - minX;
         const h = maxY - minY;
         const cx = (minX + maxX) / 2;
@@ -1416,32 +1435,40 @@
         const avgDeviation = rDiff / pts.length;
         const ratio = Math.min(w, h) / (Math.max(w, h) || 1);
 
-        if (ratio > 0.65 && avgDeviation < avgR * 0.42) {
-          return {
-            type: 'circle',
-            cx: cx,
-            cy: cy,
-            r: avgR
-          };
+        if (ratio > 0.65 && avgDeviation < avgR * 0.40) {
+          return { type: 'circle', cx: cx, cy: cy, r: avgR };
         } else {
-          return {
-            type: 'rect',
-            x: minX,
-            y: minY,
-            w: w,
-            h: h
-          };
+          return { type: 'rect', x: minX, y: minY, w: w, h: h };
         }
       }
-    }
 
-    // Distance from point to line segment
-    function distToSegment(p, v, w) {
-      const l2 = (w.x - v.x) ** 2 + (w.y - v.y) ** 2;
-      if (l2 === 0) return Math.hypot(p.x - v.x, p.y - v.y);
-      let t = ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
-      t = Math.max(0, Math.min(1, t));
-      return Math.hypot(p.x - (v.x + t * (w.x - v.x)), p.y - (v.y + t * (w.y - v.y)));
+      // OPEN STROKE ANALYSIS: Check if it's a straight line vs. a curve (sine, cosine, quadratic)
+      let maxDev = 0;
+      for (let p of pts) {
+        const d = distToSegment(p, start, end);
+        if (d > maxDev) maxDev = d;
+      }
+
+      const linearityRatio = directDist / totalLen;
+
+      // Only lock to straight line if points deviate minimally from the direct segment
+      if (linearityRatio > 0.88 && maxDev < 18) {
+        const snapped = snapLineCoordinates(start.x, start.y, end.x, end.y);
+        return {
+          type: 'line',
+          x1: start.x,
+          y1: start.y,
+          x2: snapped.x,
+          y2: snapped.y
+        };
+      }
+
+      // It is a CURVE (sine, cosine, tangent, quadratic, cubic)! Smooth it cleanly without flattening
+      const smoothed = smoothPoints(pts, 3);
+      return {
+        type: 'smooth_curve',
+        points: smoothed
+      };
     }
 
     function hitTestObject(obj, x, y) {
@@ -1453,7 +1480,7 @@
         return Math.abs(d - obj.r) <= tol || d <= obj.r;
       } else if (obj.type === 'rect') {
         return x >= obj.x - tol && x <= obj.x + obj.w + tol && y >= obj.y - tol && y <= obj.y + obj.h + tol;
-      } else if (obj.type === 'stroke') {
+      } else if (obj.type === 'stroke' || obj.type === 'smooth_curve') {
         for (let i = 1; i < obj.points.length; i++) {
           if (distToSegment({ x, y }, obj.points[i - 1], obj.points[i]) <= tol) return true;
         }
@@ -1469,7 +1496,7 @@
         obj.cx += dx; obj.cy += dy;
       } else if (obj.type === 'rect') {
         obj.x += dx; obj.y += dy;
-      } else if (obj.type === 'stroke') {
+      } else if (obj.type === 'stroke' || obj.type === 'smooth_curve') {
         for (let pt of obj.points) {
           pt.x += dx; pt.y += dy;
         }
@@ -1483,7 +1510,7 @@
       cCtx.lineCap = 'round';
       cCtx.lineJoin = 'round';
 
-      if (obj.type === 'stroke') {
+      if (obj.type === 'stroke' || obj.type === 'smooth_curve') {
         if (obj.points && obj.points.length > 0) {
           cCtx.beginPath();
           cCtx.moveTo(obj.points[0].x, obj.points[0].y);
@@ -1527,7 +1554,7 @@
         return { x: obj.cx - obj.r, y: obj.cy - obj.r, w: obj.r * 2, h: obj.r * 2 };
       } else if (obj.type === 'rect') {
         return { x: obj.x, y: obj.y, w: obj.w, h: obj.h };
-      } else if (obj.type === 'stroke') {
+      } else if (obj.type === 'stroke' || obj.type === 'smooth_curve') {
         if (!obj.points || obj.points.length === 0) return null;
         let minX = obj.points[0].x, maxX = obj.points[0].x, minY = obj.points[0].y, maxY = obj.points[0].y;
         for (let p of obj.points) {
@@ -1555,7 +1582,6 @@
     let drawerStartX = 0, drawerStartY = 0;
     let drawerLastMoveX = 0, drawerLastMoveY = 0;
 
-    // Draw & Hold quick shape timers
     let drawerHoldTimer = null;
     let drawerSnappedShape = null;
 
@@ -1651,7 +1677,9 @@
               drawerSnappedShape.thickness = drawerPenThickness;
               redrawDrawerCanvas();
               renderSingleObject(ctx, drawerSnappedShape, false);
-              showToast("⚡ QuickShape Snapped!");
+              if (detected.type === 'line') showToast("📏 Straight Line Snapped!");
+              else if (detected.type === 'smooth_curve') showToast("🌊 Smooth Curve Polished!");
+              else showToast("⚡ Shape Snapped!");
             }
           }
         }, 420);
@@ -1687,7 +1715,6 @@
       drawerLastMoveX = currX;
       drawerLastMoveY = currY;
 
-      // Reset Draw & Hold timer on movement
       if (drawerCurrentTool === 'pen' && !drawerSnappedShape) {
         drawerCurrentStrokePoints.push({ x: currX, y: currY });
         if (distMoved > 6) {
@@ -1701,7 +1728,9 @@
                 drawerSnappedShape.thickness = drawerPenThickness;
                 redrawDrawerCanvas();
                 renderSingleObject(ctx, drawerSnappedShape, false);
-                showToast("⚡ QuickShape Snapped!");
+                if (detected.type === 'line') showToast("📏 Straight Line Snapped!");
+                else if (detected.type === 'smooth_curve') showToast("🌊 Smooth Curve Polished!");
+                else showToast("⚡ Shape Snapped!");
               }
             }
           }, 420);
@@ -1723,7 +1752,7 @@
         return;
       }
 
-      // If QuickShape is active or explicit shape tool is picked
+      // Explicit shape preview or rubberband line
       if (drawerSnappedShape || drawerCurrentTool !== 'pen') {
         redrawDrawerCanvas();
 
@@ -1740,6 +1769,8 @@
           preview = { type: 'circle', cx, cy, r, color: currentColor, thickness: drawerPenThickness };
         } else if (activeTool === 'rect') {
           preview = { type: 'rect', x: Math.min(drawerStartX, currX), y: Math.min(drawerStartY, currY), w: Math.abs(currX - drawerStartX), h: Math.abs(currY - drawerStartY), color: currentColor, thickness: drawerPenThickness };
+        } else if (activeTool === 'smooth_curve') {
+          preview = drawerSnappedShape;
         }
 
         if (preview) {
@@ -1827,9 +1858,9 @@
       });
 
       if (tool === 'move') {
-        showToast("🖐️ MOVE mode: Tap & drag any shape to relocate!");
+        showToast("🖐️ MOVE mode: Tap & drag any graph or shape!");
       } else if (tool === 'pen') {
-        showToast("✏️ PEN mode: Hold 0.4s to snap to perfect shape!");
+        showToast("✏️ PEN mode: Draw curved or linear graphs freely!");
       }
       redrawDrawerCanvas();
     }
@@ -1893,7 +1924,7 @@
       }
     }
 
-    /* ================= SPLIT SCREEN STATE & ENGINE WITH MOVE & QUICKSHAPES ================= */
+    /* ================= SPLIT SCREEN STATE & ENGINE ================= */
     let isSplitScreenActive = false;
     let splitRightSelectedValue = 'notepad';
     let splitCanvas, splitCtx;
@@ -2004,7 +2035,9 @@
               splitSnappedShape.thickness = splitPenThickness;
               redrawSplitCanvas();
               renderSingleObject(splitCtx, splitSnappedShape, false);
-              showToast("⚡ QuickShape Snapped!");
+              if (detected.type === 'line') showToast("📏 Straight Line Snapped!");
+              else if (detected.type === 'smooth_curve') showToast("🌊 Smooth Curve Polished!");
+              else showToast("⚡ Shape Snapped!");
             }
           }
         }, 420);
@@ -2053,7 +2086,9 @@
                 splitSnappedShape.thickness = splitPenThickness;
                 redrawSplitCanvas();
                 renderSingleObject(splitCtx, splitSnappedShape, false);
-                showToast("⚡ QuickShape Snapped!");
+                if (detected.type === 'line') showToast("📏 Straight Line Snapped!");
+                else if (detected.type === 'smooth_curve') showToast("🌊 Smooth Curve Polished!");
+                else showToast("⚡ Shape Snapped!");
               }
             }
           }, 420);
@@ -2089,6 +2124,8 @@
           preview = { type: 'circle', cx: (splitStartX + currX) / 2, cy: (splitStartY + currY) / 2, r, color: splitCanvasColor, thickness: splitPenThickness };
         } else if (activeTool === 'rect') {
           preview = { type: 'rect', x: Math.min(splitStartX, currX), y: Math.min(splitStartY, currY), w: Math.abs(currX - splitStartX), h: Math.abs(currY - splitStartY), color: splitCanvasColor, thickness: splitPenThickness };
+        } else if (activeTool === 'smooth_curve') {
+          preview = splitSnappedShape;
         }
 
         if (preview) {
@@ -2176,9 +2213,9 @@
       });
 
       if (tool === 'move') {
-        showToast("🖐️ MOVE mode: Tap & drag any shape to relocate!");
+        showToast("🖐️ MOVE mode: Tap & drag any graph or shape!");
       } else if (tool === 'pen') {
-        showToast("✏️ PEN mode: Hold 0.4s to snap to perfect shape!");
+        showToast("✏️ PEN mode: Draw curved or linear graphs freely!");
       }
       redrawSplitCanvas();
     }
@@ -3710,6 +3747,7 @@
             <input type="text" id="tab_timestamps_${tIdx}" value="${escapeHtml(timestampsFormatted)}" placeholder="e.g. 45:Completing Square, 180:Discriminant" class="w-full p-1.5 border border-black dark:border-neutral-600 bg-white dark:bg-neutral-900 text-black dark:text-white text-[11px]" />
           </div>
         `;
+
         container.appendChild(card);
       });
     }
