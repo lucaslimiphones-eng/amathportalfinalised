@@ -92,8 +92,8 @@
       min-width: 440px;
     }
     #scratchpadDrawer.open {
-      width: 500px;
-      min-width: 500px;
+      width: 530px;
+      min-width: 530px;
     }
     @media (max-width: 768px) {
       #formulaDrawer.open, #scratchpadDrawer.open {
@@ -294,7 +294,7 @@
         <button 
           type="button" 
           onclick="closeInstallModal()" 
-          class="px-4 py-2 border-2 border-black dark:border-white bg-black dark:bg-white text-white dark:text-black text-xs font-bold uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer"
+          class="px-4 py-2 border-2 border-black dark:border-white bg-black dark:bg-white text-white dark:text-black text-xs font-bold uppercase shadow-[2px_2px_0px_0px_rgba(0,0,1)] cursor-pointer"
         >
           Got It, Back to Study
         </button>
@@ -692,7 +692,7 @@
             </h1>
           </div>
 
-          <!-- ================= HOMEPAGE PORTAL NAVIGATION VIDEO CARD (TEACHER CODE CONTROLLED) ================= -->
+          <!-- HOMEPAGE PORTAL NAVIGATION VIDEO CARD -->
           <div class="w-full border-4 border-black dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] font-mono-code mb-6 text-left overflow-hidden">
             <div class="bg-black text-white p-3.5 sm:p-4 border-b-2 border-black flex items-center justify-between gap-2">
               <div class="flex items-center gap-2">
@@ -707,7 +707,6 @@
               </span>
             </div>
 
-            <!-- Video Player Display Container -->
             <div class="bg-black relative w-full aspect-video min-h-[220px] sm:min-h-[380px] flex items-center justify-center overflow-hidden">
               <video 
                 id="portalGuideVideo" 
@@ -919,7 +918,6 @@
               </span>
               
               <div class="flex items-center gap-3">
-                <!-- SPEED CONTROLS: ALWAYS ACCESSIBLE FOR ALL VIDEO TABS -->
                 <div id="videoSpeedControls" class="flex items-center gap-1.5 text-[11px]">
                   <span class="text-gray-400 font-bold">SPEED:</span>
                   <div class="flex items-center gap-1">
@@ -1037,9 +1035,18 @@
 
               <!-- Right Pane: Digital Scratchpad Canvas -->
               <div id="splitRightCanvasView" class="flex-1 bg-neutral-950 relative flex flex-col overflow-hidden">
-                <div class="p-2.5 bg-neutral-900 border-b border-neutral-800 flex flex-wrap items-center justify-between gap-2 text-xs text-white shrink-0">
+                <div class="p-2 bg-neutral-900 border-b border-neutral-800 flex flex-wrap items-center justify-between gap-1.5 text-xs text-white shrink-0">
+                  <!-- Tool Picker for Split Canvas -->
+                  <div class="flex items-center gap-1 text-[10px] flex-wrap">
+                    <button type="button" onclick="setSplitShapeMode('pen')" id="splitToolPenBtn" class="px-2 py-0.5 bg-emerald-500 text-black font-black uppercase rounded shadow-sm">✏️ PEN</button>
+                    <button type="button" onclick="setSplitShapeMode('line')" id="splitToolLineBtn" class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" title="100% Straight Line with Axis Snapping">📏 LINE</button>
+                    <button type="button" onclick="setSplitShapeMode('circle')" id="splitToolCircleBtn" class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" title="Perfect Circle / Locus">⭕ CIRCLE</button>
+                    <button type="button" onclick="setSplitShapeMode('rect')" id="splitToolRectBtn" class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" title="Perfect Rectangle">▢ RECT</button>
+                    <button type="button" onclick="setSplitShapeMode('eraser')" id="splitEraserModeBtn" class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded">🧹 ERASER</button>
+                  </div>
+
+                  <!-- Color Swatches -->
                   <div class="flex items-center gap-1.5">
-                    <span class="text-[10px] text-gray-400 font-bold uppercase">INK:</span>
                     <button type="button" onclick="setSplitCanvasColor('#10b981')" class="w-4 h-4 rounded-full bg-emerald-500 border border-white hover:scale-110 transition"></button>
                     <button type="button" onclick="setSplitCanvasColor('#38bdf8')" class="w-4 h-4 rounded-full bg-sky-400 border border-white hover:scale-110 transition"></button>
                     <button type="button" onclick="setSplitCanvasColor('#facc15')" class="w-4 h-4 rounded-full bg-yellow-400 border border-white hover:scale-110 transition"></button>
@@ -1047,44 +1054,41 @@
                     <button type="button" onclick="setSplitCanvasColor('#f87171')" class="w-4 h-4 rounded-full bg-red-400 border border-white hover:scale-110 transition"></button>
                   </div>
 
-                  <button 
-                    type="button" 
-                    id="splitGridToggleBtn" 
-                    onclick="toggleCanvasGrid('split')" 
-                    class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-neutral-200 border border-neutral-500 font-bold text-[10px] uppercase rounded flex items-center gap-1 transition"
-                  >
-                    <span>📏 GRID:</span>
-                    <span id="splitGridStatusText" class="text-gray-400 font-black">OFF</span>
-                  </button>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <button 
+                      type="button" 
+                      id="splitGridToggleBtn" 
+                      onclick="toggleCanvasGrid('split')" 
+                      class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-neutral-200 border border-neutral-500 font-bold text-[10px] uppercase rounded flex items-center gap-1 transition"
+                    >
+                      <span>📏 GRID:</span>
+                      <span id="splitGridStatusText" class="text-gray-400 font-black">OFF</span>
+                    </button>
 
-                  <button 
-                    type="button" 
-                    id="splitStylusOnlyToggleBtn" 
-                    onclick="toggleStylusOnlyMode()" 
-                    class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-neutral-200 border border-neutral-500 font-bold text-[10px] uppercase rounded flex items-center gap-1 transition"
-                    title="Blocks palm/finger touches. Only Apple Pencil or active stylus draws."
-                  >
-                    <span>✍️ STYLUS:</span>
-                    <span id="splitStylusOnlyStatusText" class="text-gray-400 font-black">OFF</span>
-                  </button>
+                    <button 
+                      type="button" 
+                      id="splitStylusOnlyToggleBtn" 
+                      onclick="toggleStylusOnlyMode()" 
+                      class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-neutral-200 border border-neutral-500 font-bold text-[10px] uppercase rounded flex items-center gap-1 transition"
+                      title="Blocks palm/finger touches. Only Apple Pencil or active stylus draws."
+                    >
+                      <span>✍️ STYLUS:</span>
+                      <span id="splitStylusOnlyStatusText" class="text-gray-400 font-black">OFF</span>
+                    </button>
 
-                  <div class="flex items-center gap-1 text-[10px]">
-                    <button type="button" onclick="setSplitCanvasMode('pen')" id="splitPenModeBtn" class="px-2 py-0.5 bg-emerald-500 text-black font-bold uppercase rounded">PEN</button>
-                    <button type="button" onclick="setSplitCanvasMode('eraser')" id="splitEraserModeBtn" class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-bold uppercase rounded">ERASER</button>
-                  </div>
-
-                  <div class="flex items-center gap-2 bg-neutral-800 px-2 py-1 rounded border border-neutral-700 text-[10px]">
-                    <span class="text-neutral-400 font-bold uppercase">SIZE:</span>
-                    <input 
-                      type="range" 
-                      id="splitSizeSlider" 
-                      min="1" 
-                      max="40" 
-                      value="3" 
-                      oninput="updateSplitThickness(this.value)" 
-                      class="w-20 accent-emerald-400 cursor-pointer"
-                    />
-                    <span id="splitSizeValueLabel" class="w-7 text-right font-bold text-emerald-400">3px</span>
+                    <div class="flex items-center gap-1 bg-neutral-800 px-1.5 py-0.5 rounded border border-neutral-700 text-[10px]">
+                      <span class="text-neutral-400 font-bold uppercase">SIZE:</span>
+                      <input 
+                        type="range" 
+                        id="splitSizeSlider" 
+                        min="1" 
+                        max="40" 
+                        value="3" 
+                        oninput="updateSplitThickness(this.value)" 
+                        class="w-16 accent-emerald-400 cursor-pointer"
+                      />
+                      <span id="splitSizeValueLabel" class="w-6 text-right font-bold text-emerald-400">3px</span>
+                    </div>
                   </div>
                 </div>
 
@@ -1121,7 +1125,7 @@
           <span class="text-base">✏️</span>
           <div class="truncate">
             <h3 class="font-black text-xs uppercase tracking-tight truncate">DIGITAL WORKING CANVAS</h3>
-            <span class="text-[9px] font-bold uppercase block text-neutral-800">PALM REJECTION &amp; STYLUS</span>
+            <span class="text-[9px] font-bold uppercase block text-neutral-800">100% STRAIGHT LINES • PERFECT SHAPES • STYLUS</span>
           </div>
         </div>
         <button type="button" onclick="toggleScratchpadDrawer()" class="font-black px-2 py-0.5 bg-black text-white hover:bg-neutral-800 text-xs transition cursor-pointer shrink-0 ml-2">
@@ -1129,55 +1133,71 @@
         </button>
       </div>
 
-      <div class="p-2.5 bg-neutral-800 border-b border-neutral-700 flex flex-wrap items-center justify-between gap-2 font-mono-code text-xs text-white shrink-0">
-        <div class="flex items-center gap-1.5">
-          <span class="text-[10px] text-gray-400 font-bold uppercase">INK:</span>
-          <button type="button" onclick="setCanvasColor('#10b981')" class="w-5 h-5 rounded-full bg-emerald-500 border border-white hover:scale-110 transition"></button>
-          <button type="button" onclick="setCanvasColor('#38bdf8')" class="w-5 h-5 rounded-full bg-sky-400 border border-white hover:scale-110 transition"></button>
-          <button type="button" onclick="setCanvasColor('#facc15')" class="w-5 h-5 rounded-full bg-yellow-400 border border-white hover:scale-110 transition"></button>
-          <button type="button" onclick="setCanvasColor('#ffffff')" class="w-5 h-5 rounded-full bg-white border border-neutral-400 hover:scale-110 transition"></button>
+      <!-- Enhanced Canvas Tool Options -->
+      <div class="p-2.5 bg-neutral-800 border-b border-neutral-700 flex flex-col gap-2 font-mono-code text-xs text-white shrink-0">
+        <!-- Row 1: Shape & Drawing Modes -->
+        <div class="flex flex-wrap items-center justify-between gap-1.5">
+          <div class="flex items-center gap-1 text-[11px] flex-wrap">
+            <button type="button" onclick="setDrawerShapeMode('pen')" id="drawerToolPenBtn" class="px-2.5 py-1 bg-emerald-500 text-black font-black uppercase rounded shadow-sm">✏️ PEN</button>
+            <button type="button" onclick="setDrawerShapeMode('line')" id="drawerToolLineBtn" class="px-2.5 py-1 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" title="100% Straight Line (Snaps to 0° & 90° axes)">📏 LINE</button>
+            <button type="button" onclick="setDrawerShapeMode('circle')" id="drawerToolCircleBtn" class="px-2.5 py-1 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" title="Perfect Circle / Locus">⭕ CIRCLE</button>
+            <button type="button" onclick="setDrawerShapeMode('rect')" id="drawerToolRectBtn" class="px-2.5 py-1 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" title="Perfect Rectangle">▢ RECT</button>
+            <button type="button" onclick="setDrawerShapeMode('eraser')" id="drawerEraserModeBtn" class="px-2.5 py-1 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded">🧹 ERASER</button>
+          </div>
+
+          <div class="flex items-center gap-1">
+            <button type="button" onclick="undoDrawerCanvas()" title="Undo stroke" class="px-2 py-1 bg-neutral-700 hover:bg-neutral-600 text-white font-bold uppercase rounded text-[11px]">↩ UNDO</button>
+            <button type="button" onclick="clearScratchpadCanvas()" class="px-2 py-1 bg-red-600 hover:bg-red-700 text-white font-bold uppercase rounded text-[11px]">CLEAR</button>
+          </div>
         </div>
 
-        <button 
-          type="button" 
-          id="drawerGridToggleBtn" 
-          onclick="toggleCanvasGrid('drawer')" 
-          class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-neutral-200 border border-neutral-500 font-bold text-[10px] uppercase rounded flex items-center gap-1 transition"
-        >
-          <span>📏 GRID:</span>
-          <span id="drawerGridStatusText" class="text-gray-400 font-black">OFF</span>
-        </button>
+        <!-- Row 2: Colors, Palettes & Assist Toggles -->
+        <div class="flex flex-wrap items-center justify-between gap-2 border-t border-neutral-700/60 pt-2">
+          <div class="flex items-center gap-1.5">
+            <span class="text-[10px] text-gray-400 font-bold uppercase">INK:</span>
+            <button type="button" onclick="setCanvasColor('#10b981')" class="w-5 h-5 rounded-full bg-emerald-500 border border-white hover:scale-110 transition"></button>
+            <button type="button" onclick="setCanvasColor('#38bdf8')" class="w-5 h-5 rounded-full bg-sky-400 border border-white hover:scale-110 transition"></button>
+            <button type="button" onclick="setCanvasColor('#facc15')" class="w-5 h-5 rounded-full bg-yellow-400 border border-white hover:scale-110 transition"></button>
+            <button type="button" onclick="setCanvasColor('#ffffff')" class="w-5 h-5 rounded-full bg-white border border-neutral-400 hover:scale-110 transition"></button>
+            <button type="button" onclick="setCanvasColor('#f87171')" class="w-5 h-5 rounded-full bg-red-400 border border-neutral-400 hover:scale-110 transition"></button>
+          </div>
 
-        <button 
-          type="button" 
-          id="stylusOnlyToggleBtn" 
-          onclick="toggleStylusOnlyMode()" 
-          class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-neutral-200 border border-neutral-500 font-bold text-[10px] uppercase rounded flex items-center gap-1 transition"
-          title="Blocks palm/finger touches. Only Apple Pencil or active stylus draws."
-        >
-          <span>✍️ STYLUS:</span>
-          <span id="stylusOnlyStatusText" class="text-gray-400 font-black">OFF</span>
-        </button>
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <button 
+              type="button" 
+              id="drawerGridToggleBtn" 
+              onclick="toggleCanvasGrid('drawer')" 
+              class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-neutral-200 border border-neutral-500 font-bold text-[10px] uppercase rounded flex items-center gap-1 transition"
+            >
+              <span>📏 GRID:</span>
+              <span id="drawerGridStatusText" class="text-gray-400 font-black">OFF</span>
+            </button>
 
-        <div class="flex items-center gap-1.5 bg-neutral-900 px-2 py-0.5 rounded border border-neutral-700 text-[10px]">
-          <span class="text-neutral-400 uppercase font-bold">SIZE:</span>
-          <input 
-            type="range" 
-            id="drawerSizeSlider" 
-            min="1" 
-            max="40" 
-            value="3" 
-            oninput="updateDrawerThickness(this.value)" 
-            class="w-16 accent-emerald-400 cursor-pointer"
-          />
-          <span id="drawerSizeValueLabel" class="w-6 text-right font-bold text-emerald-400">3px</span>
-        </div>
+            <button 
+              type="button" 
+              id="stylusOnlyToggleBtn" 
+              onclick="toggleStylusOnlyMode()" 
+              class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-neutral-200 border border-neutral-500 font-bold text-[10px] uppercase rounded flex items-center gap-1 transition"
+              title="Blocks palm/finger touches. Only Apple Pencil or active stylus draws."
+            >
+              <span>✍️ STYLUS:</span>
+              <span id="stylusOnlyStatusText" class="text-gray-400 font-black">OFF</span>
+            </button>
 
-        <div class="flex items-center gap-1 text-[11px]">
-          <button type="button" onclick="setCanvasMode('pen')" id="penModeBtn" class="px-2 py-0.5 bg-emerald-500 text-black font-bold uppercase rounded">PEN</button>
-          <button type="button" onclick="setCanvasMode('eraser')" id="eraserModeBtn" class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-bold uppercase rounded">ERASER</button>
-          <button type="button" onclick="undoDrawerCanvas()" title="Undo stroke" class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-bold uppercase rounded">↩</button>
-          <button type="button" onclick="clearScratchpadCanvas()" class="px-2 py-0.5 bg-red-600 hover:bg-red-700 text-white font-bold uppercase rounded">CLEAR</button>
+            <div class="flex items-center gap-1.5 bg-neutral-900 px-2 py-0.5 rounded border border-neutral-700 text-[10px]">
+              <span class="text-neutral-400 uppercase font-bold">SIZE:</span>
+              <input 
+                type="range" 
+                id="drawerSizeSlider" 
+                min="1" 
+                max="40" 
+                value="3" 
+                oninput="updateDrawerThickness(this.value)" 
+                class="w-16 accent-emerald-400 cursor-pointer"
+              />
+              <span id="drawerSizeValueLabel" class="w-6 text-right font-bold text-emerald-400">3px</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1186,9 +1206,9 @@
           <canvas id="scratchpadCanvas" class="w-full h-full bg-neutral-900 border border-neutral-700 rounded shadow-inner"></canvas>
         </div>
         <div class="bg-amber-100 dark:bg-amber-950/60 border-t-2 border-black p-2.5 text-[11px] font-mono-code text-black dark:text-amber-200 shrink-0 mt-2">
-          <p class="font-black uppercase mb-1">💡 How to ask a winning question:</p>
+          <p class="font-black uppercase mb-1">💡 Lucas's Tip on Math Diagrams:</p>
           <p class="text-[10px] text-gray-700 dark:text-neutral-300 leading-tight">
-            Circle where you got stuck, write down your first step, and ask: <span class="italic font-bold">"Lucas, I got up to step 2 here, but why did the sign flip when expanding the bracket?"</span>
+            Use <strong class="font-black text-black dark:text-white">📏 LINE</strong> to rule straight axes, tangents &amp; asymptotes. Use <strong class="font-black text-black dark:text-white">⭕ CIRCLE</strong> for loci and coordinate geometry circles!
           </p>
         </div>
       </div>
@@ -1587,7 +1607,7 @@
       }
     }
 
-    /* ================= SPLIT SCREEN STATE & ENGINE ================= */
+    /* ================= SPLIT SCREEN STATE & ENGINE WITH SHAPES ================= */
     let isSplitScreenActive = false;
     let splitRightSelectedValue = 'notepad';
     let splitCanvas, splitCtx;
@@ -1595,7 +1615,10 @@
     let splitCanvasColor = '#10b981';
     let splitPenThickness = 3;
     let splitEraserThickness = 20;
-    let isSplitEraser = false;
+    let splitCurrentTool = 'pen'; // 'pen', 'line', 'circle', 'rect', 'eraser'
+    let splitStartX = 0;
+    let splitStartY = 0;
+    let splitSnapshot = null;
     let splitUndoHistory = [];
 
     function toggleSplitScreenMode() {
@@ -1617,7 +1640,7 @@
         }
         setupSplitScreenPanes();
         setTimeout(initSplitScratchCanvas, 150);
-        showToast("Split Screen Active: Choose any tab or notepad on the right!");
+        showToast("Split Screen Active: 100% Straight Line & Shape tools ready!");
       } else {
         if (splitPane) {
           splitPane.classList.add('hidden');
@@ -1759,6 +1782,29 @@
       }
     }
 
+    /* Helper: Snap angle to 0, 45, 90 deg for accurate axes */
+    function snapLineCoordinates(x0, y0, x1, y1) {
+      const dx = x1 - x0;
+      const dy = y1 - y0;
+      const dist = Math.hypot(dx, dy);
+      if (dist < 10) return { x: x1, y: y1 };
+
+      const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+      const snapAngles = [0, 45, 90, 135, 180, -180, -135, -90, -45];
+      const threshold = 6.5; // degrees tolerance
+
+      for (let sa of snapAngles) {
+        if (Math.abs(angle - sa) < threshold || Math.abs(angle - (sa + 360)) < threshold || Math.abs(angle - (sa - 360)) < threshold) {
+          const rad = sa * (Math.PI / 180);
+          return {
+            x: x0 + Math.cos(rad) * dist,
+            y: y0 + Math.sin(rad) * dist
+          };
+        }
+      }
+      return { x: x1, y: y1 };
+    }
+
     function initSplitScratchCanvas() {
       splitCanvas = document.getElementById('splitScratchCanvas');
       if (!splitCanvas) return;
@@ -1772,8 +1818,15 @@
         saveSplitState();
         isSplitDrawing = true;
         const rect = splitCanvas.getBoundingClientRect();
-        splitCtx.beginPath();
-        splitCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        splitStartX = e.clientX - rect.left;
+        splitStartY = e.clientY - rect.top;
+
+        if (splitCurrentTool === 'pen' || splitCurrentTool === 'eraser') {
+          splitCtx.beginPath();
+          splitCtx.moveTo(splitStartX, splitStartY);
+        } else {
+          splitSnapshot = splitCtx.getImageData(0, 0, splitCanvas.width, splitCanvas.height);
+        }
         try { splitCanvas.setPointerCapture(e.pointerId); } catch (err) {}
       });
 
@@ -1781,27 +1834,59 @@
         if (!isSplitDrawing) return;
         if (isStylusOnlyMode && e.pointerType !== 'pen') return;
         const rect = splitCanvas.getBoundingClientRect();
+        const currX = e.clientX - rect.left;
+        const currY = e.clientY - rect.top;
 
-        if (isSplitEraser) {
+        if (splitCurrentTool === 'eraser') {
           splitCtx.strokeStyle = '#171717';
           splitCtx.lineWidth = splitEraserThickness;
-        } else {
+          splitCtx.lineTo(currX, currY);
+          splitCtx.stroke();
+        } else if (splitCurrentTool === 'pen') {
           splitCtx.strokeStyle = splitCanvasColor;
           if (e.pointerType === 'pen' && e.pressure && e.pressure > 0) {
             splitCtx.lineWidth = splitPenThickness * (0.6 + e.pressure * 0.8);
           } else {
             splitCtx.lineWidth = splitPenThickness;
           }
-        }
+          splitCtx.lineTo(currX, currY);
+          splitCtx.stroke();
+        } else {
+          // Geometric Shapes: restore snapshot & preview live shape
+          if (splitSnapshot) {
+            splitCtx.putImageData(splitSnapshot, 0, 0);
+          }
+          splitCtx.strokeStyle = splitCanvasColor;
+          splitCtx.lineWidth = splitPenThickness;
 
-        splitCtx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
-        splitCtx.stroke();
+          if (splitCurrentTool === 'line') {
+            const snapped = snapLineCoordinates(splitStartX, splitStartY, currX, currY);
+            splitCtx.beginPath();
+            splitCtx.moveTo(splitStartX, splitStartY);
+            splitCtx.lineTo(snapped.x, snapped.y);
+            splitCtx.stroke();
+          } else if (splitCurrentTool === 'circle') {
+            const rx = Math.abs(currX - splitStartX) / 2;
+            const ry = Math.abs(currY - splitStartY) / 2;
+            const cx = Math.min(splitStartX, currX) + rx;
+            const cy = Math.min(splitStartY, currY) + ry;
+            splitCtx.beginPath();
+            splitCtx.ellipse(cx, cy, rx, ry, 0, 0, 2 * Math.PI);
+            splitCtx.stroke();
+          } else if (splitCurrentTool === 'rect') {
+            splitCtx.beginPath();
+            splitCtx.strokeRect(splitStartX, splitStartY, currX - splitStartX, currY - splitStartY);
+          }
+        }
       });
 
       splitCanvas.addEventListener('pointerup', (e) => {
         if (!isSplitDrawing) return;
         isSplitDrawing = false;
-        splitCtx.closePath();
+        splitSnapshot = null;
+        if (splitCurrentTool === 'pen' || splitCurrentTool === 'eraser') {
+          splitCtx.closePath();
+        }
         try { splitCanvas.releasePointerCapture(e.pointerId); } catch (err) {}
       });
     }
@@ -1847,13 +1932,51 @@
 
     function setSplitCanvasColor(color) {
       splitCanvasColor = color;
-      isSplitEraser = false;
-      updateSplitToolUI();
+      if (splitCurrentTool === 'eraser') {
+        setSplitShapeMode('pen');
+      }
     }
 
-    function setSplitCanvasMode(mode) {
-      isSplitEraser = (mode === 'eraser');
-      updateSplitToolUI();
+    function setSplitShapeMode(tool) {
+      splitCurrentTool = tool;
+      const penBtn = document.getElementById('splitToolPenBtn');
+      const lineBtn = document.getElementById('splitToolLineBtn');
+      const circleBtn = document.getElementById('splitToolCircleBtn');
+      const rectBtn = document.getElementById('splitToolRectBtn');
+      const eraserBtn = document.getElementById('splitEraserModeBtn');
+
+      const btns = [
+        { key: 'pen', el: penBtn },
+        { key: 'line', el: lineBtn },
+        { key: 'circle', el: circleBtn },
+        { key: 'rect', el: rectBtn },
+        { key: 'eraser', el: eraserBtn }
+      ];
+
+      btns.forEach(b => {
+        if (!b.el) return;
+        if (b.key === tool) {
+          b.el.className = "px-2 py-0.5 bg-emerald-500 text-black font-black uppercase rounded shadow-sm";
+        } else {
+          b.el.className = "px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded";
+        }
+      });
+
+      const slider = document.getElementById('splitSizeSlider');
+      const label = document.getElementById('splitSizeValueLabel');
+      if (slider && label) {
+        if (tool === 'eraser') {
+          slider.value = splitEraserThickness;
+          label.textContent = `${splitEraserThickness}px`;
+        } else {
+          slider.value = splitPenThickness;
+          label.textContent = `${splitPenThickness}px`;
+        }
+      }
+
+      if (tool === 'line') showToast("100% Straight Line active (snaps to axes)!");
+      if (tool === 'circle') showToast("Perfect Circle / Locus tool active!");
+      if (tool === 'rect') showToast("Perfect Rectangle tool active!");
     }
 
     function updateSplitThickness(val) {
@@ -1861,29 +1984,10 @@
       const label = document.getElementById('splitSizeValueLabel');
       if (label) label.textContent = `${parsed}px`;
 
-      if (isSplitEraser) {
+      if (splitCurrentTool === 'eraser') {
         splitEraserThickness = parsed;
       } else {
         splitPenThickness = parsed;
-      }
-    }
-
-    function updateSplitToolUI() {
-      const penBtn = document.getElementById('splitPenModeBtn');
-      const eraserBtn = document.getElementById('splitEraserModeBtn');
-      const slider = document.getElementById('splitSizeSlider');
-      const label = document.getElementById('splitSizeValueLabel');
-
-      if (isSplitEraser) {
-        if (eraserBtn) eraserBtn.className = "px-2 py-0.5 bg-cyan-400 text-black font-bold uppercase rounded";
-        if (penBtn) penBtn.className = "px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-bold uppercase rounded";
-        if (slider) slider.value = splitEraserThickness;
-        if (label) label.textContent = `${splitEraserThickness}px`;
-      } else {
-        if (penBtn) penBtn.className = "px-2 py-0.5 bg-emerald-500 text-black font-bold uppercase rounded";
-        if (eraserBtn) eraserBtn.className = "px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-bold uppercase rounded";
-        if (slider) slider.value = splitPenThickness;
-        if (label) label.textContent = `${splitPenThickness}px`;
       }
     }
 
@@ -1920,20 +2024,293 @@
       }
     }
 
-    /* ================= DRAWER NOTEPAD THICKNESS ENGINES ================= */
+    /* ================= DRAWER NOTEPAD WITH 100% STRAIGHT LINES & SHAPES ================= */
+    let canvas, ctx;
+    let isDrawing = false;
+    let currentColor = '#10b981';
+    let drawerCurrentTool = 'pen'; // 'pen', 'line', 'circle', 'rect', 'eraser'
     let drawerPenThickness = 3;
     let drawerEraserThickness = 20;
+    let isStylusOnlyMode = false;
+    let drawerUndoHistory = [];
+    let drawerStartX = 0;
+    let drawerStartY = 0;
+    let drawerSnapshot = null;
 
     function updateDrawerThickness(val) {
       const parsed = parseInt(val, 10);
       const label = document.getElementById('drawerSizeValueLabel');
       if (label) label.textContent = `${parsed}px`;
 
-      if (isEraser) {
+      if (drawerCurrentTool === 'eraser') {
         drawerEraserThickness = parsed;
       } else {
         drawerPenThickness = parsed;
       }
+    }
+
+    function initScratchpadCanvas() {
+      canvas = document.getElementById('scratchpadCanvas');
+      if (!canvas) return;
+      ctx = canvas.getContext('2d');
+
+      resizeScratchpadCanvas();
+      window.addEventListener('resize', resizeScratchpadCanvas);
+
+      canvas.addEventListener('pointerdown', handlePointerDown);
+      canvas.addEventListener('pointermove', handlePointerMove);
+      canvas.addEventListener('pointerup', handlePointerUp);
+      canvas.addEventListener('pointercancel', handlePointerUp);
+      canvas.addEventListener('pointerleave', handlePointerUp);
+    }
+
+    function setDrawerShapeMode(tool) {
+      drawerCurrentTool = tool;
+      const penBtn = document.getElementById('drawerToolPenBtn');
+      const lineBtn = document.getElementById('drawerToolLineBtn');
+      const circleBtn = document.getElementById('drawerToolCircleBtn');
+      const rectBtn = document.getElementById('drawerToolRectBtn');
+      const eraserBtn = document.getElementById('drawerEraserModeBtn');
+
+      const btns = [
+        { key: 'pen', el: penBtn },
+        { key: 'line', el: lineBtn },
+        { key: 'circle', el: circleBtn },
+        { key: 'rect', el: rectBtn },
+        { key: 'eraser', el: eraserBtn }
+      ];
+
+      btns.forEach(b => {
+        if (!b.el) return;
+        if (b.key === tool) {
+          b.el.className = "px-2.5 py-1 bg-emerald-500 text-black font-black uppercase rounded shadow-sm";
+        } else {
+          b.el.className = "px-2.5 py-1 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded";
+        }
+      });
+
+      const slider = document.getElementById('drawerSizeSlider');
+      const label = document.getElementById('drawerSizeValueLabel');
+      if (slider && label) {
+        if (tool === 'eraser') {
+          slider.value = drawerEraserThickness;
+          label.textContent = `${drawerEraserThickness}px`;
+        } else {
+          slider.value = drawerPenThickness;
+          label.textContent = `${drawerPenThickness}px`;
+        }
+      }
+
+      if (tool === 'line') showToast("100% Straight Line active (axes snap at 0° & 90°)!");
+      if (tool === 'circle') showToast("Perfect Circle / Locus active!");
+      if (tool === 'rect') showToast("Perfect Rectangle active!");
+    }
+
+    function handlePointerDown(e) {
+      if (isStylusOnlyMode && e.pointerType !== 'pen') return;
+      saveDrawerState();
+      isDrawing = true;
+      const rect = canvas.getBoundingClientRect();
+      drawerStartX = e.clientX - rect.left;
+      drawerStartY = e.clientY - rect.top;
+
+      if (drawerCurrentTool === 'pen' || drawerCurrentTool === 'eraser') {
+        ctx.beginPath();
+        ctx.moveTo(drawerStartX, drawerStartY);
+      } else {
+        drawerSnapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      }
+      try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
+    }
+
+    function handlePointerMove(e) {
+      if (!isDrawing) return;
+      if (isStylusOnlyMode && e.pointerType !== 'pen') return;
+
+      const rect = canvas.getBoundingClientRect();
+      const currX = e.clientX - rect.left;
+      const currY = e.clientY - rect.top;
+
+      if (drawerCurrentTool === 'eraser') {
+        ctx.strokeStyle = '#171717';
+        ctx.lineWidth = drawerEraserThickness;
+        ctx.lineTo(currX, currY);
+        ctx.stroke();
+      } else if (drawerCurrentTool === 'pen') {
+        ctx.strokeStyle = currentColor;
+        if (e.pointerType === 'pen' && e.pressure && e.pressure > 0) {
+          ctx.lineWidth = drawerPenThickness * (0.6 + e.pressure * 0.8);
+        } else {
+          ctx.lineWidth = drawerPenThickness;
+        }
+        ctx.lineTo(currX, currY);
+        ctx.stroke();
+      } else {
+        // Geometric Shapes with Real-Time Preview
+        if (drawerSnapshot) {
+          ctx.putImageData(drawerSnapshot, 0, 0);
+        }
+        ctx.strokeStyle = currentColor;
+        ctx.lineWidth = drawerPenThickness;
+
+        if (drawerCurrentTool === 'line') {
+          const snapped = snapLineCoordinates(drawerStartX, drawerStartY, currX, currY);
+          ctx.beginPath();
+          ctx.moveTo(drawerStartX, drawerStartY);
+          ctx.lineTo(snapped.x, snapped.y);
+          ctx.stroke();
+        } else if (drawerCurrentTool === 'circle') {
+          const rx = Math.abs(currX - drawerStartX) / 2;
+          const ry = Math.abs(currY - drawerStartY) / 2;
+          const cx = Math.min(drawerStartX, currX) + rx;
+          const cy = Math.min(drawerStartY, currY) + ry;
+          ctx.beginPath();
+          ctx.ellipse(cx, cy, rx, ry, 0, 0, 2 * Math.PI);
+          ctx.stroke();
+        } else if (drawerCurrentTool === 'rect') {
+          ctx.beginPath();
+          ctx.strokeRect(drawerStartX, drawerStartY, currX - drawerStartX, currY - drawerStartY);
+        }
+      }
+    }
+
+    function handlePointerUp(e) {
+      if (!isDrawing) return;
+      isDrawing = false;
+      drawerSnapshot = null;
+      if (drawerCurrentTool === 'pen' || drawerCurrentTool === 'eraser') {
+        ctx.closePath();
+      }
+      try { canvas.releasePointerCapture(e.pointerId); } catch (err) {}
+    }
+
+    function toggleStylusOnlyMode() {
+      isStylusOnlyMode = !isStylusOnlyMode;
+      const statusText = document.getElementById('stylusOnlyStatusText');
+      const toggleBtn = document.getElementById('stylusOnlyToggleBtn');
+      const splitStatusText = document.getElementById('splitStylusOnlyStatusText');
+      const splitToggleBtn = document.getElementById('splitStylusOnlyToggleBtn');
+
+      if (isStylusOnlyMode) {
+        if (statusText) {
+          statusText.textContent = "ON";
+          statusText.className = "text-emerald-400 font-black";
+        }
+        if (toggleBtn) {
+          toggleBtn.className = "px-2 py-0.5 bg-emerald-950/70 border border-emerald-400 text-white font-bold text-[10px] uppercase rounded flex items-center gap-1 transition shadow-[1px_1px_0px_0px_rgba(16,185,129,1)]";
+        }
+        if (splitStatusText) {
+          splitStatusText.textContent = "ON";
+          splitStatusText.className = "text-emerald-400 font-black";
+        }
+        if (splitToggleBtn) {
+          splitToggleBtn.className = "px-2 py-0.5 bg-emerald-950/70 border border-emerald-400 text-white font-bold text-[10px] uppercase rounded flex items-center gap-1 transition shadow-[1px_1px_0px_0px_rgba(16,185,129,1)]";
+        }
+        showToast("Stylus Only Enabled: Palm touches ignored!");
+      } else {
+        if (statusText) {
+          statusText.textContent = "OFF";
+          statusText.className = "text-gray-400 font-black";
+        }
+        if (toggleBtn) {
+          toggleBtn.className = "px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-neutral-200 border border-neutral-500 font-bold text-[10px] uppercase rounded flex items-center gap-1 transition";
+        }
+        if (splitStatusText) {
+          splitStatusText.textContent = "OFF";
+          splitStatusText.className = "text-gray-400 font-black";
+        }
+        if (splitToggleBtn) {
+          splitToggleBtn.className = "px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-neutral-200 border border-neutral-500 font-bold text-[10px] uppercase rounded flex items-center gap-1 transition";
+        }
+        showToast("Stylus Only Disabled: Finger and stylus both draw.");
+      }
+    }
+
+    function saveDrawerState() {
+      if (!canvas) return;
+      if (drawerUndoHistory.length > 20) drawerUndoHistory.shift();
+      drawerUndoHistory.push(canvas.toDataURL());
+    }
+
+    function undoDrawerCanvas() {
+      if (!canvas || !ctx || drawerUndoHistory.length === 0) return;
+      const prevData = drawerUndoHistory.pop();
+      const img = new Image();
+      img.onload = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0);
+      };
+      img.src = prevData;
+    }
+
+    function resizeScratchpadCanvas() {
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return;
+
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = canvas.width;
+      tempCanvas.height = canvas.height;
+      const tempCtx = tempCanvas.getContext('2d');
+      if (canvas.width > 0 && canvas.height > 0) {
+        tempCtx.drawImage(canvas, 0, 0);
+      }
+
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      if (tempCanvas.width > 0 && tempCanvas.height > 0) {
+        ctx.drawImage(tempCanvas, 0, 0);
+      }
+    }
+
+    function setCanvasColor(color) {
+      currentColor = color;
+      if (drawerCurrentTool === 'eraser') {
+        setDrawerShapeMode('pen');
+      }
+    }
+
+    function clearScratchpadCanvas() {
+      if (!ctx || !canvas) return;
+      saveDrawerState();
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      showToast("Scratchpad cleared!");
+    }
+
+    function toggleScratchpadDrawer() {
+      const drawer = document.getElementById('scratchpadDrawer');
+      const formulaDrawer = document.getElementById('formulaDrawer');
+      const btn = document.getElementById('scratchpadToggleBtn');
+      if (!drawer) return;
+
+      const isOpen = drawer.classList.contains('open');
+      if (isOpen) {
+        drawer.classList.remove('open');
+        if (btn) btn.classList.remove('ring-2', 'ring-black');
+      } else {
+        if (formulaDrawer && formulaDrawer.classList.contains('open')) formulaDrawer.classList.remove('open');
+        drawer.classList.add('open');
+        if (btn) btn.classList.add('ring-2', 'ring-black');
+        setTimeout(resizeScratchpadCanvas, 320);
+      }
+    }
+
+    function downloadScratchpadPNG() {
+      if (!canvas) return;
+      const link = document.createElement('a');
+      link.download = `A-Math_Working_${Date.now()}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      showToast("Saved working as image!");
+    }
+
+    function sendScratchpadToLucas() {
+      const studentName = currentStudent ? currentStudent.name : 'Student';
+      const encoded = encodeURIComponent(`Hi Lucas, I am ${studentName}! I just saved my digital scratchpad working. Sending the photo over for checking!`);
+      window.open(`https://wa.me/6581980012?text=${encoded}`, '_blank');
     }
 
     /* ================= FOCUS LOCKDOWN STATE & ENGINE ================= */
@@ -2081,222 +2458,6 @@
       if (streakText) {
         streakText.textContent = `${streakCount} DAY${streakCount > 1 ? 'S' : ''}`;
       }
-    }
-
-    /* ================= DIGITAL WORKING SCRATCHPAD ENGINE ================= */
-    let canvas, ctx;
-    let isDrawing = false;
-    let currentColor = '#10b981';
-    let isEraser = false;
-    let isStylusOnlyMode = false;
-    let drawerUndoHistory = [];
-
-    function initScratchpadCanvas() {
-      canvas = document.getElementById('scratchpadCanvas');
-      if (!canvas) return;
-      ctx = canvas.getContext('2d');
-
-      resizeScratchpadCanvas();
-      window.addEventListener('resize', resizeScratchpadCanvas);
-
-      canvas.addEventListener('pointerdown', handlePointerDown);
-      canvas.addEventListener('pointermove', handlePointerMove);
-      canvas.addEventListener('pointerup', handlePointerUp);
-      canvas.addEventListener('pointercancel', handlePointerUp);
-      canvas.addEventListener('pointerleave', handlePointerUp);
-    }
-
-    function toggleStylusOnlyMode() {
-      isStylusOnlyMode = !isStylusOnlyMode;
-      const statusText = document.getElementById('stylusOnlyStatusText');
-      const toggleBtn = document.getElementById('stylusOnlyToggleBtn');
-      const splitStatusText = document.getElementById('splitStylusOnlyStatusText');
-      const splitToggleBtn = document.getElementById('splitStylusOnlyToggleBtn');
-
-      if (isStylusOnlyMode) {
-        if (statusText) {
-          statusText.textContent = "ON";
-          statusText.className = "text-emerald-400 font-black";
-        }
-        if (toggleBtn) {
-          toggleBtn.className = "px-2 py-0.5 bg-emerald-950/70 border border-emerald-400 text-white font-bold text-[10px] uppercase rounded flex items-center gap-1 transition shadow-[1px_1px_0px_0px_rgba(16,185,129,1)]";
-        }
-        if (splitStatusText) {
-          splitStatusText.textContent = "ON";
-          splitStatusText.className = "text-emerald-400 font-black";
-        }
-        if (splitToggleBtn) {
-          splitToggleBtn.className = "px-2 py-0.5 bg-emerald-950/70 border border-emerald-400 text-white font-bold text-[10px] uppercase rounded flex items-center gap-1 transition shadow-[1px_1px_0px_0px_rgba(16,185,129,1)]";
-        }
-        showToast("Stylus Only Enabled: Palm touches ignored!");
-      } else {
-        if (statusText) {
-          statusText.textContent = "OFF";
-          statusText.className = "text-gray-400 font-black";
-        }
-        if (toggleBtn) {
-          toggleBtn.className = "px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-neutral-200 border border-neutral-500 font-bold text-[10px] uppercase rounded flex items-center gap-1 transition";
-        }
-        if (splitStatusText) {
-          splitStatusText.textContent = "OFF";
-          splitStatusText.className = "text-gray-400 font-black";
-        }
-        if (splitToggleBtn) {
-          splitToggleBtn.className = "px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-neutral-200 border border-neutral-500 font-bold text-[10px] uppercase rounded flex items-center gap-1 transition";
-        }
-        showToast("Stylus Only Disabled: Finger and stylus both draw.");
-      }
-    }
-
-    function saveDrawerState() {
-      if (!canvas) return;
-      if (drawerUndoHistory.length > 20) drawerUndoHistory.shift();
-      drawerUndoHistory.push(canvas.toDataURL());
-    }
-
-    function undoDrawerCanvas() {
-      if (!canvas || !ctx || drawerUndoHistory.length === 0) return;
-      const prevData = drawerUndoHistory.pop();
-      const img = new Image();
-      img.onload = () => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, 0, 0);
-      };
-      img.src = prevData;
-    }
-
-    function handlePointerDown(e) {
-      if (isStylusOnlyMode && e.pointerType !== 'pen') return;
-      saveDrawerState();
-      isDrawing = true;
-      const rect = canvas.getBoundingClientRect();
-      ctx.beginPath();
-      ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
-      try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
-    }
-
-    function handlePointerMove(e) {
-      if (!isDrawing) return;
-      if (isStylusOnlyMode && e.pointerType !== 'pen') return;
-
-      const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
-      if (isEraser) {
-        ctx.strokeStyle = '#171717';
-        ctx.lineWidth = drawerEraserThickness;
-      } else {
-        ctx.strokeStyle = currentColor;
-        if (e.pointerType === 'pen' && e.pressure && e.pressure > 0) {
-          ctx.lineWidth = drawerPenThickness * (0.6 + e.pressure * 0.8);
-        } else {
-          ctx.lineWidth = drawerPenThickness;
-        }
-      }
-
-      ctx.lineTo(x, y);
-      ctx.stroke();
-    }
-
-    function handlePointerUp(e) {
-      if (!isDrawing) return;
-      isDrawing = false;
-      ctx.closePath();
-      try { canvas.releasePointerCapture(e.pointerId); } catch (err) {}
-    }
-
-    function resizeScratchpadCanvas() {
-      if (!canvas) return;
-      const rect = canvas.getBoundingClientRect();
-      if (rect.width === 0 || rect.height === 0) return;
-
-      const tempCanvas = document.createElement('canvas');
-      tempCanvas.width = canvas.width;
-      tempCanvas.height = canvas.height;
-      const tempCtx = tempCanvas.getContext('2d');
-      if (canvas.width > 0 && canvas.height > 0) {
-        tempCtx.drawImage(canvas, 0, 0);
-      }
-
-      canvas.width = rect.width;
-      canvas.height = rect.height;
-
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      if (tempCanvas.width > 0 && tempCanvas.height > 0) {
-        ctx.drawImage(tempCanvas, 0, 0);
-      }
-    }
-
-    function setCanvasColor(color) {
-      currentColor = color;
-      isEraser = false;
-      updateCanvasToolButtons();
-    }
-
-    function setCanvasMode(mode) {
-      isEraser = (mode === 'eraser');
-      updateCanvasToolButtons();
-    }
-
-    function updateCanvasToolButtons() {
-      const penBtn = document.getElementById('penModeBtn');
-      const eraserBtn = document.getElementById('eraserModeBtn');
-      const slider = document.getElementById('drawerSizeSlider');
-      const label = document.getElementById('drawerSizeValueLabel');
-
-      if (isEraser) {
-        if (eraserBtn) eraserBtn.className = "px-2 py-0.5 bg-cyan-400 text-black font-bold uppercase rounded";
-        if (penBtn) penBtn.className = "px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-bold uppercase rounded";
-        if (slider) slider.value = drawerEraserThickness;
-        if (label) label.textContent = `${drawerEraserThickness}px`;
-      } else {
-        if (penBtn) penBtn.className = "px-2 py-0.5 bg-emerald-500 text-black font-bold uppercase rounded";
-        if (eraserBtn) eraserBtn.className = "px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-bold uppercase rounded";
-        if (slider) slider.value = drawerPenThickness;
-        if (label) label.textContent = `${drawerPenThickness}px`;
-      }
-    }
-
-    function clearScratchpadCanvas() {
-      if (!ctx || !canvas) return;
-      saveDrawerState();
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      showToast("Scratchpad cleared!");
-    }
-
-    function toggleScratchpadDrawer() {
-      const drawer = document.getElementById('scratchpadDrawer');
-      const formulaDrawer = document.getElementById('formulaDrawer');
-      const btn = document.getElementById('scratchpadToggleBtn');
-      if (!drawer) return;
-
-      const isOpen = drawer.classList.contains('open');
-      if (isOpen) {
-        drawer.classList.remove('open');
-        if (btn) btn.classList.remove('ring-2', 'ring-black');
-      } else {
-        if (formulaDrawer && formulaDrawer.classList.contains('open')) formulaDrawer.classList.remove('open');
-        drawer.classList.add('open');
-        if (btn) btn.classList.add('ring-2', 'ring-black');
-        setTimeout(resizeScratchpadCanvas, 320);
-      }
-    }
-
-    function downloadScratchpadPNG() {
-      if (!canvas) return;
-      const link = document.createElement('a');
-      link.download = `A-Math_Working_${Date.now()}.png`;
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-      showToast("Saved working as image!");
-    }
-
-    function sendScratchpadToLucas() {
-      const studentName = currentStudent ? currentStudent.name : 'Student';
-      const encoded = encodeURIComponent(`Hi Lucas, I am ${studentName}! I just saved my digital scratchpad working. Sending the photo over for checking!`);
-      window.open(`https://wa.me/6581980012?text=${encoded}`, '_blank');
     }
 
     /* ================= DARK MODE & FORMULA DRAWER ================= */
@@ -2541,7 +2702,6 @@
         video.playbackRate = speed;
       }
 
-      // Update preset buttons active highlight
       document.querySelectorAll('.speed-btn').forEach(btn => {
         const btnSpeed = parseFloat(btn.getAttribute('data-speed'));
         if (btnSpeed === speed) {
@@ -2551,7 +2711,6 @@
         }
       });
 
-      // Synchronize dropdown
       const customSelect = document.getElementById('customSpeedDropdown');
       if (customSelect) {
         customSelect.value = speed.toString();
@@ -2995,7 +3154,6 @@
       }
     }
 
-    /* REWRITTEN: Speed controls remain visible on any video tab whether URL is entered or not */
     function loadActiveMedia() {
       if (currentChapterIndex === null || !activeTabId) return;
       const ch = chapters[currentChapterIndex];
@@ -3008,7 +3166,6 @@
       const statusLabel = document.getElementById('mediaStatusLabel');
       const speedControls = document.getElementById('videoSpeedControls');
 
-      // KEEP SPEED CONTROLS VISIBLE IF TAB IS MARKED AS VIDEO
       if (tab.type === 'video') {
         if (speedControls) {
           speedControls.classList.remove('hidden');
