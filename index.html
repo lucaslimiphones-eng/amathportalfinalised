@@ -919,12 +919,29 @@
               </span>
               
               <div class="flex items-center gap-3">
-                <div id="videoSpeedControls" class="flex items-center gap-1 text-[11px]">
-                  <span class="text-gray-400 font-bold mr-1">SPEED:</span>
-                  <button type="button" onclick="setVideoSpeed(1)" class="px-1.5 py-0.5 border border-gray-600 bg-gray-800">1x</button>
-                  <button type="button" onclick="setVideoSpeed(1.25)" class="px-1.5 py-0.5 border border-gray-600 bg-gray-800">1.25x</button>
-                  <button type="button" onclick="setVideoSpeed(1.5)" class="px-1.5 py-0.5 border border-gray-600 bg-gray-800">1.5x</button>
-                  <button type="button" onclick="setVideoSpeed(2)" class="px-1.5 py-0.5 border border-gray-600 bg-gray-800">2x</button>
+                <!-- SPEED CONTROLS: ALWAYS ACCESSIBLE FOR ALL VIDEO TABS -->
+                <div id="videoSpeedControls" class="flex items-center gap-1.5 text-[11px]">
+                  <span class="text-gray-400 font-bold">SPEED:</span>
+                  <div class="flex items-center gap-1">
+                    <button type="button" onclick="setVideoSpeed(1)" class="speed-btn px-2 py-0.5 border border-gray-600 bg-emerald-500 text-black font-bold text-xs" data-speed="1">1x</button>
+                    <button type="button" onclick="setVideoSpeed(1.25)" class="speed-btn px-2 py-0.5 border border-gray-600 bg-gray-800 hover:bg-gray-700 text-white font-bold text-xs" data-speed="1.25">1.25x</button>
+                    <button type="button" onclick="setVideoSpeed(1.5)" class="speed-btn px-2 py-0.5 border border-gray-600 bg-gray-800 hover:bg-gray-700 text-white font-bold text-xs" data-speed="1.5">1.5x</button>
+                    <button type="button" onclick="setVideoSpeed(2)" class="speed-btn px-2 py-0.5 border border-gray-600 bg-gray-800 hover:bg-gray-700 text-white font-bold text-xs" data-speed="2">2x</button>
+                  </div>
+                  <select 
+                    id="customSpeedDropdown" 
+                    onchange="setVideoSpeed(parseFloat(this.value))" 
+                    class="bg-gray-800 text-emerald-400 border border-gray-600 px-1 py-0.5 rounded text-[11px] font-bold focus:outline-none cursor-pointer"
+                  >
+                    <option value="0.5">0.5x</option>
+                    <option value="0.75">0.75x</option>
+                    <option value="1" selected>1.0x</option>
+                    <option value="1.25">1.25x</option>
+                    <option value="1.5">1.5x</option>
+                    <option value="1.75">1.75x</option>
+                    <option value="2">2.0x</option>
+                    <option value="2.5">2.5x</option>
+                  </select>
                 </div>
 
                 <button type="button" onclick="toggleMediaFullscreen()" class="hover:text-emerald-400 underline font-mono-code cursor-pointer">
@@ -1298,12 +1315,6 @@
 
   <script>
     const MASTER_PIN = "94668661";
-
-    /* =========================================================================
-       HOMEPAGE ONBOARDING VIDEO (CODE CONTROLLED)
-       Change this variable to your video file path or URL:
-       Example: "portal-walkthrough.mp4" OR "https://example.com/video.mp4"
-       ========================================================================= */
     const HOMEPAGE_GUIDE_VIDEO_SRC = "portal-walkthrough.mp4";
 
     const AUTHORIZED_STUDENTS = [
@@ -2528,8 +2539,25 @@
       const video = document.getElementById('activeMediaVideo');
       if (video) {
         video.playbackRate = speed;
-        showToast(`Video Speed: ${speed}x`);
       }
+
+      // Update preset buttons active highlight
+      document.querySelectorAll('.speed-btn').forEach(btn => {
+        const btnSpeed = parseFloat(btn.getAttribute('data-speed'));
+        if (btnSpeed === speed) {
+          btn.className = "speed-btn px-2 py-0.5 border border-gray-600 bg-emerald-500 text-black font-bold text-xs";
+        } else {
+          btn.className = "speed-btn px-2 py-0.5 border border-gray-600 bg-gray-800 hover:bg-gray-700 text-white font-bold text-xs";
+        }
+      });
+
+      // Synchronize dropdown
+      const customSelect = document.getElementById('customSpeedDropdown');
+      if (customSelect) {
+        customSelect.value = speed.toString();
+      }
+
+      showToast(`Video Speed: ${speed}x`);
     }
 
     /* ================= PROGRESS & CHAPTER DATA ================= */
@@ -2967,6 +2995,7 @@
       }
     }
 
+    /* REWRITTEN: Speed controls remain visible on any video tab whether URL is entered or not */
     function loadActiveMedia() {
       if (currentChapterIndex === null || !activeTabId) return;
       const ch = chapters[currentChapterIndex];
@@ -2978,6 +3007,19 @@
       const placeholder = document.getElementById('mediaPlaceholder');
       const statusLabel = document.getElementById('mediaStatusLabel');
       const speedControls = document.getElementById('videoSpeedControls');
+
+      // KEEP SPEED CONTROLS VISIBLE IF TAB IS MARKED AS VIDEO
+      if (tab.type === 'video') {
+        if (speedControls) {
+          speedControls.classList.remove('hidden');
+          speedControls.classList.add('flex');
+        }
+      } else {
+        if (speedControls) {
+          speedControls.classList.add('hidden');
+          speedControls.classList.remove('flex');
+        }
+      }
 
       const quickBtn = document.getElementById('quickWorksheetDownloadBtn');
       const worksheetTab = ch.tabs.find(t => t.title.toLowerCase().includes('worksheet') && t.type === 'document') || 
@@ -3008,14 +3050,12 @@
           videoPlayer.src = formattedUrl;
           videoPlayer.load();
           placeholder.classList.add('hidden');
-          if (speedControls) speedControls.classList.remove('hidden');
         } else {
           videoPlayer.classList.add('hidden');
           videoPlayer.pause();
           iframe.classList.remove('hidden');
           iframe.src = formattedUrl;
           placeholder.classList.add('hidden');
-          if (speedControls) speedControls.classList.add('hidden');
         }
       } else {
         videoPlayer.classList.add('hidden');
@@ -3023,7 +3063,6 @@
         iframe.classList.add('hidden');
         iframe.src = '';
         placeholder.classList.remove('hidden');
-        if (speedControls) speedControls.classList.add('hidden');
         statusLabel.innerHTML = `<span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span> ${tab.title} (NO FILE CONFIGURED)`;
       }
 
