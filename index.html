@@ -112,11 +112,12 @@
       cursor: crosshair;
     }
 
+    /* Sharp, High-Visibility Graph Paper Grid */
     .math-grid {
-      background-size: 24px 24px;
+      background-size: 24px 24px !important;
       background-image: 
-        linear-gradient(to right, rgba(255, 255, 255, 0.07) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+        linear-gradient(to right, rgba(255, 255, 255, 0.16) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.16) 1px, transparent 1px) !important;
     }
 
     #mediaContainer:fullscreen,
@@ -231,7 +232,7 @@
         <button 
           type="button" 
           onclick="runNativeInstall()" 
-          class="w-full py-2.5 bg-emerald-400 hover:bg-emerald-300 text-black font-black text-xs uppercase border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] cursor-pointer"
+          class="w-full py-2.5 bg-emerald-400 hover:bg-emerald-300 text-black font-black text-xs uppercase border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,1)] cursor-pointer"
         >
           ⬇️ Tap Here to Install App Now
         </button>
@@ -363,7 +364,7 @@
     </div>
   </div>
 
-  <!-- ================= TOP BAR ================= -->
+  <!-- ================= TOP BAR WITH WHATSAPP IN HEADER ================= -->
   <header id="mainHeader" class="h-14 sm:h-16 bg-white dark:bg-neutral-900 border-b-2 border-black dark:border-neutral-700 flex items-center justify-between px-3 sm:px-6 sticky top-0 z-30 shrink-0 gap-2">
     <div class="flex items-center gap-2 sm:gap-3.5 min-w-0">
       <button 
@@ -401,13 +402,13 @@
     </div>
 
     <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
-      <!-- TOP NAV WHATSAPP BUTTON (REPLACES FLOATING BOTTOM BUTTON) -->
+      <!-- DEDICATED TOP MENU WHATSAPP BUTTON (ALWAYS ACCESSIBLE, NO OVERLAY OBSTRUCTION) -->
       <a 
         id="topNavWhatsAppBtn"
         href="https://wa.me/6581980012?text=Hi%20Lucas!%20I'm%20submitting%20my%20work%20to%20be%20marked%20or%20I%20have%20a%20question." 
         target="_blank" 
-        title="Submit work or ask questions via WhatsApp (81980012)"
-        class="flex items-center gap-1 bg-emerald-400 hover:bg-emerald-300 text-black px-2 sm:px-2.5 py-1 sm:py-1.5 border-2 border-black font-mono-code text-xs font-black uppercase shadow-[2px_2px_0px_0px_rgba(0,0,1)] active:translate-x-[1px] active:translate-y-[1px] cursor-pointer"
+        title="Submit work or ask doubts directly to Lucas via WhatsApp (81980012)"
+        class="flex items-center gap-1 bg-emerald-400 hover:bg-emerald-300 text-black px-2 sm:px-3 py-1 sm:py-1.5 border-2 border-black font-mono-code text-xs font-black uppercase shadow-[2px_2px_0px_0px_rgba(0,0,1)] active:translate-x-[1px] active:translate-y-[1px] cursor-pointer"
       >
         <span class="text-sm">💬</span>
         <span class="hidden sm:inline">WHATSAPP</span>
@@ -916,7 +917,7 @@
                 Mark this lesson / worksheet as completed
               </label>
             </div>
-            <span id="tabCompletionStatusTag" class="text-[10px] font-bold px-2 py-0.5 border border-black bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-neutral-400 uppercase">
+            <span id="tabCompletionStatusTag" class="text-[10px] font-bold px-2 py-0.5 border border-emerald-600 bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 uppercase">
               NOT COMPLETED
             </span>
           </div>
@@ -1005,7 +1006,7 @@
               <span>◫</span>
               <span>TWO-PANE STUDY MODE ACTIVE</span>
             </span>
-            <span class="text-[10px] text-neutral-600 dark:text-neutral-400">Curved graphs fully protected • Smooth freehand &amp; move mode</span>
+            <span class="text-[10px] text-neutral-600 dark:text-neutral-400">Curved graphs protected • Draw &amp; hold to snap lines/shapes • Use 🖐️ MOVE to drag</span>
           </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -1049,7 +1050,7 @@
               <div id="splitRightCanvasView" class="flex-1 bg-neutral-950 relative flex flex-col overflow-hidden">
                 <div class="p-2 bg-neutral-900 border-b border-neutral-800 flex flex-wrap items-center justify-between gap-1.5 text-xs text-white shrink-0">
                   <div class="flex items-center gap-1 text-[10px] flex-wrap">
-                    <button type="button" onclick="setSplitShapeMode('pen')" id="splitToolPenBtn" class="px-2 py-0.5 bg-emerald-500 text-black font-black uppercase rounded shadow-sm" title="Pen (Draw wavy graphs freely)">✏️ PEN</button>
+                    <button type="button" onclick="setSplitShapeMode('pen')" id="splitToolPenBtn" class="px-2 py-0.5 bg-emerald-500 text-black font-black uppercase rounded shadow-sm" title="Pen (Hold 0.4s to snap to straight lines/shapes)">✏️ PEN</button>
                     <button type="button" onclick="setSplitShapeMode('move')" id="splitToolMoveBtn" class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" title="Move & Reposition any shape">🖐️ MOVE</button>
                     <button type="button" onclick="setSplitShapeMode('line')" id="splitToolLineBtn" class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" title="100% Straight Line with Axis Snapping">📏 LINE</button>
                     <button type="button" onclick="setSplitShapeMode('circle')" id="splitToolCircleBtn" class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" title="Perfect Circle / Locus">⭕ CIRCLE</button>
@@ -1070,7 +1071,7 @@
                       type="button" 
                       id="splitGridToggleBtn" 
                       onclick="toggleCanvasGrid('split')" 
-                      class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-neutral-200 border border-neutral-500 font-bold text-[10px] uppercase rounded flex items-center gap-1 transition"
+                      class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-neutral-200 border border-neutral-500 font-bold text-[10px] uppercase rounded flex items-center gap-1 transition cursor-pointer"
                     >
                       <span>📏 GRID:</span>
                       <span id="splitGridStatusText" class="text-gray-400 font-black">OFF</span>
@@ -1103,8 +1104,8 @@
                   </div>
                 </div>
 
-                <div class="flex-1 relative overflow-hidden" id="splitCanvasWrapper">
-                  <canvas id="splitScratchCanvas" class="w-full h-full bg-neutral-900"></canvas>
+                <div class="flex-1 relative overflow-hidden bg-neutral-900" id="splitCanvasWrapper">
+                  <canvas id="splitScratchCanvas" class="w-full h-full block"></canvas>
                 </div>
               </div>
 
@@ -1136,7 +1137,7 @@
           <span class="text-base">✏️</span>
           <div class="truncate">
             <h3 class="font-black text-xs uppercase tracking-tight truncate">DIGITAL WORKING CANVAS</h3>
-            <span class="text-[9px] font-bold uppercase block text-neutral-800">TRIG CURVES &amp; WAVE DRAWING PROTECTED</span>
+            <span class="text-[9px] font-bold uppercase block text-neutral-800">DRAW &amp; HOLD QUICKSHAPE • MOVE SHAPES • STYLUS</span>
           </div>
         </div>
         <button type="button" onclick="toggleScratchpadDrawer()" class="font-black px-2 py-0.5 bg-black text-white hover:bg-neutral-800 text-xs transition cursor-pointer shrink-0 ml-2">
@@ -1148,7 +1149,7 @@
       <div class="p-2.5 bg-neutral-800 border-b border-neutral-700 flex flex-col gap-2 font-mono-code text-xs text-white shrink-0">
         <div class="flex flex-wrap items-center justify-between gap-1.5">
           <div class="flex items-center gap-1 text-[11px] flex-wrap">
-            <button type="button" onclick="setDrawerShapeMode('pen')" id="drawerToolPenBtn" class="px-2.5 py-1 bg-emerald-500 text-black font-black uppercase rounded shadow-sm" title="Pen: Draw smooth sine/cosine waves freely">✏️ PEN</button>
+            <button type="button" onclick="setDrawerShapeMode('pen')" id="drawerToolPenBtn" class="px-2.5 py-1 bg-emerald-500 text-black font-black uppercase rounded shadow-sm" title="Pen: Hold 0.4s to snap to straight lines/shapes">✏️ PEN</button>
             <button type="button" onclick="setDrawerShapeMode('move')" id="drawerToolMoveBtn" class="px-2.5 py-1 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" title="Move & Reposition any shape or curve">🖐️ MOVE</button>
             <button type="button" onclick="setDrawerShapeMode('line')" id="drawerToolLineBtn" class="px-2.5 py-1 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" title="100% Straight Line (Snaps to 0° & 90° axes)">📏 LINE</button>
             <button type="button" onclick="setDrawerShapeMode('circle')" id="drawerToolCircleBtn" class="px-2.5 py-1 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" title="Perfect Circle / Locus">⭕ CIRCLE</button>
@@ -1177,7 +1178,7 @@
               type="button" 
               id="drawerGridToggleBtn" 
               onclick="toggleCanvasGrid('drawer')" 
-              class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-neutral-200 border border-neutral-500 font-bold text-[10px] uppercase rounded flex items-center gap-1 transition"
+              class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-neutral-200 border border-neutral-500 font-bold text-[10px] uppercase rounded flex items-center gap-1 transition cursor-pointer"
             >
               <span>📏 GRID:</span>
               <span id="drawerGridStatusText" class="text-gray-400 font-black">OFF</span>
@@ -1212,13 +1213,13 @@
       </div>
 
       <div class="flex-1 bg-neutral-950 p-2 relative overflow-hidden flex flex-col justify-between" id="scratchpadCanvasWrapper">
-        <div class="flex-1 relative overflow-hidden flex items-center justify-center">
-          <canvas id="scratchpadCanvas" class="w-full h-full bg-neutral-900 border border-neutral-700 rounded shadow-inner"></canvas>
+        <div class="flex-1 relative overflow-hidden flex items-center justify-center bg-neutral-900 rounded border border-neutral-700" id="scratchpadInnerWrapper">
+          <canvas id="scratchpadCanvas" class="w-full h-full block"></canvas>
         </div>
         <div class="bg-amber-100 dark:bg-amber-950/60 border-t-2 border-black p-2.5 text-[11px] font-mono-code text-black dark:text-amber-200 shrink-0 mt-2">
-          <p class="font-black uppercase mb-1">🌊 Trigonometric Curves Protected:</p>
+          <p class="font-black uppercase mb-1">⚡ QuickShape &amp; Move Guide:</p>
           <p class="text-[10px] text-gray-700 dark:text-neutral-300 leading-tight">
-            Draw sine, cosine, tangent &amp; parabolic waves without straight-line flattening! Only clean, deliberate straight strokes snap to lines. Use <strong class="font-bold">🖐️ MOVE</strong> to drag any curve or line across the canvas.
+            Draw a line or shape and hold for 0.4s: it snaps to a crisp line, circle or box. Draw wavy sine/cosine graphs: they stay smooth curves without flattening! Use <strong class="font-bold text-black dark:text-white">🖐️ MOVE</strong> to drag any object.
           </p>
         </div>
       </div>
@@ -1343,7 +1344,39 @@
     const FORMULA_SHEET_IMAGE_SRC = "IMG_00691fac-85d6-44d7-9a1a-2c5e7a45bedb.png";
     let currentStudent = null;
 
-    /* ================= GEOMETRY & CURVED GRAPH PRESERVATION ENGINE ================= */
+    /* ================= GRID TOGGLE SYSTEM ================= */
+    let isDrawerGridOn = false;
+    let isSplitGridOn = false;
+
+    function toggleCanvasGrid(target) {
+      if (target === 'drawer') {
+        const canvasEl = document.getElementById('scratchpadCanvas');
+        const wrapperEl = document.getElementById('scratchpadInnerWrapper');
+        const status = document.getElementById('drawerGridStatusText');
+        isDrawerGridOn = !isDrawerGridOn;
+        if (canvasEl) canvasEl.classList.toggle('math-grid', isDrawerGridOn);
+        if (wrapperEl) wrapperEl.classList.toggle('math-grid', isDrawerGridOn);
+        if (status) {
+          status.textContent = isDrawerGridOn ? 'ON' : 'OFF';
+          status.className = isDrawerGridOn ? 'text-emerald-400 font-black' : 'text-gray-400 font-black';
+        }
+        showToast(isDrawerGridOn ? "Drawer Math Grid: ON" : "Drawer Math Grid: OFF");
+      } else if (target === 'split') {
+        const canvasEl = document.getElementById('splitScratchCanvas');
+        const wrapperEl = document.getElementById('splitCanvasWrapper');
+        const status = document.getElementById('splitGridStatusText');
+        isSplitGridOn = !isSplitGridOn;
+        if (canvasEl) canvasEl.classList.toggle('math-grid', isSplitGridOn);
+        if (wrapperEl) wrapperEl.classList.toggle('math-grid', isSplitGridOn);
+        if (status) {
+          status.textContent = isSplitGridOn ? 'ON' : 'OFF';
+          status.className = isSplitGridOn ? 'text-emerald-400 font-black' : 'text-gray-400 font-black';
+        }
+        showToast(isSplitGridOn ? "Split Math Grid: ON" : "Split Math Grid: OFF");
+      }
+    }
+
+    /* ================= GEOMETRY & QUICKSHAPE RECOGNITION ================= */
     function snapLineCoordinates(x0, y0, x1, y1) {
       const dx = x1 - x0;
       const dy = y1 - y0;
@@ -1352,7 +1385,7 @@
 
       const angle = Math.atan2(dy, dx) * (180 / Math.PI);
       const snapAngles = [0, 45, 90, 135, 180, -180, -135, -90, -45];
-      const threshold = 6.0;
+      const threshold = 7.5; // snaps smoothly to horizontal and vertical axes
 
       for (let sa of snapAngles) {
         if (Math.abs(angle - sa) < threshold || Math.abs(angle - (sa + 360)) < threshold || Math.abs(angle - (sa - 360)) < threshold) {
@@ -1374,6 +1407,12 @@
       return Math.hypot(p.x - (v.x + t * (w.x - v.x)), p.y - (v.y + t * (w.y - v.y)));
     }
 
+    function signedDistToLine(p, v, w) {
+      const num = (w.y - v.y) * p.x - (w.x - v.x) * p.y + w.x * v.y - w.y * v.x;
+      const den = Math.hypot(w.y - v.y, w.x - v.x);
+      return den === 0 ? 0 : num / den;
+    }
+
     function smoothPoints(pts, iterations = 2) {
       if (!pts || pts.length <= 4) return pts;
       let cur = pts.map(p => ({ x: p.x, y: p.y }));
@@ -1391,8 +1430,10 @@
       return cur;
     }
 
+    // Intelligent Shape Detection:
+    // Recognizes straight lines & shapes reliably while preserving mathematical wave graphs (sine, cosine, tangent)
     function recognizeShapeFromPoints(pts) {
-      if (!pts || pts.length < 6) return null;
+      if (!pts || pts.length < 5) return null;
       const start = pts[0];
       const end = pts[pts.length - 1];
       const directDist = Math.hypot(end.x - start.x, end.y - start.y);
@@ -1405,10 +1446,10 @@
         minY = Math.min(minY, pts[i].y); maxY = Math.max(maxY, pts[i].y);
       }
 
-      if (totalLen < 15) return null;
+      if (totalLen < 20) return null;
 
-      const isClosed = directDist < 30 || (totalLen > 70 && directDist / totalLen < 0.20);
-
+      // 1. Check for Closed Shapes (Circle, Ellipse, Rectangle)
+      const isClosed = directDist < Math.max(45, totalLen * 0.28) && totalLen > 50;
       if (isClosed) {
         const w = maxX - minX;
         const h = maxY - minY;
@@ -1424,12 +1465,15 @@
         const avgDeviation = rDiff / pts.length;
         const ratio = Math.min(w, h) / (Math.max(w, h) || 1);
 
-        if (ratio > 0.70 && avgDeviation < avgR * 0.35) {
+        if (ratio > 0.65 && avgDeviation < avgR * 0.38) {
           return { type: 'circle', cx: cx, cy: cy, r: avgR };
         } else {
           return { type: 'rect', x: minX, y: minY, w: w, h: h };
         }
       }
+
+      // 2. Open Strokes: Distinguish Straight Lines vs. Curved Trigonometric Graphs
+      if (directDist < 25) return null;
 
       let maxDev = 0;
       for (let p of pts) {
@@ -1437,9 +1481,32 @@
         if (d > maxDev) maxDev = d;
       }
 
+      // Count zero-crossings across the baseline chord to detect oscillating waves (sine, cosine)
+      let signChanges = 0;
+      let lastSign = 0;
+      for (let p of pts) {
+        const sDist = signedDistToLine(p, start, end);
+        if (Math.abs(sDist) > 10) {
+          const curSign = sDist > 0 ? 1 : -1;
+          if (lastSign !== 0 && curSign !== lastSign) {
+            signChanges++;
+          }
+          lastSign = curSign;
+        }
+      }
+
       const lengthRatio = totalLen / (directDist || 1);
 
-      if (lengthRatio < 1.08 && maxDev < 10 && (maxDev / (directDist || 1)) < 0.06) {
+      // If it oscillates across the chord with multiple waves, it is a trig curve -> keep as curve!
+      if (signChanges >= 2) {
+        return {
+          type: 'stroke',
+          points: smoothPoints(pts, 2)
+        };
+      }
+
+      // If it is intended to be a straight line (reasonably straight with normal hand wobble)
+      if (lengthRatio < 1.25 && maxDev <= Math.max(24, directDist * 0.16)) {
         const snapped = snapLineCoordinates(start.x, start.y, end.x, end.y);
         return {
           type: 'line',
@@ -1450,6 +1517,7 @@
         };
       }
 
+      // Otherwise, it's a deliberate parabolic curve or curved graph -> smooth gently, do not flatten
       return {
         type: 'stroke',
         points: smoothPoints(pts, 2)
@@ -1555,7 +1623,7 @@
     let canvas, ctx;
     let isDrawing = false;
     let currentColor = '#10b981';
-    let drawerCurrentTool = 'pen';
+    let drawerCurrentTool = 'pen'; // 'pen', 'move', 'line', 'circle', 'rect', 'eraser'
     let drawerPenThickness = 3;
     let drawerEraserThickness = 20;
     let isStylusOnlyMode = false;
@@ -1614,6 +1682,26 @@
       canvas.addEventListener('pointerleave', handleDrawerPointerUp);
     }
 
+    function scheduleDrawerHoldCheck() {
+      clearTimeout(drawerHoldTimer);
+      drawerHoldTimer = setTimeout(() => {
+        if (isDrawing && drawerCurrentTool === 'pen' && drawerCurrentStrokePoints.length > 5) {
+          const detected = recognizeShapeFromPoints(drawerCurrentStrokePoints);
+          if (detected) {
+            drawerSnappedShape = detected;
+            drawerSnappedShape.color = currentColor;
+            drawerSnappedShape.thickness = drawerPenThickness;
+            redrawDrawerCanvas();
+            renderSingleObject(ctx, drawerSnappedShape, false);
+            if (detected.type === 'line') showToast("📏 100% Straight Line Snapped!");
+            else if (detected.type === 'circle') showToast("⭕ Perfect Circle Snapped!");
+            else if (detected.type === 'rect') showToast("▢ Perfect Rectangle Snapped!");
+            else showToast("🌊 Smooth Curve Polished!");
+          }
+        }
+      }, 380);
+    }
+
     function handleDrawerPointerDown(e) {
       if (isStylusOnlyMode && e.pointerType !== 'pen') return;
       const rect = canvas.getBoundingClientRect();
@@ -1650,6 +1738,7 @@
 
       saveDrawerState();
       drawerCurrentStrokePoints = [{ x, y }];
+      scheduleDrawerHoldCheck();
       try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
     }
 
@@ -1677,29 +1766,12 @@
         return;
       }
 
-      const distMoved = Math.hypot(currX - drawerLastMoveX, currY - drawerLastMoveY);
       drawerLastMoveX = currX;
       drawerLastMoveY = currY;
 
       if (drawerCurrentTool === 'pen') {
         drawerCurrentStrokePoints.push({ x: currX, y: currY });
-        clearTimeout(drawerHoldTimer);
-
-        if (distMoved < 3) {
-          drawerHoldTimer = setTimeout(() => {
-            if (isDrawing && drawerCurrentStrokePoints.length > 8) {
-              const detected = recognizeShapeFromPoints(drawerCurrentStrokePoints);
-              if (detected && detected.type !== 'stroke') {
-                drawerSnappedShape = detected;
-                drawerSnappedShape.color = currentColor;
-                drawerSnappedShape.thickness = drawerPenThickness;
-                redrawDrawerCanvas();
-                renderSingleObject(ctx, drawerSnappedShape, false);
-                showToast(detected.type === 'line' ? "📏 Straight Line Snapped!" : "⚡ Shape Snapped!");
-              }
-            }
-          }, 460);
-        }
+        scheduleDrawerHoldCheck();
 
         if (drawerSnappedShape) {
           redrawDrawerCanvas();
@@ -1722,6 +1794,7 @@
         return;
       }
 
+      // Explicit shapes preview
       if (drawerCurrentTool !== 'pen') {
         redrawDrawerCanvas();
         let preview = null;
@@ -1824,7 +1897,7 @@
       if (tool === 'move') {
         showToast("🖐️ MOVE mode: Tap & drag any graph or shape!");
       } else if (tool === 'pen') {
-        showToast("✏️ PEN mode: Smooth freehand curves active.");
+        showToast("✏️ PEN mode: Hold 0.4s to snap lines & shapes!");
       }
       redrawDrawerCanvas();
     }
@@ -1951,6 +2024,26 @@
       splitCanvas.addEventListener('pointerleave', handleSplitPointerUp);
     }
 
+    function scheduleSplitHoldCheck() {
+      clearTimeout(splitHoldTimer);
+      splitHoldTimer = setTimeout(() => {
+        if (isSplitDrawing && splitCurrentTool === 'pen' && splitCurrentStrokePoints.length > 5) {
+          const detected = recognizeShapeFromPoints(splitCurrentStrokePoints);
+          if (detected) {
+            splitSnappedShape = detected;
+            splitSnappedShape.color = splitCanvasColor;
+            splitSnappedShape.thickness = splitPenThickness;
+            redrawSplitCanvas();
+            renderSingleObject(splitCtx, splitSnappedShape, false);
+            if (detected.type === 'line') showToast("📏 100% Straight Line Snapped!");
+            else if (detected.type === 'circle') showToast("⭕ Perfect Circle Snapped!");
+            else if (detected.type === 'rect') showToast("▢ Perfect Rectangle Snapped!");
+            else showToast("🌊 Smooth Curve Polished!");
+          }
+        }
+      }, 380);
+    }
+
     function handleSplitPointerDown(e) {
       if (isStylusOnlyMode && e.pointerType !== 'pen') return;
       const rect = splitCanvas.getBoundingClientRect();
@@ -1987,6 +2080,7 @@
 
       saveSplitState();
       splitCurrentStrokePoints = [{ x, y }];
+      scheduleSplitHoldCheck();
       try { splitCanvas.setPointerCapture(e.pointerId); } catch (err) {}
     }
 
@@ -2014,29 +2108,12 @@
         return;
       }
 
-      const distMoved = Math.hypot(currX - splitLastMoveX, currY - splitLastMoveY);
       splitLastMoveX = currX;
       splitLastMoveY = currY;
 
       if (splitCurrentTool === 'pen') {
         splitCurrentStrokePoints.push({ x: currX, y: currY });
-        clearTimeout(splitHoldTimer);
-
-        if (distMoved < 3) {
-          splitHoldTimer = setTimeout(() => {
-            if (isSplitDrawing && splitCurrentStrokePoints.length > 8) {
-              const detected = recognizeShapeFromPoints(splitCurrentStrokePoints);
-              if (detected && detected.type !== 'stroke') {
-                splitSnappedShape = detected;
-                splitSnappedShape.color = splitCanvasColor;
-                splitSnappedShape.thickness = splitPenThickness;
-                redrawSplitCanvas();
-                renderSingleObject(splitCtx, splitSnappedShape, false);
-                showToast(detected.type === 'line' ? "📏 Straight Line Snapped!" : "⚡ Shape Snapped!");
-              }
-            }
-          }, 460);
-        }
+        scheduleSplitHoldCheck();
 
         if (splitSnappedShape) {
           redrawSplitCanvas();
@@ -2113,7 +2190,7 @@
           const snapped = snapLineCoordinates(splitStartX, splitStartY, endX, endY);
           splitObjects.push({ type: 'line', x1: splitStartX, y1: splitStartY, x2: snapped.x, y2: snapped.y, color: splitCanvasColor, thickness: splitPenThickness });
         } else if (splitCurrentTool === 'circle') {
-          const r = Math.hypot(endX - splitStartX, endY - drawerStartY) / 2;
+          const r = Math.hypot(endX - splitStartX, endY - splitStartY) / 2;
           splitObjects.push({ type: 'circle', cx: (splitStartX + endX) / 2, cy: (splitStartY + endY) / 2, r, color: splitCanvasColor, thickness: splitPenThickness });
         } else if (splitCurrentTool === 'rect') {
           splitObjects.push({ type: 'rect', x: Math.min(splitStartX, endX), y: Math.min(splitStartY, endY), w: Math.abs(endX - splitStartX), h: Math.abs(endY - splitStartY), color: splitCanvasColor, thickness: splitPenThickness });
@@ -2161,7 +2238,7 @@
       if (tool === 'move') {
         showToast("🖐️ MOVE mode: Tap & drag any graph or shape!");
       } else if (tool === 'pen') {
-        showToast("✏️ PEN mode: Smooth freehand curves active.");
+        showToast("✏️ PEN mode: Hold 0.4s to snap lines & shapes!");
       }
       redrawSplitCanvas();
     }
@@ -2464,26 +2541,6 @@
             if (iframe) { iframe.classList.add('hidden'); iframe.src = ''; }
             if (placeholder) placeholder.classList.remove('hidden');
           }
-        }
-      }
-    }
-
-    function toggleCanvasGrid(target) {
-      if (target === 'drawer') {
-        const wrapper = document.getElementById('scratchpadCanvas');
-        const status = document.getElementById('drawerGridStatusText');
-        const on = wrapper.classList.toggle('math-grid');
-        if (status) {
-          status.textContent = on ? 'ON' : 'OFF';
-          status.className = on ? 'text-emerald-400 font-black' : 'text-gray-400 font-black';
-        }
-      } else if (target === 'split') {
-        const wrapper = document.getElementById('splitScratchCanvas');
-        const status = document.getElementById('splitGridStatusText');
-        const on = wrapper.classList.toggle('math-grid');
-        if (status) {
-          status.textContent = on ? 'ON' : 'OFF';
-          status.className = on ? 'text-emerald-400 font-black' : 'text-gray-400 font-black';
         }
       }
     }
