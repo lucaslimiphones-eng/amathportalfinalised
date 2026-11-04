@@ -1202,7 +1202,7 @@
             <button type="button" onclick="setCanvasColor('#38bdf8')" class="w-5 h-5 rounded-full bg-sky-400 border border-white hover:scale-110 transition"></button>
             <button type="button" onclick="setCanvasColor('#facc15')" class="w-5 h-5 rounded-full bg-yellow-400 border border-white hover:scale-110 transition"></button>
             <button type="button" onclick="setCanvasColor('#ffffff')" class="w-5 h-5 rounded-full bg-white border border-neutral-400 hover:scale-110 transition"></button>
-            <button type="button" onclick="setCanvasColor('#f87171')" class="w-5 h-5 rounded-full bg-red-400 border border-white hover:scale-110 transition"></button>
+            <button type="button" onclick="setCanvasColor('#f87171')" class="w-5 h-5 rounded-full bg-red-400 border border-neutral-400 hover:scale-110 transition"></button>
           </div>
 
           <div class="flex items-center gap-1.5 flex-wrap">
@@ -1251,7 +1251,7 @@
         <div class="bg-amber-100 dark:bg-amber-950/60 border-t-2 border-black p-2.5 text-[11px] font-mono-code text-black dark:text-amber-200 shrink-0 mt-2">
           <p class="font-black uppercase mb-1">⚡ Smart Auto-Correct &amp; Workspace Guide:</p>
           <p class="text-[10px] text-gray-700 dark:text-neutral-300 leading-tight">
-            Draw circles or rectangles cleanly: circles stay circular, and boxes stay rectangular! Tap <strong class="font-bold text-black dark:text-white">850px</strong> or <strong class="font-bold text-black dark:text-white">FULL</strong> in the top-right header for a larger workspace canvas.
+            Draw numbers and equations naturally! Shapes only form when your stroke endpoints genuinely connect and meet geometric thresholds. Use the <strong class="font-bold text-black dark:text-white">550px / 850px / FULL</strong> buttons in the header to expand your workspace.
           </p>
         </div>
       </div>
@@ -1377,7 +1377,7 @@
     let currentStudent = null;
 
     /* ================= WORKSPACE RESIZING SYSTEMS ================= */
-    let currentDrawerSize = 'standard'; // 'standard' (550px), 'wide' (850px), 'full' (100vw)
+    let currentDrawerSize = 'standard';
 
     function setDrawerWorkspaceWidth(sizeKey) {
       currentDrawerSize = sizeKey;
@@ -1546,9 +1546,9 @@
       return cur;
     }
 
-    /* Fixed Geometry Classifier: Prevents Circle/Rectangle Inversion */
+    /* Fixed Geometry Classifier: Strictly requires endpoints to touch and meets accurate geometry standards */
     function recognizeShapeFromPoints(pts) {
-      if (!pts || pts.length < 5) return null;
+      if (!pts || pts.length < 8) return null;
       const start = pts[0];
       const end = pts[pts.length - 1];
       const directDist = Math.hypot(end.x - start.x, end.y - start.y);
@@ -1561,76 +1561,120 @@
         minY = Math.min(minY, pts[i].y); maxY = Math.max(maxY, pts[i].y);
       }
 
-      if (totalLen < 25) return null;
+      const w = maxX - minX;
+      const h = maxY - minY;
+      const minDim = Math.min(w, h);
+      const maxDim = Math.max(w, h);
 
-      // 1. Closed Shape Recognition: Circle vs. Rectangle / Square
-      const isClosed = (directDist < Math.max(55, totalLen * 0.35)) && totalLen > 55;
+      // Normal small equation characters or short strokes will never be converted
+      if (totalLen < 30) return null;
+
+      // ==========================================
+      // 1. CLOSED SHAPES (RECTANGLE & CIRCLE)
+      // Endpoints MUST truly touch ("touch tips")!
+      // ==========================================
+      const maxClosureGap = Math.min(18, minDim * 0.20, totalLen * 0.08);
+      const isClosed = (directDist <= maxClosureGap) && (minDim >= 26) && (totalLen >= 80);
+
       if (isClosed) {
-        const w = maxX - minX;
-        const h = maxY - minY;
+        const cx = (minX + maxX) / 2;
+        const cy = (minY + maxY) / 2;
+        const avgR = (w + h) / 4;
+        const aspect = minDim / (maxDim || 1);
 
-        if (w >= 18 && h >= 18) {
-          const cx = (minX + maxX) / 2;
-          const cy = (minY + maxY) / 2;
-          const avgR = (w + h) / 4;
-          const aspect = Math.min(w, h) / (Math.max(w, h) || 1);
-
-          // Calculate Shoelace enclosed polygon area
-          let shoelaceArea = 0;
-          for (let i = 0; i < pts.length; i++) {
-            const next = pts[(i + 1) % pts.length];
-            shoelaceArea += (pts[i].x * next.y - next.x * pts[i].y);
-          }
-          shoelaceArea = Math.abs(shoelaceArea) / 2;
-          const boxArea = w * h;
-          const fillRatio = shoelaceArea / (boxArea || 1);
-
-          // Calculate radial variation from center (Coefficient of Variation: std / mean)
-          let rSum = 0;
-          for (let p of pts) {
-            rSum += Math.hypot(p.x - cx, p.y - cy);
-          }
-          const meanR = rSum / pts.length;
-
-          let rVarSum = 0;
-          for (let p of pts) {
-            const d = Math.hypot(p.x - cx, p.y - cy);
-            rVarSum += (d - meanR) ** 2;
-          }
-          const stdR = Math.sqrt(rVarSum / pts.length);
-          const cvR = stdR / (meanR || 1);
-
-          // Check corner reach
-          let c1 = Infinity, c2 = Infinity, c3 = Infinity, c4 = Infinity;
-          for (let p of pts) {
-            const d1 = Math.hypot(p.x - minX, p.y - minY);
-            const d2 = Math.hypot(p.x - maxX, p.y - minY);
-            const d3 = Math.hypot(p.x - maxX, p.y - maxY);
-            const d4 = Math.hypot(p.x - minX, p.y - maxY);
-            if (d1 < c1) c1 = d1;
-            if (d2 < c2) c2 = d2;
-            if (d3 < c3) c3 = d3;
-            if (d4 < c4) c4 = d4;
-          }
-          const maxCornerDist = Math.max(c1, c2, c3, c4);
-
-          // CIRCLE DETERMINATION:
-          // A circle has low radial variance (cvR < 0.14), fillRatio close to pi/4 (~0.78),
-          // high aspect ratio, and empty corners.
-          if (aspect >= 0.70 && cvR < 0.14 && fillRatio < 0.86 && maxCornerDist > Math.min(w, h) * 0.12) {
-            return { type: 'circle', cx: cx, cy: cy, r: avgR };
-          }
-
-          // RECTANGLE DETERMINATION:
-          // A box fills >= 0.85 of its bounding box or has corner reach / higher radial variance.
-          if (fillRatio >= 0.85 || cvR >= 0.14 || aspect < 0.70) {
-            return { type: 'rect', x: minX, y: minY, w: w, h: h };
-          }
+        // Calculate Shoelace enclosed polygon area
+        let shoelaceArea = 0;
+        for (let i = 0; i < pts.length; i++) {
+          const next = pts[(i + 1) % pts.length];
+          shoelaceArea += (pts[i].x * next.y - next.x * pts[i].y);
         }
+        shoelaceArea = Math.abs(shoelaceArea) / 2;
+        const boxArea = w * h;
+        const fillRatio = shoelaceArea / (boxArea || 1);
+
+        // Radial coefficient of variation (stdR / meanR)
+        let rSum = 0;
+        for (let p of pts) {
+          rSum += Math.hypot(p.x - cx, p.y - cy);
+        }
+        const meanR = rSum / pts.length;
+
+        let rVarSum = 0;
+        for (let p of pts) {
+          const d = Math.hypot(p.x - cx, p.y - cy);
+          rVarSum += (d - meanR) ** 2;
+        }
+        const stdR = Math.sqrt(rVarSum / pts.length);
+        const cvR = stdR / (meanR || 1);
+
+        // Check corner reach of the 4 bounding box corners
+        let dTL = Infinity, dTR = Infinity, dBR = Infinity, dBL = Infinity;
+        for (let p of pts) {
+          dTL = Math.min(dTL, Math.hypot(p.x - minX, p.y - minY));
+          dTR = Math.min(dTR, Math.hypot(p.x - maxX, p.y - minY));
+          dBR = Math.min(dBR, Math.hypot(p.x - maxX, p.y - maxY));
+          dBL = Math.min(dBL, Math.hypot(p.x - minX, p.y - maxY));
+        }
+        const maxCornerDist = Math.max(dTL, dTR, dBR, dBL);
+
+        // --- RECTANGLE TEST ---
+        // A rectangle must:
+        // 1. Visit all 4 bounding box corners
+        // 2. Have points hug the 4 perimeter edges
+        // 3. Have perimeter close to 2*(w + h)
+        // 4. Fill at least 72% of the bounding box
+        let boxEdgeDevSum = 0;
+        for (let p of pts) {
+          const distToEdge = Math.min(
+            Math.abs(p.x - minX),
+            Math.abs(p.x - maxX),
+            Math.abs(p.y - minY),
+            Math.abs(p.y - maxY)
+          );
+          boxEdgeDevSum += distToEdge;
+        }
+        const avgBoxEdgeErr = boxEdgeDevSum / pts.length;
+        const normBoxErr = avgBoxEdgeErr / (minDim || 1);
+        const rectPerimeter = 2 * (w + h);
+        const perimeterRatio = totalLen / (rectPerimeter || 1);
+
+        const isAccurateRect = (maxCornerDist <= minDim * 0.35) &&
+                               (normBoxErr <= 0.12) &&
+                               (perimeterRatio >= 0.78 && perimeterRatio <= 1.30) &&
+                               (fillRatio >= 0.72);
+
+        if (isAccurateRect) {
+          return { type: 'rect', x: minX, y: minY, w: w, h: h };
+        }
+
+        // --- CIRCLE TEST ---
+        // A circle must:
+        // 1. Have aspect ratio >= 0.72 (roughly equal width and height)
+        // 2. Have low radial variation from center (cvR <= 0.12)
+        // 3. Have circumference close to 2 * PI * meanR
+        // 4. Fill roughly pi/4 (~0.785) of bounding box (0.62 to 0.88)
+        // 5. Corners of bounding box must be unfilled
+        const circlePerimeter = 2 * Math.PI * meanR;
+        const circlePerimeterRatio = totalLen / (circlePerimeter || 1);
+
+        const isAccurateCircle = (aspect >= 0.72) &&
+                                 (cvR <= 0.12) &&
+                                 (circlePerimeterRatio >= 0.78 && circlePerimeterRatio <= 1.30) &&
+                                 (fillRatio >= 0.62 && fillRatio <= 0.88) &&
+                                 (maxCornerDist >= minDim * 0.12);
+
+        if (isAccurateCircle) {
+          return { type: 'circle', cx: cx, cy: cy, r: avgR };
+        }
+
+        // If it's closed but neither an accurate rectangle nor circle, leave it as freehand
+        return null;
       }
 
-      // 2. Open Strokes: Straight Line vs Curves / Wave graphs
-      if (directDist < 20) return null;
+      // ==========================================
+      // 2. OPEN STROKES (STRAIGHT LINE)
+      // ==========================================
+      if (directDist < 25) return null;
 
       let maxDev = 0;
       for (let p of pts) {
@@ -1642,7 +1686,7 @@
       let lastSign = 0;
       for (let p of pts) {
         const sDist = signedDistToLine(p, start, end);
-        if (Math.abs(sDist) > 8) {
+        if (Math.abs(sDist) > 6) {
           const curSign = sDist > 0 ? 1 : -1;
           if (lastSign !== 0 && curSign !== lastSign) {
             signChanges++;
@@ -1651,14 +1695,13 @@
         }
       }
 
-      // Trigonometric / wave curves remain intact
-      if (signChanges >= 2) {
-        return null;
-      }
+      // Preserve curves and wave graphs
+      if (signChanges >= 2) return null;
 
+      // Strict straight line criteria:
+      // Must have length close to direct chord so handwriting is never flattened!
       const lengthRatio = totalLen / (directDist || 1);
-
-      if (lengthRatio < 1.30 && maxDev <= Math.max(28, directDist * 0.22)) {
+      if (lengthRatio <= 1.08 && maxDev <= Math.max(6, directDist * 0.08)) {
         const snapped = snapLineCoordinates(start.x, start.y, end.x, end.y);
         return {
           type: 'line',
@@ -1836,7 +1879,7 @@
       if (!isDrawerAutoShapeOn || drawerCurrentTool !== 'pen') return;
 
       drawerHoldTimer = setTimeout(() => {
-        if (isDrawing && drawerCurrentStrokePoints.length >= 6) {
+        if (isDrawing && drawerCurrentStrokePoints.length >= 8) {
           const detected = recognizeShapeFromPoints(drawerCurrentStrokePoints);
           if (detected) {
             drawerSnappedShape = detected;
@@ -1991,7 +2034,7 @@
       } else if (drawerCurrentTool === 'pen') {
         if (drawerCurrentStrokePoints.length > 1) {
           let finalShape = null;
-          if (isDrawerAutoShapeOn && drawerCurrentStrokePoints.length >= 6) {
+          if (isDrawerAutoShapeOn && drawerCurrentStrokePoints.length >= 8) {
             finalShape = recognizeShapeFromPoints(drawerCurrentStrokePoints);
           }
 
@@ -2068,7 +2111,7 @@
       if (tool === 'move') {
         showToast("🖐️ MOVE mode: Tap & drag any graph or shape!");
       } else if (tool === 'pen') {
-        showToast("✏️ Smart Pen: Lines & shapes auto-correct!");
+        showToast("✏️ Smart Pen: Lines & connected shapes auto-correct!");
       }
       redrawDrawerCanvas();
     }
@@ -2201,7 +2244,7 @@
       if (!isSplitAutoShapeOn || splitCurrentTool !== 'pen') return;
 
       splitHoldTimer = setTimeout(() => {
-        if (isSplitDrawing && splitCurrentStrokePoints.length >= 6) {
+        if (isSplitDrawing && splitCurrentStrokePoints.length >= 8) {
           const detected = recognizeShapeFromPoints(splitCurrentStrokePoints);
           if (detected) {
             splitSnappedShape = detected;
@@ -2356,7 +2399,7 @@
       } else if (splitCurrentTool === 'pen') {
         if (splitCurrentStrokePoints.length > 1) {
           let finalShape = null;
-          if (isSplitAutoShapeOn && splitCurrentStrokePoints.length >= 6) {
+          if (isSplitAutoShapeOn && splitCurrentStrokePoints.length >= 8) {
             finalShape = recognizeShapeFromPoints(splitCurrentStrokePoints);
           }
 
@@ -2433,7 +2476,7 @@
       if (tool === 'move') {
         showToast("🖐️ MOVE mode: Tap & drag any graph or shape!");
       } else if (tool === 'pen') {
-        showToast("✏️ Smart Pen: Lines & shapes auto-correct!");
+        showToast("✏️ Smart Pen: Lines & connected shapes auto-correct!");
       }
       redrawSplitCanvas();
     }
