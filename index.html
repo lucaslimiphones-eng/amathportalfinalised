@@ -1059,8 +1059,8 @@
                   </select>
                 </div>
                 <div class="flex items-center gap-1 shrink-0">
-                  <button type="button" id="splitCanvasUndoBtn" onclick="undoSplitCanvas()" title="Undo Step" class="text-[10px] bg-neutral-700 hover:bg-neutral-600 px-2 py-0.5 text-white font-bold uppercase rounded">↩ Undo</button>
-                  <button type="button" id="splitCanvasClearBtn" onclick="clearSplitCanvas()" class="text-[10px] bg-red-600 hover:bg-red-700 px-2 py-0.5 text-white font-bold uppercase rounded">Clear</button>
+                  <button type="button" id="splitCanvasUndoBtn" onclick="undoCanvas('split')" title="Undo Step" class="text-[10px] bg-neutral-700 hover:bg-neutral-600 px-2 py-0.5 text-white font-bold uppercase rounded">↩ Undo</button>
+                  <button type="button" id="splitCanvasClearBtn" onclick="clearCanvas('split')" class="text-[10px] bg-red-600 hover:bg-red-700 px-2 py-0.5 text-white font-bold uppercase rounded">Clear</button>
                 </div>
               </div>
 
@@ -1068,21 +1068,20 @@
               <div id="splitRightCanvasView" class="flex-1 bg-neutral-950 relative flex flex-col overflow-hidden">
                 <div class="p-2 bg-neutral-900 border-b border-neutral-800 flex flex-wrap items-center justify-between gap-1.5 text-xs text-white shrink-0">
                   <div class="flex items-center gap-1 text-[10px] flex-wrap">
-                    <button type="button" onclick="setSplitShapeMode('pen')" id="splitToolPenBtn" class="px-2 py-0.5 bg-emerald-500 text-black font-black uppercase rounded shadow-sm" title="Smart Pen: Auto-detects lines & shapes">✏️ PEN</button>
+                    <button type="button" onclick="setTool('split', 'pen')" id="splitToolPenBtn" class="px-2 py-0.5 bg-emerald-500 text-black font-black uppercase rounded shadow-sm" title="Pen">✏️ PEN</button>
                     <button type="button" onclick="toggleAutoShapeMode('split')" id="splitAutoShapeToggleBtn" class="px-2 py-0.5 bg-cyan-400 text-black font-black uppercase rounded shadow-sm" title="Toggle Auto-Shape Correction">✨ AUTO: ON</button>
-                    <button type="button" onclick="setSplitShapeMode('move')" id="splitToolMoveBtn" class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" title="Move & Reposition any shape">🖐️ MOVE</button>
-                    <button type="button" onclick="setSplitShapeMode('line')" id="splitToolLineBtn" class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" title="100% Straight Line with Axis Snapping">📏 LINE</button>
-                    <button type="button" onclick="setSplitShapeMode('circle')" id="splitToolCircleBtn" class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" title="Perfect Circle / Locus">⭕ CIRCLE</button>
-                    <button type="button" onclick="setSplitShapeMode('rect')" id="splitToolRectBtn" class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" title="Perfect Rectangle">▢ RECT</button>
-                    <button type="button" onclick="setSplitShapeMode('eraser')" id="splitEraserModeBtn" class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded">🧹 ERASER</button>
+                    <button type="button" onclick="setTool('split', 'line')" id="splitToolLineBtn" class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" title="100% Straight Line">📏 LINE</button>
+                    <button type="button" onclick="setTool('split', 'circle')" id="splitToolCircleBtn" class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" title="Circle">⭕ CIRCLE</button>
+                    <button type="button" onclick="setTool('split', 'rect')" id="splitToolRectBtn" class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" title="Rectangle">▢ RECT</button>
+                    <button type="button" onclick="setTool('split', 'eraser')" id="splitEraserModeBtn" class="px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" title="Bit-by-Bit Precise Eraser">🧹 ERASER</button>
                   </div>
 
                   <div class="flex items-center gap-1.5">
-                    <button type="button" onclick="setSplitCanvasColor('#10b981')" class="w-4 h-4 rounded-full bg-emerald-500 border border-white hover:scale-110 transition"></button>
-                    <button type="button" onclick="setSplitCanvasColor('#38bdf8')" class="w-4 h-4 rounded-full bg-sky-400 border border-white hover:scale-110 transition"></button>
-                    <button type="button" onclick="setSplitCanvasColor('#facc15')" class="w-4 h-4 rounded-full bg-yellow-400 border border-white hover:scale-110 transition"></button>
-                    <button type="button" onclick="setSplitCanvasColor('#ffffff')" class="w-4 h-4 rounded-full bg-white border border-neutral-400 hover:scale-110 transition"></button>
-                    <button type="button" onclick="setSplitCanvasColor('#f87171')" class="w-4 h-4 rounded-full bg-red-400 border border-white hover:scale-110 transition"></button>
+                    <button type="button" onclick="setCanvasColor('split', '#10b981')" class="w-4 h-4 rounded-full bg-emerald-500 border border-white hover:scale-110 transition"></button>
+                    <button type="button" onclick="setCanvasColor('split', '#38bdf8')" class="w-4 h-4 rounded-full bg-sky-400 border border-white hover:scale-110 transition"></button>
+                    <button type="button" onclick="setCanvasColor('split', '#facc15')" class="w-4 h-4 rounded-full bg-yellow-400 border border-white hover:scale-110 transition"></button>
+                    <button type="button" onclick="setCanvasColor('split', '#ffffff')" class="w-4 h-4 rounded-full bg-white border border-neutral-400 hover:scale-110 transition"></button>
+                    <button type="button" onclick="setCanvasColor('split', '#f87171')" class="w-4 h-4 rounded-full bg-red-400 border border-white hover:scale-110 transition"></button>
                   </div>
 
                   <div class="flex items-center gap-1.5 flex-wrap">
@@ -1113,9 +1112,9 @@
                         type="range" 
                         id="splitSizeSlider" 
                         min="1" 
-                        max="40" 
+                        max="50" 
                         value="3" 
-                        oninput="updateSplitThickness(this.value)" 
+                        oninput="updateThickness('split', this.value)" 
                         class="w-16 accent-emerald-400 cursor-pointer"
                       />
                       <span id="splitSizeValueLabel" class="w-6 text-right font-bold text-emerald-400">3px</span>
@@ -1156,7 +1155,7 @@
           <span class="text-base">✏️</span>
           <div class="truncate">
             <h3 class="font-black text-xs uppercase tracking-tight truncate">DIGITAL WORKING CANVAS</h3>
-            <span class="text-[9px] font-bold uppercase block text-neutral-800">SMART SHAPE CORRECTION • RESIZABLE WORKSPACE</span>
+            <span class="text-[9px] font-bold uppercase block text-neutral-800">PRECISE BIT-BY-BIT ERASER • AUTO SHAPE CORRECTION</span>
           </div>
         </div>
 
@@ -1177,29 +1176,28 @@
       <div class="p-2.5 bg-neutral-800 border-b border-neutral-700 flex flex-col gap-2 font-mono-code text-xs text-white shrink-0">
         <div class="flex flex-wrap items-center justify-between gap-1.5">
           <div class="flex items-center gap-1 text-[11px] flex-wrap">
-            <button type="button" onclick="setDrawerShapeMode('pen')" id="drawerToolPenBtn" class="px-2.5 py-1 bg-emerald-500 text-black font-black uppercase rounded shadow-sm" title="Smart Pen: Auto-detects lines & shapes">✏️ PEN</button>
-            <button type="button" onclick="toggleAutoShapeMode('drawer')" id="drawerAutoShapeToggleBtn" class="px-2 py-1 bg-cyan-400 text-black font-black uppercase rounded shadow-sm" title="Toggle Auto-Shape Correction">✨ AUTO: ON</button>
-            <button type="button" onclick="setDrawerShapeMode('move')" id="drawerToolMoveBtn" class="px-2.5 py-1 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" title="Move & Reposition any shape or curve">🖐️ MOVE</button>
-            <button type="button" onclick="setDrawerShapeMode('line')" id="drawerToolLineBtn" class="px-2.5 py-1 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" title="100% Straight Line (Snaps to 0° & 90° axes)">📏 LINE</button>
-            <button type="button" onclick="setDrawerShapeMode('circle')" id="drawerToolCircleBtn" class="px-2.5 py-1 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" title="Perfect Circle / Locus">⭕ CIRCLE</button>
-            <button type="button" onclick="setDrawerShapeMode('rect')" id="drawerToolRectBtn" class="px-2.5 py-1 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" title="Perfect Rectangle">▢ RECT</button>
-            <button type="button" onclick="setDrawerShapeMode('eraser')" id="drawerEraserModeBtn" class="px-2.5 py-1 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded">🧹 ERASER</button>
+            <button type="button" onclick="setTool('drawer', 'pen')" id="drawerToolPenBtn" class="px-2.5 py-1 bg-emerald-500 text-black font-black uppercase rounded shadow-sm" title="Smart Pen: Auto-detects lines & shapes">✏️ PEN</button>
+            <button type="button" onclick="toggleAutoShapeMode('drawer')" id="drawerAutoShapeToggleBtn" class="px-2.5 py-1 bg-cyan-400 text-black font-black uppercase rounded shadow-sm" title="Toggle Auto-Shape Correction">✨ AUTO: ON</button>
+            <button type="button" onclick="setTool('drawer', 'line')" id="drawerToolLineBtn" class="px-2.5 py-1 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" title="100% Straight Line">📏 LINE</button>
+            <button type="button" onclick="setTool('drawer', 'circle')" id="drawerToolCircleBtn" class="px-2.5 py-1 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" title="Circle">⭕ CIRCLE</button>
+            <button type="button" onclick="setTool('drawer', 'rect')" id="drawerToolRectBtn" class="px-2.5 py-1 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" title="Rectangle">▢ RECT</button>
+            <button type="button" onclick="setTool('drawer', 'eraser')" id="drawerEraserModeBtn" class="px-2.5 py-1 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" title="Bit-by-Bit Precise Eraser">🧹 ERASER</button>
           </div>
 
           <div class="flex items-center gap-1">
-            <button type="button" onclick="undoDrawerCanvas()" title="Undo stroke" class="px-2 py-1 bg-neutral-700 hover:bg-neutral-600 text-white font-bold uppercase rounded text-[11px]">↩ UNDO</button>
-            <button type="button" onclick="clearScratchpadCanvas()" class="px-2 py-1 bg-red-600 hover:bg-red-700 text-white font-bold uppercase rounded text-[11px]">CLEAR</button>
+            <button type="button" onclick="undoCanvas('drawer')" title="Undo stroke" class="px-2 py-1 bg-neutral-700 hover:bg-neutral-600 text-white font-bold uppercase rounded text-[11px]">↩ UNDO</button>
+            <button type="button" onclick="clearCanvas('drawer')" class="px-2 py-1 bg-red-600 hover:bg-red-700 text-white font-bold uppercase rounded text-[11px]">CLEAR</button>
           </div>
         </div>
 
         <div class="flex flex-wrap items-center justify-between gap-2 border-t border-neutral-700/60 pt-2">
           <div class="flex items-center gap-1.5">
             <span class="text-[10px] text-gray-400 font-bold uppercase">INK:</span>
-            <button type="button" onclick="setCanvasColor('#10b981')" class="w-5 h-5 rounded-full bg-emerald-500 border border-white hover:scale-110 transition"></button>
-            <button type="button" onclick="setCanvasColor('#38bdf8')" class="w-5 h-5 rounded-full bg-sky-400 border border-white hover:scale-110 transition"></button>
-            <button type="button" onclick="setCanvasColor('#facc15')" class="w-5 h-5 rounded-full bg-yellow-400 border border-white hover:scale-110 transition"></button>
-            <button type="button" onclick="setCanvasColor('#ffffff')" class="w-5 h-5 rounded-full bg-white border border-neutral-400 hover:scale-110 transition"></button>
-            <button type="button" onclick="setCanvasColor('#f87171')" class="w-5 h-5 rounded-full bg-red-400 border border-neutral-400 hover:scale-110 transition"></button>
+            <button type="button" onclick="setCanvasColor('drawer', '#10b981')" class="w-5 h-5 rounded-full bg-emerald-500 border border-white hover:scale-110 transition"></button>
+            <button type="button" onclick="setCanvasColor('drawer', '#38bdf8')" class="w-5 h-5 rounded-full bg-sky-400 border border-white hover:scale-110 transition"></button>
+            <button type="button" onclick="setCanvasColor('drawer', '#facc15')" class="w-5 h-5 rounded-full bg-yellow-400 border border-white hover:scale-110 transition"></button>
+            <button type="button" onclick="setCanvasColor('drawer', '#ffffff')" class="w-5 h-5 rounded-full bg-white border border-neutral-400 hover:scale-110 transition"></button>
+            <button type="button" onclick="setCanvasColor('drawer', '#f87171')" class="w-5 h-5 rounded-full bg-red-400 border border-neutral-400 hover:scale-110 transition"></button>
           </div>
 
           <div class="flex items-center gap-1.5 flex-wrap">
@@ -1230,9 +1228,9 @@
                 type="range" 
                 id="drawerSizeSlider" 
                 min="1" 
-                max="40" 
+                max="50" 
                 value="3" 
-                oninput="updateDrawerThickness(this.value)" 
+                oninput="updateThickness('drawer', this.value)" 
                 class="w-16 accent-emerald-400 cursor-pointer"
               />
               <span id="drawerSizeValueLabel" class="w-6 text-right font-bold text-emerald-400">3px</span>
@@ -1246,9 +1244,9 @@
           <canvas id="scratchpadCanvas" class="w-full h-full block"></canvas>
         </div>
         <div class="bg-amber-100 dark:bg-amber-950/60 border-t-2 border-black p-2.5 text-[11px] font-mono-code text-black dark:text-amber-200 shrink-0 mt-2">
-          <p class="font-black uppercase mb-1">⚡ Smart Auto-Correct &amp; Workspace Guide:</p>
+          <p class="font-black uppercase mb-1">⚡ Precise Bit-by-Bit Eraser &amp; Smart Guides:</p>
           <p class="text-[10px] text-gray-700 dark:text-neutral-300 leading-tight">
-            Draw circles and rectangles naturally! Hold your pen still for a brief pause or lift after drawing to auto-snap. Toggle <strong class="font-bold text-black dark:text-white">✨ AUTO</strong> above if you prefer pure freehand.
+            Use the eraser to rub out only what you touch bit by bit! Draw lines, circles, and rectangles naturally, and hold for a split second to auto-snap.
           </p>
         </div>
       </div>
@@ -1395,7 +1393,7 @@
       if (btnWide) btnWide.className = sizeKey === 'wide' ? activeCls : inactiveCls;
       if (btnFull) btnFull.className = sizeKey === 'full' ? activeCls : inactiveCls;
 
-      setTimeout(resizeScratchpadCanvas, 320);
+      setTimeout(() => resizeCanvasSmoothly('drawer'), 320);
       showToast(`Canvas resized to: ${sizeKey.toUpperCase()}`);
     }
 
@@ -1427,7 +1425,7 @@
         if (btnWide) btnWide.className = "px-2 py-0.5 bg-neutral-200 dark:bg-neutral-800 text-black dark:text-white font-black text-[10px] uppercase rounded";
         showToast("Split View: 1:1 Equal ratio.");
       }
-      setTimeout(resizeSplitScratchCanvas, 200);
+      setTimeout(() => resizeCanvasSmoothly('split'), 200);
     }
 
     /* ================= GRID TOGGLE SYSTEM ================= */
@@ -1462,32 +1460,37 @@
       }
     }
 
-    /* ================= AUTO-SHAPE STATE & ACCURATE RECOGNITION ENGINE ================= */
-    let isDrawerAutoShapeOn = true;
-    let isSplitAutoShapeOn = true;
+    /* ================= PALM REJECTION / STYLUS ONLY ================= */
+    let isStylusOnlyMode = false;
 
-    function toggleAutoShapeMode(target) {
-      if (target === 'drawer') {
-        isDrawerAutoShapeOn = !isDrawerAutoShapeOn;
-        const btn = document.getElementById('drawerAutoShapeToggleBtn');
-        if (btn) {
-          btn.textContent = isDrawerAutoShapeOn ? '✨ AUTO: ON' : '✨ AUTO: OFF';
-          btn.className = isDrawerAutoShapeOn 
-            ? "px-2.5 py-1 bg-cyan-400 text-black font-black uppercase rounded shadow-sm"
-            : "px-2.5 py-1 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded";
+    function toggleStylusOnlyMode() {
+      isStylusOnlyMode = !isStylusOnlyMode;
+      const statusText = document.getElementById('stylusOnlyStatusText');
+      const splitStatusText = document.getElementById('splitStylusOnlyStatusText');
+      const val = isStylusOnlyMode ? 'ON' : 'OFF';
+      const cls = isStylusOnlyMode ? 'text-emerald-400 font-black' : 'text-gray-400 font-black';
+
+      if (statusText) { statusText.textContent = val; statusText.className = cls; }
+      if (splitStatusText) { splitStatusText.textContent = val; splitStatusText.className = cls; }
+      showToast(isStylusOnlyMode ? "Stylus Only Enabled: Palm touches blocked!" : "Stylus Only Disabled: Finger & Stylus active.");
+    }
+
+    /* ================= AUTO-SHAPE RECOGNITION UTILITIES ================= */
+    function smoothPoints(pts, iterations = 2) {
+      if (!pts || pts.length <= 4) return pts;
+      let cur = pts.map(p => ({ x: p.x, y: p.y }));
+      for (let it = 0; it < iterations; it++) {
+        let next = [cur[0]];
+        for (let i = 1; i < cur.length - 1; i++) {
+          next.push({
+            x: 0.25 * cur[i - 1].x + 0.5 * cur[i].x + 0.25 * cur[i + 1].x,
+            y: 0.25 * cur[i - 1].y + 0.5 * cur[i].y + 0.25 * cur[i + 1].y
+          });
         }
-        showToast(isDrawerAutoShapeOn ? "Auto-Shape: ON" : "Auto-Shape: OFF (Pure Freehand)");
-      } else if (target === 'split') {
-        isSplitAutoShapeOn = !isSplitAutoShapeOn;
-        const btn = document.getElementById('splitAutoShapeToggleBtn');
-        if (btn) {
-          btn.textContent = isSplitAutoShapeOn ? '✨ AUTO: ON' : '✨ AUTO: OFF';
-          btn.className = isSplitAutoShapeOn 
-            ? "px-2 py-0.5 bg-cyan-400 text-black font-black uppercase rounded shadow-sm"
-            : "px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded";
-        }
-        showToast(isSplitAutoShapeOn ? "Split Auto-Shape: ON" : "Split Auto-Shape: OFF");
+        next.push(cur[cur.length - 1]);
+        cur = next;
       }
+      return cur;
     }
 
     function snapLineCoordinates(x0, y0, x1, y1) {
@@ -1520,29 +1523,9 @@
       return Math.hypot(p.x - (v.x + t * (w.x - v.x)), p.y - (v.y + t * (w.y - v.y)));
     }
 
-    function smoothPoints(pts, iterations = 2) {
-      if (!pts || pts.length <= 4) return pts;
-      let cur = pts.map(p => ({ x: p.x, y: p.y }));
-      for (let it = 0; it < iterations; it++) {
-        let next = [cur[0]];
-        for (let i = 1; i < cur.length - 1; i++) {
-          next.push({
-            x: 0.25 * cur[i - 1].x + 0.5 * cur[i].x + 0.25 * cur[i + 1].x,
-            y: 0.25 * cur[i - 1].y + 0.5 * cur[i].y + 0.25 * cur[i + 1].y
-          });
-        }
-        next.push(cur[cur.length - 1]);
-        cur = next;
-      }
-      return cur;
-    }
-
     function recognizeShapeFromPoints(rawPts) {
       if (!rawPts || rawPts.length < 8) return null;
-
-      // Smooth points to strip out touchscreen high-frequency jitter
       const pts = smoothPoints(rawPts, 2);
-
       const start = pts[0];
       const end = pts[pts.length - 1];
       const directDist = Math.hypot(end.x - start.x, end.y - start.y);
@@ -1565,7 +1548,6 @@
       const cx = (minX + maxX) / 2;
       const cy = (minY + maxY) / 2;
 
-      // 1. Angular sweep around centroid
       let totalAngleSweep = 0;
       let prevAngle = Math.atan2(pts[0].y - cy, pts[0].x - cx);
       for (let i = 1; i < pts.length; i++) {
@@ -1578,7 +1560,6 @@
       }
       const absSweep = Math.abs(totalAngleSweep);
 
-      // 2. Enclosed shoelace area vs bounding box area (fill ratio)
       let shoelaceArea = 0;
       for (let i = 0; i < pts.length; i++) {
         const next = pts[(i + 1) % pts.length];
@@ -1586,19 +1567,8 @@
       }
       shoelaceArea = Math.abs(shoelaceArea) / 2;
       const bboxArea = (w * h) || 1;
-      const fillRatio = shoelaceArea / bboxArea; // Ideal Circle ~ 0.785; Ideal Rectangle ~ 1.0
+      const fillRatio = shoelaceArea / bboxArea;
 
-      // 3. Minimum distance to each of the 4 bounding box corners
-      let dTL = Infinity, dTR = Infinity, dBR = Infinity, dBL = Infinity;
-      for (let p of pts) {
-        dTL = Math.min(dTL, Math.hypot(p.x - minX, p.y - minY));
-        dTR = Math.min(dTR, Math.hypot(p.x - maxX, p.y - minY));
-        dBR = Math.min(dBR, Math.hypot(p.x - maxX, p.y - maxY));
-        dBL = Math.min(dBL, Math.hypot(p.x - minX, p.y - maxY));
-      }
-      const maxCornerDist = Math.max(dTL, dTR, dBR, dBL);
-
-      // 4. Mean radius and normalized radial deviation
       let rSum = 0;
       for (let p of pts) {
         rSum += Math.hypot(p.x - cx, p.y - cy);
@@ -1610,30 +1580,14 @@
       }
       const normRadialDev = (rDevSum / pts.length) / (meanR || 1);
 
-      // Is the stroke a closed loop? (endpoints meet or sweep is >= ~280 degrees)
       const isLoop = (absSweep >= 4.8 || directDist <= Math.max(50, minDim * 0.45)) && (minDim >= 20) && (totalLen >= 60);
 
       if (isLoop) {
         const aspect = minDim / (maxDim || 1);
-
-        // --- CIRCLE CHECK ---
-        // Circles are round (aspect >= 0.65), have constant radius (normRadialDev <= 0.25),
-        // fill ~pi/4 of their box (0.58 - 0.86), and do NOT poke into the 4 box corners.
-        const isCircleRatio = fillRatio >= 0.58 && fillRatio <= 0.88;
-        const isCircleGeometry = aspect >= 0.65 && normRadialDev <= 0.25;
-
-        if (isCircleGeometry && (isCircleRatio || maxCornerDist > minDim * 0.16)) {
-          return {
-            type: 'circle',
-            cx: cx,
-            cy: cy,
-            r: (w + h) / 4
-          };
+        if (aspect >= 0.65 && normRadialDev <= 0.25) {
+          return { type: 'circle', cx: cx, cy: cy, r: (w + h) / 4 };
         }
 
-        // --- RECTANGLE CHECK ---
-        // Rectangles fill most of the box (fillRatio >= 0.78),
-        // have strokes passing near all 4 corners, or have low edge deviation.
         let boxEdgeDevSum = 0;
         for (let p of pts) {
           const distToEdge = Math.min(
@@ -1645,19 +1599,10 @@
           boxEdgeDevSum += distToEdge;
         }
         const normBoxErr = (boxEdgeDevSum / pts.length) / (minDim || 1);
-        const cornersReached = maxCornerDist <= minDim * 0.42;
-
-        if ((fillRatio >= 0.75 && (cornersReached || normBoxErr <= 0.22)) || normBoxErr <= 0.18) {
-          return {
-            type: 'rect',
-            x: minX,
-            y: minY,
-            w: w,
-            h: h
-          };
+        if (fillRatio >= 0.75 || normBoxErr <= 0.20) {
+          return { type: 'rect', x: minX, y: minY, w: w, h: h };
         }
 
-        // Decisive fallback for closed loops:
         if (fillRatio < 0.84 && aspect >= 0.62) {
           return { type: 'circle', cx: cx, cy: cy, r: (w + h) / 4 };
         } else {
@@ -1665,7 +1610,6 @@
         }
       }
 
-      // --- STRAIGHT LINE CHECK ---
       if (directDist >= 25) {
         let maxDev = 0;
         for (let p of pts) {
@@ -1675,397 +1619,113 @@
         const lengthRatio = totalLen / (directDist || 1);
         if (lengthRatio <= 1.15 && maxDev <= Math.max(8, directDist * 0.12)) {
           const snapped = snapLineCoordinates(start.x, start.y, end.x, end.y);
-          return {
-            type: 'line',
-            x1: start.x,
-            y1: start.y,
-            x2: snapped.x,
-            y2: snapped.y
-          };
+          return { type: 'line', x1: start.x, y1: start.y, x2: snapped.x, y2: snapped.y };
         }
       }
 
       return null;
     }
 
-    function hitTestObject(obj, x, y) {
-      const tol = (obj.thickness || 3) + 12;
-      if (obj.type === 'line') {
-        return distToSegment({ x, y }, { x: obj.x1, y: obj.y1 }, { x: obj.x2, y: obj.y2 }) <= tol;
-      } else if (obj.type === 'circle') {
-        const d = Math.hypot(x - obj.cx, y - obj.cy);
-        return Math.abs(d - obj.r) <= tol || d <= obj.r;
-      } else if (obj.type === 'rect') {
-        return x >= obj.x - tol && x <= obj.x + obj.w + tol && y >= obj.y - tol && y <= obj.y + obj.h + tol;
-      } else if (obj.type === 'stroke') {
-        for (let i = 1; i < obj.points.length; i++) {
-          if (distToSegment({ x, y }, obj.points[i - 1], obj.points[i]) <= tol) return true;
-        }
+    /* ================= UNIFIED DUAL-CANVAS ENGINE WITH BIT-BY-BIT ERASER ================= */
+    const canvasEngines = {
+      drawer: {
+        canvasId: 'scratchpadCanvas',
+        canvas: null,
+        ctx: null,
+        undoStack: [],
+        currentTool: 'pen',
+        currentColor: '#10b981',
+        penThickness: 3,
+        eraserThickness: 24,
+        isAutoShapeOn: true,
+        isDrawing: false,
+        startX: 0, startY: 0,
+        lastX: 0, lastY: 0,
+        holdAnchorX: 0, holdAnchorY: 0,
+        holdTimer: null,
+        strokePoints: [],
+        preStrokeSnapshot: null,
+        snappedShape: null
+      },
+      split: {
+        canvasId: 'splitScratchCanvas',
+        canvas: null,
+        ctx: null,
+        undoStack: [],
+        currentTool: 'pen',
+        currentColor: '#10b981',
+        penThickness: 3,
+        eraserThickness: 24,
+        isAutoShapeOn: true,
+        isDrawing: false,
+        startX: 0, startY: 0,
+        lastX: 0, lastY: 0,
+        holdAnchorX: 0, holdAnchorY: 0,
+        holdTimer: null,
+        strokePoints: [],
+        preStrokeSnapshot: null,
+        snappedShape: null
       }
-      return false;
+    };
+
+    function saveCanvasState(targetKey) {
+      const eng = canvasEngines[targetKey];
+      if (!eng.canvas || eng.canvas.width === 0 || eng.canvas.height === 0) return;
+      const copy = document.createElement('canvas');
+      copy.width = eng.canvas.width;
+      copy.height = eng.canvas.height;
+      const copyCtx = copy.getContext('2d');
+      copyCtx.drawImage(eng.canvas, 0, 0);
+
+      eng.undoStack.push(copy);
+      if (eng.undoStack.length > 25) eng.undoStack.shift();
     }
 
-    function moveObjectBy(obj, dx, dy) {
-      if (obj.type === 'line') {
-        obj.x1 += dx; obj.y1 += dy;
-        obj.x2 += dx; obj.y2 += dy;
-      } else if (obj.type === 'circle') {
-        obj.cx += dx; obj.cy += dy;
-      } else if (obj.type === 'rect') {
-        obj.x += dx; obj.y += dy;
-      } else if (obj.type === 'stroke') {
-        for (let pt of obj.points) {
-          pt.x += dx; pt.y += dy;
-        }
+    function undoCanvas(targetKey) {
+      const eng = canvasEngines[targetKey];
+      if (!eng.canvas || !eng.ctx) return;
+      if (eng.undoStack.length === 0) {
+        eng.ctx.clearRect(0, 0, eng.canvas.width, eng.canvas.height);
+        showToast("Canvas clear!");
+        return;
       }
-    }
-
-    function renderSingleObject(cCtx, obj, isSelected = false) {
-      cCtx.save();
-      cCtx.strokeStyle = obj.color;
-      cCtx.lineWidth = obj.thickness;
-      cCtx.lineCap = 'round';
-      cCtx.lineJoin = 'round';
-
-      if (obj.type === 'stroke') {
-        if (obj.points && obj.points.length > 0) {
-          cCtx.beginPath();
-          cCtx.moveTo(obj.points[0].x, obj.points[0].y);
-          for (let i = 1; i < obj.points.length; i++) {
-            cCtx.lineTo(obj.points[i].x, obj.points[i].y);
-          }
-          cCtx.stroke();
-        }
-      } else if (obj.type === 'line') {
-        cCtx.beginPath();
-        cCtx.moveTo(obj.x1, obj.y1);
-        cCtx.lineTo(obj.x2, obj.y2);
-        cCtx.stroke();
-      } else if (obj.type === 'circle') {
-        cCtx.beginPath();
-        cCtx.arc(obj.cx, obj.cy, Math.max(1, obj.r), 0, 2 * Math.PI);
-        cCtx.stroke();
-      } else if (obj.type === 'rect') {
-        cCtx.beginPath();
-        cCtx.strokeRect(obj.x, obj.y, obj.w, obj.h);
-      }
-
-      if (isSelected) {
-        cCtx.strokeStyle = '#38bdf8';
-        cCtx.lineWidth = 1.5;
-        cCtx.setLineDash([4, 4]);
-        const bbox = getObjectBoundingBox(obj);
-        if (bbox) {
-          cCtx.strokeRect(bbox.x - 6, bbox.y - 6, bbox.w + 12, bbox.h + 12);
-        }
-      }
-      cCtx.restore();
-    }
-
-    function getObjectBoundingBox(obj) {
-      if (obj.type === 'line') {
-        const x = Math.min(obj.x1, obj.x2);
-        const y = Math.min(obj.y1, obj.y2);
-        return { x, y, w: Math.abs(obj.x2 - obj.x1), h: Math.abs(obj.y2 - obj.y1) };
-      } else if (obj.type === 'circle') {
-        return { x: obj.cx - obj.r, y: obj.cy - obj.r, w: obj.r * 2, h: obj.r * 2 };
-      } else if (obj.type === 'rect') {
-        return { x: obj.x, y: obj.y, w: obj.w, h: obj.h };
-      } else if (obj.type === 'stroke') {
-        if (!obj.points || obj.points.length === 0) return null;
-        let minX = obj.points[0].x, maxX = obj.points[0].x, minY = obj.points[0].y, maxY = obj.points[0].y;
-        for (let p of obj.points) {
-          minX = Math.min(minX, p.x); maxX = Math.max(maxX, p.x);
-          minY = Math.min(minY, p.y); maxY = Math.max(maxY, p.y);
-        }
-        return { x: minX, y: minY, w: maxX - minX, h: maxY - minY };
-      }
-      return null;
-    }
-
-    /* ================= DRAWER NOTEPAD SYSTEM ================= */
-    let canvas, ctx;
-    let isDrawing = false;
-    let currentColor = '#10b981';
-    let drawerCurrentTool = 'pen';
-    let drawerPenThickness = 3;
-    let drawerEraserThickness = 20;
-    let isStylusOnlyMode = false;
-
-    let drawerObjects = [];
-    let drawerUndoStack = [];
-    let drawerSelectedObj = null;
-    let drawerCurrentStrokePoints = [];
-    let drawerStartX = 0, drawerStartY = 0;
-    let drawerLastMoveX = 0, drawerLastMoveY = 0;
-    let drawerHoldAnchorX = 0, drawerHoldAnchorY = 0;
-
-    let drawerHoldTimer = null;
-    let drawerSnappedShape = null;
-
-    function redrawDrawerCanvas() {
-      if (!ctx || !canvas) return;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      for (let obj of drawerObjects) {
-        renderSingleObject(ctx, obj, obj === drawerSelectedObj);
-      }
-    }
-
-    function saveDrawerState() {
-      drawerUndoStack.push(JSON.parse(JSON.stringify(drawerObjects)));
-      if (drawerUndoStack.length > 25) drawerUndoStack.shift();
-    }
-
-    function undoDrawerCanvas() {
-      if (drawerUndoStack.length === 0) return;
-      drawerObjects = drawerUndoStack.pop();
-      drawerSelectedObj = null;
-      redrawDrawerCanvas();
+      const previousState = eng.undoStack.pop();
+      eng.ctx.clearRect(0, 0, eng.canvas.width, eng.canvas.height);
+      eng.ctx.drawImage(previousState, 0, 0);
       showToast("Undone!");
     }
 
-    function clearScratchpadCanvas() {
-      saveDrawerState();
-      drawerObjects = [];
-      drawerSelectedObj = null;
-      redrawDrawerCanvas();
-      showToast("Scratchpad cleared!");
+    function clearCanvas(targetKey) {
+      const eng = canvasEngines[targetKey];
+      if (!eng.canvas || !eng.ctx) return;
+      saveCanvasState(targetKey);
+      eng.ctx.clearRect(0, 0, eng.canvas.width, eng.canvas.height);
+      showToast("Canvas cleared!");
     }
 
-    function initScratchpadCanvas() {
-      canvas = document.getElementById('scratchpadCanvas');
-      if (!canvas) return;
-      ctx = canvas.getContext('2d');
-
-      resizeScratchpadCanvas();
-      window.addEventListener('resize', resizeScratchpadCanvas);
-
-      canvas.addEventListener('pointerdown', handleDrawerPointerDown);
-      canvas.addEventListener('pointermove', handleDrawerPointerMove);
-      canvas.addEventListener('pointerup', handleDrawerPointerUp);
-      canvas.addEventListener('pointercancel', handleDrawerPointerUp);
-      canvas.addEventListener('pointerleave', handleDrawerPointerUp);
+    function setCanvasColor(targetKey, color) {
+      const eng = canvasEngines[targetKey];
+      eng.currentColor = color;
+      if (eng.currentTool === 'eraser') {
+        setTool(targetKey, 'pen');
+      }
+      showToast(`Ink color selected`);
     }
 
-    function resetDrawerHoldTimer() {
-      clearTimeout(drawerHoldTimer);
-      if (!isDrawerAutoShapeOn || drawerCurrentTool !== 'pen') return;
+    function setTool(targetKey, tool) {
+      const eng = canvasEngines[targetKey];
+      eng.currentTool = tool;
+      const isDrawer = targetKey === 'drawer';
+      const prefix = isDrawer ? 'drawer' : 'split';
 
-      drawerHoldTimer = setTimeout(() => {
-        if (isDrawing && drawerCurrentStrokePoints.length >= 8) {
-          const detected = recognizeShapeFromPoints(drawerCurrentStrokePoints);
-          if (detected) {
-            drawerSnappedShape = detected;
-            drawerSnappedShape.color = currentColor;
-            drawerSnappedShape.thickness = drawerPenThickness;
-            redrawDrawerCanvas();
-            renderSingleObject(ctx, drawerSnappedShape, false);
-            if (detected.type === 'line') showToast("📏 Straight Line Snapped!");
-            else if (detected.type === 'circle') showToast("⭕ Perfect Circle Snapped!");
-            else if (detected.type === 'rect') showToast("▢ Perfect Rectangle Snapped!");
-          }
-        }
-      }, 550);
-    }
-
-    function handleDrawerPointerDown(e) {
-      if (isStylusOnlyMode && e.pointerType !== 'pen') return;
-      const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
-      isDrawing = true;
-      drawerStartX = x;
-      drawerStartY = y;
-      drawerLastMoveX = x;
-      drawerLastMoveY = y;
-      drawerHoldAnchorX = x;
-      drawerHoldAnchorY = y;
-      drawerSnappedShape = null;
-
-      if (drawerCurrentTool === 'move') {
-        saveDrawerState();
-        drawerSelectedObj = null;
-        for (let i = drawerObjects.length - 1; i >= 0; i--) {
-          if (hitTestObject(drawerObjects[i], x, y)) {
-            drawerSelectedObj = drawerObjects[i];
-            break;
-          }
-        }
-        redrawDrawerCanvas();
-        try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
-        return;
-      }
-
-      if (drawerCurrentTool === 'eraser') {
-        saveDrawerState();
-        eraseAtPointDrawer(x, y);
-        try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
-        return;
-      }
-
-      saveDrawerState();
-      drawerCurrentStrokePoints = [{ x, y }];
-      resetDrawerHoldTimer();
-      try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
-    }
-
-    function handleDrawerPointerMove(e) {
-      if (!isDrawing) return;
-      if (isStylusOnlyMode && e.pointerType !== 'pen') return;
-      const rect = canvas.getBoundingClientRect();
-      const currX = e.clientX - rect.left;
-      const currY = e.clientY - rect.top;
-
-      if (drawerCurrentTool === 'move') {
-        if (drawerSelectedObj) {
-          const dx = currX - drawerLastMoveX;
-          const dy = currY - drawerLastMoveY;
-          moveObjectBy(drawerSelectedObj, dx, dy);
-          drawerLastMoveX = currX;
-          drawerLastMoveY = currY;
-          redrawDrawerCanvas();
-        }
-        return;
-      }
-
-      if (drawerCurrentTool === 'eraser') {
-        eraseAtPointDrawer(currX, currY);
-        return;
-      }
-
-      drawerLastMoveX = currX;
-      drawerLastMoveY = currY;
-
-      if (drawerCurrentTool === 'pen') {
-        drawerCurrentStrokePoints.push({ x: currX, y: currY });
-
-        const moveDist = Math.hypot(currX - drawerHoldAnchorX, currY - drawerHoldAnchorY);
-        if (moveDist > 14) {
-          drawerHoldAnchorX = currX;
-          drawerHoldAnchorY = currY;
-          resetDrawerHoldTimer();
-        }
-
-        if (drawerSnappedShape) {
-          redrawDrawerCanvas();
-          renderSingleObject(ctx, drawerSnappedShape, false);
-        } else {
-          redrawDrawerCanvas();
-          ctx.save();
-          ctx.strokeStyle = currentColor;
-          ctx.lineWidth = drawerPenThickness;
-          ctx.lineCap = 'round';
-          ctx.lineJoin = 'round';
-          ctx.beginPath();
-          ctx.moveTo(drawerCurrentStrokePoints[0].x, drawerCurrentStrokePoints[0].y);
-          for (let i = 1; i < drawerCurrentStrokePoints.length; i++) {
-            ctx.lineTo(drawerCurrentStrokePoints[i].x, drawerCurrentStrokePoints[i].y);
-          }
-          ctx.stroke();
-          ctx.restore();
-        }
-        return;
-      }
-
-      if (drawerCurrentTool !== 'pen') {
-        redrawDrawerCanvas();
-        let preview = null;
-
-        if (drawerCurrentTool === 'line') {
-          const snapped = snapLineCoordinates(drawerStartX, drawerStartY, currX, currY);
-          preview = { type: 'line', x1: drawerStartX, y1: drawerStartY, x2: snapped.x, y2: snapped.y, color: currentColor, thickness: drawerPenThickness };
-        } else if (drawerCurrentTool === 'circle') {
-          const r = Math.hypot(currX - drawerStartX, currY - drawerStartY) / 2;
-          const cx = (drawerStartX + currX) / 2;
-          const cy = (drawerStartY + currY) / 2;
-          preview = { type: 'circle', cx, cy, r, color: currentColor, thickness: drawerPenThickness };
-        } else if (drawerCurrentTool === 'rect') {
-          preview = { type: 'rect', x: Math.min(drawerStartX, currX), y: Math.min(drawerStartY, currY), w: Math.abs(currX - drawerStartX), h: Math.abs(currY - drawerStartY), color: currentColor, thickness: drawerPenThickness };
-        }
-
-        if (preview) {
-          renderSingleObject(ctx, preview, false);
-        }
-      }
-    }
-
-    function handleDrawerPointerUp(e) {
-      if (!isDrawing) return;
-      isDrawing = false;
-      clearTimeout(drawerHoldTimer);
-
-      if (drawerCurrentTool === 'move') {
-        redrawDrawerCanvas();
-        try { canvas.releasePointerCapture(e.pointerId); } catch (err) {}
-        return;
-      }
-
-      if (drawerSnappedShape) {
-        drawerObjects.push(drawerSnappedShape);
-        drawerSnappedShape = null;
-      } else if (drawerCurrentTool === 'pen') {
-        if (drawerCurrentStrokePoints.length > 1) {
-          let finalShape = null;
-          if (isDrawerAutoShapeOn && drawerCurrentStrokePoints.length >= 8) {
-            finalShape = recognizeShapeFromPoints(drawerCurrentStrokePoints);
-          }
-
-          if (finalShape) {
-            finalShape.color = currentColor;
-            finalShape.thickness = drawerPenThickness;
-            drawerObjects.push(finalShape);
-            if (finalShape.type === 'line') showToast("📏 Straight Line Created!");
-            else if (finalShape.type === 'circle') showToast("⭕ Circle Created!");
-            else if (finalShape.type === 'rect') showToast("▢ Rectangle Created!");
-          } else {
-            drawerObjects.push({
-              type: 'stroke',
-              points: smoothPoints(drawerCurrentStrokePoints, 1),
-              color: currentColor,
-              thickness: drawerPenThickness
-            });
-          }
-        }
-      } else if (drawerCurrentTool === 'line' || drawerCurrentTool === 'circle' || drawerCurrentTool === 'rect') {
-        const rect = canvas.getBoundingClientRect();
-        const endX = e.clientX - rect.left;
-        const endY = e.clientY - rect.top;
-
-        if (drawerCurrentTool === 'line') {
-          const snapped = snapLineCoordinates(drawerStartX, drawerStartY, endX, endY);
-          drawerObjects.push({ type: 'line', x1: drawerStartX, y1: drawerStartY, x2: snapped.x, y2: snapped.y, color: currentColor, thickness: drawerPenThickness });
-        } else if (drawerCurrentTool === 'circle') {
-          const r = Math.hypot(endX - drawerStartX, endY - drawerStartY) / 2;
-          drawerObjects.push({ type: 'circle', cx: (drawerStartX + endX) / 2, cy: (drawerStartY + endY) / 2, r, color: currentColor, thickness: drawerPenThickness });
-        } else if (drawerCurrentTool === 'rect') {
-          drawerObjects.push({ type: 'rect', x: Math.min(drawerStartX, endX), y: Math.min(drawerStartY, endY), w: Math.abs(endX - drawerStartX), h: Math.abs(endY - drawerStartY), color: currentColor, thickness: drawerPenThickness });
-        }
-      }
-
-      drawerCurrentStrokePoints = [];
-      redrawDrawerCanvas();
-      try { canvas.releasePointerCapture(e.pointerId); } catch (err) {}
-    }
-
-    function eraseAtPointDrawer(x, y) {
-      const initLen = drawerObjects.length;
-      drawerObjects = drawerObjects.filter(obj => !hitTestObject(obj, x, y));
-      if (drawerObjects.length !== initLen) redrawDrawerCanvas();
-    }
-
-    function setDrawerShapeMode(tool) {
-      drawerCurrentTool = tool;
-      const penBtn = document.getElementById('drawerToolPenBtn');
-      const moveBtn = document.getElementById('drawerToolMoveBtn');
-      const lineBtn = document.getElementById('drawerToolLineBtn');
-      const circleBtn = document.getElementById('drawerToolCircleBtn');
-      const rectBtn = document.getElementById('drawerToolRectBtn');
-      const eraserBtn = document.getElementById('drawerEraserModeBtn');
+      const penBtn = document.getElementById(`${prefix}ToolPenBtn`);
+      const lineBtn = document.getElementById(`${prefix}ToolLineBtn`);
+      const circleBtn = document.getElementById(`${prefix}ToolCircleBtn`);
+      const rectBtn = document.getElementById(`${prefix}ToolRectBtn`);
+      const eraserBtn = document.getElementById(isDrawer ? 'drawerEraserModeBtn' : 'splitEraserModeBtn');
 
       const btns = [
         { key: 'pen', el: penBtn },
-        { key: 'move', el: moveBtn },
         { key: 'line', el: lineBtn },
         { key: 'circle', el: circleBtn },
         { key: 'rect', el: rectBtn },
@@ -2075,32 +1735,334 @@
       btns.forEach(b => {
         if (!b.el) return;
         if (b.key === tool) {
-          b.el.className = "px-2.5 py-1 bg-emerald-500 text-black font-black uppercase rounded shadow-sm";
+          b.el.className = isDrawer 
+            ? "px-2.5 py-1 bg-emerald-500 text-black font-black uppercase rounded shadow-sm"
+            : "px-2 py-0.5 bg-emerald-500 text-black font-black uppercase rounded shadow-sm";
         } else {
-          b.el.className = "px-2.5 py-1 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded";
+          b.el.className = isDrawer
+            ? "px-2.5 py-1 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded"
+            : "px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded";
         }
       });
 
-      if (tool === 'move') {
-        showToast("🖐️ MOVE mode: Tap & drag any graph or shape!");
-      } else if (tool === 'pen') {
-        showToast("✏️ Smart Pen: Lines & connected shapes auto-correct!");
+      const sizeSlider = document.getElementById(isDrawer ? 'drawerSizeSlider' : 'splitSizeSlider');
+      const sizeLabel = document.getElementById(isDrawer ? 'drawerSizeValueLabel' : 'splitSizeValueLabel');
+
+      if (tool === 'eraser') {
+        if (sizeSlider) sizeSlider.value = eng.eraserThickness;
+        if (sizeLabel) sizeLabel.textContent = `${eng.eraserThickness}px`;
+        showToast("🧹 Precision Eraser: Rubs out drawing bit by bit!");
+      } else {
+        if (sizeSlider) sizeSlider.value = eng.penThickness;
+        if (sizeLabel) sizeLabel.textContent = `${eng.penThickness}px`;
       }
-      redrawDrawerCanvas();
     }
 
-    function resizeScratchpadCanvas() {
-      if (!canvas) return;
-      const rect = canvas.getBoundingClientRect();
+    function updateThickness(targetKey, val) {
+      const eng = canvasEngines[targetKey];
+      const parsed = parseInt(val, 10);
+      const isDrawer = targetKey === 'drawer';
+      const label = document.getElementById(isDrawer ? 'drawerSizeValueLabel' : 'splitSizeValueLabel');
+      if (label) label.textContent = `${parsed}px`;
+
+      if (eng.currentTool === 'eraser') {
+        eng.eraserThickness = parsed;
+      } else {
+        eng.penThickness = parsed;
+      }
+    }
+
+    function toggleAutoShapeMode(targetKey) {
+      const eng = canvasEngines[targetKey];
+      eng.isAutoShapeOn = !eng.isAutoShapeOn;
+      const isDrawer = targetKey === 'drawer';
+      const btn = document.getElementById(isDrawer ? 'drawerAutoShapeToggleBtn' : 'splitAutoShapeToggleBtn');
+      if (btn) {
+        btn.textContent = eng.isAutoShapeOn ? '✨ AUTO: ON' : '✨ AUTO: OFF';
+        btn.className = eng.isAutoShapeOn 
+          ? (isDrawer ? "px-2.5 py-1 bg-cyan-400 text-black font-black uppercase rounded shadow-sm" : "px-2 py-0.5 bg-cyan-400 text-black font-black uppercase rounded shadow-sm")
+          : (isDrawer ? "px-2.5 py-1 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded" : "px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded");
+      }
+      showToast(eng.isAutoShapeOn ? "Auto-Shape: ON" : "Auto-Shape: OFF (Pure Freehand)");
+    }
+
+    function resizeCanvasSmoothly(targetKey) {
+      const eng = canvasEngines[targetKey];
+      if (!eng.canvas || !eng.ctx) return;
+      const rect = eng.canvas.getBoundingClientRect();
       if (rect.width === 0 || rect.height === 0) return;
-      canvas.width = rect.width;
-      canvas.height = rect.height;
-      redrawDrawerCanvas();
+
+      const newW = Math.round(rect.width);
+      const newH = Math.round(rect.height);
+      if (eng.canvas.width === newW && eng.canvas.height === newH) return;
+
+      const temp = document.createElement('canvas');
+      temp.width = eng.canvas.width;
+      temp.height = eng.canvas.height;
+      if (temp.width > 0 && temp.height > 0) {
+        temp.getContext('2d').drawImage(eng.canvas, 0, 0);
+      }
+
+      eng.canvas.width = newW;
+      eng.canvas.height = newH;
+
+      if (temp.width > 0 && temp.height > 0) {
+        eng.ctx.drawImage(temp, 0, 0);
+      }
     }
 
-    function setCanvasColor(color) {
-      currentColor = color;
-      if (drawerCurrentTool === 'eraser') setDrawerShapeMode('pen');
+    function initUnifiedCanvas(targetKey) {
+      const eng = canvasEngines[targetKey];
+      eng.canvas = document.getElementById(eng.canvasId);
+      if (!eng.canvas) return;
+      eng.ctx = eng.canvas.getContext('2d');
+
+      resizeCanvasSmoothly(targetKey);
+      window.addEventListener('resize', () => resizeCanvasSmoothly(targetKey));
+
+      eng.canvas.addEventListener('pointerdown', (e) => handleCanvasPointerDown(targetKey, e));
+      eng.canvas.addEventListener('pointermove', (e) => handleCanvasPointerMove(targetKey, e));
+      eng.canvas.addEventListener('pointerup', (e) => handleCanvasPointerUp(targetKey, e));
+      eng.canvas.addEventListener('pointercancel', (e) => handleCanvasPointerUp(targetKey, e));
+      eng.canvas.addEventListener('pointerleave', (e) => handleCanvasPointerUp(targetKey, e));
+    }
+
+    function handleCanvasPointerDown(targetKey, e) {
+      const eng = canvasEngines[targetKey];
+      if (isStylusOnlyMode && e.pointerType !== 'pen') return;
+
+      const rect = eng.canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      eng.isDrawing = true;
+      eng.startX = x;
+      eng.startY = y;
+      eng.lastX = x;
+      eng.lastY = y;
+      eng.holdAnchorX = x;
+      eng.holdAnchorY = y;
+      eng.snappedShape = null;
+
+      saveCanvasState(targetKey);
+
+      eng.preStrokeSnapshot = document.createElement('canvas');
+      eng.preStrokeSnapshot.width = eng.canvas.width;
+      eng.preStrokeSnapshot.height = eng.canvas.height;
+      eng.preStrokeSnapshot.getContext('2d').drawImage(eng.canvas, 0, 0);
+
+      // BIT-BY-BIT ERASER: Single tap dab
+      if (eng.currentTool === 'eraser') {
+        eng.ctx.save();
+        eng.ctx.globalCompositeOperation = 'destination-out';
+        eng.ctx.beginPath();
+        eng.ctx.arc(x, y, eng.eraserThickness / 2, 0, Math.PI * 2);
+        eng.ctx.fill();
+        eng.ctx.restore();
+        try { eng.canvas.setPointerCapture(e.pointerId); } catch (err) {}
+        return;
+      }
+
+      eng.strokePoints = [{ x, y }];
+      clearTimeout(eng.holdTimer);
+
+      if (eng.currentTool === 'pen' && eng.isAutoShapeOn) {
+        eng.holdTimer = setTimeout(() => {
+          if (eng.isDrawing && eng.strokePoints.length >= 8) {
+            const detected = recognizeShapeFromPoints(eng.strokePoints);
+            if (detected) {
+              eng.snappedShape = detected;
+              eng.ctx.clearRect(0, 0, eng.canvas.width, eng.canvas.height);
+              eng.ctx.drawImage(eng.preStrokeSnapshot, 0, 0);
+              renderShape(eng.ctx, detected, eng.currentColor, eng.penThickness);
+              if (detected.type === 'line') showToast("📏 Straight Line Snapped!");
+              else if (detected.type === 'circle') showToast("⭕ Perfect Circle Snapped!");
+              else if (detected.type === 'rect') showToast("▢ Perfect Rectangle Snapped!");
+            }
+          }
+        }, 550);
+      }
+
+      try { eng.canvas.setPointerCapture(e.pointerId); } catch (err) {}
+    }
+
+    function handleCanvasPointerMove(targetKey, e) {
+      const eng = canvasEngines[targetKey];
+      if (!eng.isDrawing) return;
+      if (isStylusOnlyMode && e.pointerType !== 'pen') return;
+
+      const rect = eng.canvas.getBoundingClientRect();
+      const currX = e.clientX - rect.left;
+      const currY = e.clientY - rect.top;
+
+      // BIT-BY-BIT ERASER: continuous, smooth line & dab removal
+      if (eng.currentTool === 'eraser') {
+        eng.ctx.save();
+        eng.ctx.globalCompositeOperation = 'destination-out';
+        eng.ctx.lineWidth = eng.eraserThickness;
+        eng.ctx.lineCap = 'round';
+        eng.ctx.lineJoin = 'round';
+        eng.ctx.beginPath();
+        eng.ctx.moveTo(eng.lastX, eng.lastY);
+        eng.ctx.lineTo(currX, currY);
+        eng.ctx.stroke();
+
+        eng.ctx.beginPath();
+        eng.ctx.arc(currX, currY, eng.eraserThickness / 2, 0, Math.PI * 2);
+        eng.ctx.fill();
+        eng.ctx.restore();
+
+        eng.lastX = currX;
+        eng.lastY = currY;
+        return;
+      }
+
+      if (eng.currentTool === 'pen') {
+        eng.strokePoints.push({ x: currX, y: currY });
+
+        const moveDist = Math.hypot(currX - eng.holdAnchorX, currY - eng.holdAnchorY);
+        if (moveDist > 14) {
+          eng.holdAnchorX = currX;
+          eng.holdAnchorY = currY;
+          clearTimeout(eng.holdTimer);
+          if (eng.isAutoShapeOn) {
+            eng.holdTimer = setTimeout(() => {
+              if (eng.isDrawing && eng.strokePoints.length >= 8) {
+                const detected = recognizeShapeFromPoints(eng.strokePoints);
+                if (detected) {
+                  eng.snappedShape = detected;
+                  eng.ctx.clearRect(0, 0, eng.canvas.width, eng.canvas.height);
+                  eng.ctx.drawImage(eng.preStrokeSnapshot, 0, 0);
+                  renderShape(eng.ctx, detected, eng.currentColor, eng.penThickness);
+                }
+              }
+            }, 550);
+          }
+        }
+
+        if (eng.snappedShape) {
+          eng.ctx.clearRect(0, 0, eng.canvas.width, eng.canvas.height);
+          eng.ctx.drawImage(eng.preStrokeSnapshot, 0, 0);
+          renderShape(eng.ctx, eng.snappedShape, eng.currentColor, eng.penThickness);
+        } else {
+          eng.ctx.save();
+          eng.ctx.globalCompositeOperation = 'source-over';
+          eng.ctx.strokeStyle = eng.currentColor;
+          eng.ctx.lineWidth = eng.penThickness;
+          eng.ctx.lineCap = 'round';
+          eng.ctx.lineJoin = 'round';
+          eng.ctx.beginPath();
+          eng.ctx.moveTo(eng.lastX, eng.lastY);
+          eng.ctx.lineTo(currX, currY);
+          eng.ctx.stroke();
+          eng.ctx.restore();
+        }
+
+        eng.lastX = currX;
+        eng.lastY = currY;
+        return;
+      }
+
+      // PREVIEW FOR GEOMETRIC SHAPES
+      if (eng.currentTool === 'line' || eng.currentTool === 'circle' || eng.currentTool === 'rect') {
+        eng.ctx.clearRect(0, 0, eng.canvas.width, eng.canvas.height);
+        eng.ctx.drawImage(eng.preStrokeSnapshot, 0, 0);
+
+        let previewShape = null;
+        if (eng.currentTool === 'line') {
+          const snapped = snapLineCoordinates(eng.startX, eng.startY, currX, currY);
+          previewShape = { type: 'line', x1: eng.startX, y1: eng.startY, x2: snapped.x, y2: snapped.y };
+        } else if (eng.currentTool === 'circle') {
+          const r = Math.hypot(currX - eng.startX, currY - eng.startY) / 2;
+          previewShape = { type: 'circle', cx: (eng.startX + currX) / 2, cy: (eng.startY + currY) / 2, r };
+        } else if (eng.currentTool === 'rect') {
+          previewShape = { type: 'rect', x: Math.min(eng.startX, currX), y: Math.min(eng.startY, currY), w: Math.abs(currX - eng.startX), h: Math.abs(currY - eng.startY) };
+        }
+
+        if (previewShape) {
+          renderShape(eng.ctx, previewShape, eng.currentColor, eng.penThickness);
+        }
+      }
+    }
+
+    function handleCanvasPointerUp(targetKey, e) {
+      const eng = canvasEngines[targetKey];
+      if (!eng.isDrawing) return;
+      eng.isDrawing = false;
+      clearTimeout(eng.holdTimer);
+
+      if (eng.currentTool === 'eraser') {
+        try { eng.canvas.releasePointerCapture(e.pointerId); } catch (err) {}
+        return;
+      }
+
+      if (eng.snappedShape) {
+        eng.ctx.clearRect(0, 0, eng.canvas.width, eng.canvas.height);
+        eng.ctx.drawImage(eng.preStrokeSnapshot, 0, 0);
+        renderShape(eng.ctx, eng.snappedShape, eng.currentColor, eng.penThickness);
+        eng.snappedShape = null;
+      } else if (eng.currentTool === 'pen') {
+        if (eng.isAutoShapeOn && eng.strokePoints.length >= 8) {
+          const finalShape = recognizeShapeFromPoints(eng.strokePoints);
+          if (finalShape) {
+            eng.ctx.clearRect(0, 0, eng.canvas.width, eng.canvas.height);
+            eng.ctx.drawImage(eng.preStrokeSnapshot, 0, 0);
+            renderShape(eng.ctx, finalShape, eng.currentColor, eng.penThickness);
+            if (finalShape.type === 'line') showToast("📏 Straight Line Created!");
+            else if (finalShape.type === 'circle') showToast("⭕ Circle Created!");
+            else if (finalShape.type === 'rect') showToast("▢ Rectangle Created!");
+          }
+        }
+      } else if (eng.currentTool === 'line' || eng.currentTool === 'circle' || eng.currentTool === 'rect') {
+        const rect = eng.canvas.getBoundingClientRect();
+        const endX = e.clientX - rect.left;
+        const endY = e.clientY - rect.top;
+
+        eng.ctx.clearRect(0, 0, eng.canvas.width, eng.canvas.height);
+        eng.ctx.drawImage(eng.preStrokeSnapshot, 0, 0);
+
+        let finalShape = null;
+        if (eng.currentTool === 'line') {
+          const snapped = snapLineCoordinates(eng.startX, eng.startY, endX, endY);
+          finalShape = { type: 'line', x1: eng.startX, y1: eng.startY, x2: snapped.x, y2: snapped.y };
+        } else if (eng.currentTool === 'circle') {
+          const r = Math.hypot(endX - eng.startX, endY - eng.startY) / 2;
+          finalShape = { type: 'circle', cx: (eng.startX + endX) / 2, cy: (eng.startY + endY) / 2, r };
+        } else if (eng.currentTool === 'rect') {
+          finalShape = { type: 'rect', x: Math.min(eng.startX, endX), y: Math.min(eng.startY, endY), w: Math.abs(endX - eng.startX), h: Math.abs(endY - eng.startY) };
+        }
+
+        if (finalShape) {
+          renderShape(eng.ctx, finalShape, eng.currentColor, eng.penThickness);
+        }
+      }
+
+      eng.strokePoints = [];
+      try { eng.canvas.releasePointerCapture(e.pointerId); } catch (err) {}
+    }
+
+    function renderShape(cCtx, shape, color, thickness) {
+      cCtx.save();
+      cCtx.globalCompositeOperation = 'source-over';
+      cCtx.strokeStyle = color;
+      cCtx.lineWidth = thickness;
+      cCtx.lineCap = 'round';
+      cCtx.lineJoin = 'round';
+
+      if (shape.type === 'line') {
+        cCtx.beginPath();
+        cCtx.moveTo(shape.x1, shape.y1);
+        cCtx.lineTo(shape.x2, shape.y2);
+        cCtx.stroke();
+      } else if (shape.type === 'circle') {
+        cCtx.beginPath();
+        cCtx.arc(shape.cx, shape.cy, Math.max(1, shape.r), 0, 2 * Math.PI);
+        cCtx.stroke();
+      } else if (shape.type === 'rect') {
+        cCtx.beginPath();
+        cCtx.strokeRect(shape.x, shape.y, shape.w, shape.h);
+      }
+      cCtx.restore();
     }
 
     function toggleScratchpadDrawer() {
@@ -2117,15 +2079,16 @@
         if (formulaDrawer && formulaDrawer.classList.contains('open')) formulaDrawer.classList.remove('open');
         drawer.classList.add('open');
         if (btn) btn.classList.add('ring-2', 'ring-black');
-        setTimeout(resizeScratchpadCanvas, 320);
+        setTimeout(() => resizeCanvasSmoothly('drawer'), 320);
       }
     }
 
     function downloadScratchpadPNG() {
-      if (!canvas) return;
+      const c = canvasEngines.drawer.canvas;
+      if (!c) return;
       const link = document.createElement('a');
       link.download = `A-Math_Working_${Date.now()}.png`;
-      link.href = canvas.toDataURL('image/png');
+      link.href = c.toDataURL('image/png');
       link.click();
       showToast("Saved working as image!");
     }
@@ -2134,350 +2097,6 @@
       const studentName = currentStudent ? currentStudent.name : 'Student';
       const encoded = encodeURIComponent(`Hi Lucas, I am ${studentName}! I just saved my digital scratchpad working. Sending the photo over for checking!`);
       window.open(`https://wa.me/6581980012?text=${encoded}`, '_blank');
-    }
-
-    function updateDrawerThickness(val) {
-      const parsed = parseInt(val, 10);
-      const label = document.getElementById('drawerSizeValueLabel');
-      if (label) label.textContent = `${parsed}px`;
-
-      if (drawerCurrentTool === 'eraser') {
-        drawerEraserThickness = parsed;
-      } else {
-        drawerPenThickness = parsed;
-      }
-    }
-
-    /* ================= SPLIT SCREEN STATE & ENGINE ================= */
-    let isSplitScreenActive = false;
-    let splitRightSelectedValue = 'notepad';
-    let splitCanvas, splitCtx;
-    let isSplitDrawing = false;
-    let splitCanvasColor = '#10b981';
-    let splitPenThickness = 3;
-    let splitEraserThickness = 20;
-    let splitCurrentTool = 'pen';
-
-    let splitObjects = [];
-    let splitUndoStack = [];
-    let splitSelectedObj = null;
-    let splitCurrentStrokePoints = [];
-    let splitStartX = 0, splitStartY = 0;
-    let splitLastMoveX = 0, splitLastMoveY = 0;
-    let splitHoldAnchorX = 0, splitHoldAnchorY = 0;
-    let splitHoldTimer = null;
-    let splitSnappedShape = null;
-
-    function redrawSplitCanvas() {
-      if (!splitCtx || !splitCanvas) return;
-      splitCtx.clearRect(0, 0, splitCanvas.width, splitCanvas.height);
-      for (let obj of splitObjects) {
-        renderSingleObject(splitCtx, obj, obj === splitSelectedObj);
-      }
-    }
-
-    function saveSplitState() {
-      splitUndoStack.push(JSON.parse(JSON.stringify(splitObjects)));
-      if (splitUndoStack.length > 25) splitUndoStack.shift();
-    }
-
-    function undoSplitCanvas() {
-      if (splitUndoStack.length === 0) return;
-      splitObjects = splitUndoStack.pop();
-      splitSelectedObj = null;
-      redrawSplitCanvas();
-      showToast("Undone!");
-    }
-
-    function clearSplitCanvas() {
-      saveSplitState();
-      splitObjects = [];
-      splitSelectedObj = null;
-      redrawSplitCanvas();
-      showToast("Split canvas cleared!");
-    }
-
-    function initSplitScratchCanvas() {
-      splitCanvas = document.getElementById('splitScratchCanvas');
-      if (!splitCanvas) return;
-      splitCtx = splitCanvas.getContext('2d');
-
-      resizeSplitScratchCanvas();
-      window.addEventListener('resize', resizeSplitScratchCanvas);
-
-      splitCanvas.addEventListener('pointerdown', handleSplitPointerDown);
-      splitCanvas.addEventListener('pointermove', handleSplitPointerMove);
-      splitCanvas.addEventListener('pointerup', handleSplitPointerUp);
-      splitCanvas.addEventListener('pointercancel', handleSplitPointerUp);
-      splitCanvas.addEventListener('pointerleave', handleSplitPointerUp);
-    }
-
-    function resetSplitHoldTimer() {
-      clearTimeout(splitHoldTimer);
-      if (!isSplitAutoShapeOn || splitCurrentTool !== 'pen') return;
-
-      splitHoldTimer = setTimeout(() => {
-        if (isSplitDrawing && splitCurrentStrokePoints.length >= 8) {
-          const detected = recognizeShapeFromPoints(splitCurrentStrokePoints);
-          if (detected) {
-            splitSnappedShape = detected;
-            splitSnappedShape.color = splitCanvasColor;
-            splitSnappedShape.thickness = splitPenThickness;
-            redrawSplitCanvas();
-            renderSingleObject(splitCtx, splitSnappedShape, false);
-            if (detected.type === 'line') showToast("📏 Straight Line Snapped!");
-            else if (detected.type === 'circle') showToast("⭕ Perfect Circle Snapped!");
-            else if (detected.type === 'rect') showToast("▢ Perfect Rectangle Snapped!");
-          }
-        }
-      }, 550);
-    }
-
-    function handleSplitPointerDown(e) {
-      if (isStylusOnlyMode && e.pointerType !== 'pen') return;
-      const rect = splitCanvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
-      isSplitDrawing = true;
-      splitStartX = x;
-      splitStartY = y;
-      splitLastMoveX = x;
-      splitLastMoveY = y;
-      splitHoldAnchorX = x;
-      splitHoldAnchorY = y;
-      splitSnappedShape = null;
-
-      if (splitCurrentTool === 'move') {
-        saveSplitState();
-        splitSelectedObj = null;
-        for (let i = splitObjects.length - 1; i >= 0; i--) {
-          if (hitTestObject(splitObjects[i], x, y)) {
-            splitSelectedObj = splitObjects[i];
-            break;
-          }
-        }
-        redrawSplitCanvas();
-        try { splitCanvas.setPointerCapture(e.pointerId); } catch (err) {}
-        return;
-      }
-
-      if (splitCurrentTool === 'eraser') {
-        saveSplitState();
-        eraseAtPointSplit(x, y);
-        try { splitCanvas.setPointerCapture(e.pointerId); } catch (err) {}
-        return;
-      }
-
-      saveSplitState();
-      splitCurrentStrokePoints = [{ x, y }];
-      resetSplitHoldTimer();
-      try { splitCanvas.setPointerCapture(e.pointerId); } catch (err) {}
-    }
-
-    function handleSplitPointerMove(e) {
-      if (!isSplitDrawing) return;
-      if (isStylusOnlyMode && e.pointerType !== 'pen') return;
-      const rect = splitCanvas.getBoundingClientRect();
-      const currX = e.clientX - rect.left;
-      const currY = e.clientY - rect.top;
-
-      if (splitCurrentTool === 'move') {
-        if (splitSelectedObj) {
-          const dx = currX - splitLastMoveX;
-          const dy = currY - splitLastMoveY;
-          moveObjectBy(splitSelectedObj, dx, dy);
-          splitLastMoveX = currX;
-          splitLastMoveY = currY;
-          redrawSplitCanvas();
-        }
-        return;
-      }
-
-      if (splitCurrentTool === 'eraser') {
-        eraseAtPointSplit(currX, currY);
-        return;
-      }
-
-      splitLastMoveX = currX;
-      splitLastMoveY = currY;
-
-      if (splitCurrentTool === 'pen') {
-        splitCurrentStrokePoints.push({ x: currX, y: currY });
-
-        const moveDist = Math.hypot(currX - splitHoldAnchorX, currY - splitHoldAnchorY);
-        if (moveDist > 14) {
-          splitHoldAnchorX = currX;
-          splitHoldAnchorY = currY;
-          resetSplitHoldTimer();
-        }
-
-        if (splitSnappedShape) {
-          redrawSplitCanvas();
-          renderSingleObject(splitCtx, splitSnappedShape, false);
-        } else {
-          redrawSplitCanvas();
-          splitCtx.save();
-          splitCtx.strokeStyle = splitCanvasColor;
-          splitCtx.lineWidth = splitPenThickness;
-          splitCtx.lineCap = 'round';
-          splitCtx.lineJoin = 'round';
-          splitCtx.beginPath();
-          splitCtx.moveTo(splitCurrentStrokePoints[0].x, splitCurrentStrokePoints[0].y);
-          for (let i = 1; i < splitCurrentStrokePoints.length; i++) {
-            splitCtx.lineTo(splitCurrentStrokePoints[i].x, splitCurrentStrokePoints[i].y);
-          }
-          splitCtx.stroke();
-          splitCtx.restore();
-        }
-        return;
-      }
-
-      if (splitCurrentTool !== 'pen') {
-        redrawSplitCanvas();
-        let preview = null;
-
-        if (splitCurrentTool === 'line') {
-          const snapped = snapLineCoordinates(splitStartX, splitStartY, currX, currY);
-          preview = { type: 'line', x1: splitStartX, y1: splitStartY, x2: snapped.x, y2: snapped.y, color: splitCanvasColor, thickness: splitPenThickness };
-        } else if (splitCurrentTool === 'circle') {
-          const r = Math.hypot(currX - splitStartX, currY - splitStartY) / 2;
-          const cx = (splitStartX + currX) / 2;
-          const cy = (splitStartY + currY) / 2;
-          preview = { type: 'circle', cx, cy, r, color: splitCanvasColor, thickness: splitPenThickness };
-        } else if (splitCurrentTool === 'rect') {
-          preview = { type: 'rect', x: Math.min(splitStartX, currX), y: Math.min(splitStartY, currY), w: Math.abs(currX - splitStartX), h: Math.abs(currY - splitStartY), color: splitCanvasColor, thickness: splitPenThickness };
-        }
-
-        if (preview) {
-          renderSingleObject(splitCtx, preview, false);
-        }
-      }
-    }
-
-    function handleSplitPointerUp(e) {
-      if (!isSplitDrawing) return;
-      isSplitDrawing = false;
-      clearTimeout(splitHoldTimer);
-
-      if (splitCurrentTool === 'move') {
-        redrawSplitCanvas();
-        try { splitCanvas.releasePointerCapture(e.pointerId); } catch (err) {}
-        return;
-      }
-
-      if (splitSnappedShape) {
-        splitObjects.push(splitSnappedShape);
-        splitSnappedShape = null;
-      } else if (splitCurrentTool === 'pen') {
-        if (splitCurrentStrokePoints.length > 1) {
-          let finalShape = null;
-          if (isSplitAutoShapeOn && splitCurrentStrokePoints.length >= 8) {
-            finalShape = recognizeShapeFromPoints(splitCurrentStrokePoints);
-          }
-
-          if (finalShape) {
-            finalShape.color = splitCanvasColor;
-            finalShape.thickness = splitPenThickness;
-            splitObjects.push(finalShape);
-            if (finalShape.type === 'line') showToast("📏 Straight Line Created!");
-            else if (finalShape.type === 'circle') showToast("⭕ Circle Created!");
-            else if (finalShape.type === 'rect') showToast("▢ Rectangle Created!");
-          } else {
-            splitObjects.push({
-              type: 'stroke',
-              points: smoothPoints(splitCurrentStrokePoints, 1),
-              color: splitCanvasColor,
-              thickness: splitPenThickness
-            });
-          }
-        }
-      } else if (splitCurrentTool === 'line' || splitCurrentTool === 'circle' || splitCurrentTool === 'rect') {
-        const rect = splitCanvas.getBoundingClientRect();
-        const endX = e.clientX - rect.left;
-        const endY = e.clientY - rect.top;
-
-        if (splitCurrentTool === 'line') {
-          const snapped = snapLineCoordinates(splitStartX, splitStartY, endX, endY);
-          splitObjects.push({ type: 'line', x1: splitStartX, y1: splitStartY, x2: snapped.x, y2: snapped.y, color: splitCanvasColor, thickness: splitPenThickness });
-        } else if (splitCurrentTool === 'circle') {
-          const r = Math.hypot(endX - splitStartX, endY - splitStartY) / 2;
-          splitObjects.push({ type: 'circle', cx: (drawerStartX + endX) / 2, cy: (drawerStartY + endY) / 2, r, color: splitCanvasColor, thickness: splitPenThickness });
-        } else if (splitCurrentTool === 'rect') {
-          splitObjects.push({ type: 'rect', x: Math.min(splitStartX, endX), y: Math.min(splitStartY, endY), w: Math.abs(endX - splitStartX), h: Math.abs(endY - splitStartY), color: splitCanvasColor, thickness: splitPenThickness });
-        }
-      }
-
-      splitCurrentStrokePoints = [];
-      redrawSplitCanvas();
-      try { splitCanvas.releasePointerCapture(e.pointerId); } catch (err) {}
-    }
-
-    function eraseAtPointSplit(x, y) {
-      const initLen = splitObjects.length;
-      splitObjects = splitObjects.filter(obj => !hitTestObject(obj, x, y));
-      if (splitObjects.length !== initLen) redrawSplitCanvas();
-    }
-
-    function setSplitShapeMode(tool) {
-      splitCurrentTool = tool;
-      const penBtn = document.getElementById('splitToolPenBtn');
-      const moveBtn = document.getElementById('splitToolMoveBtn');
-      const lineBtn = document.getElementById('splitToolLineBtn');
-      const circleBtn = document.getElementById('splitToolCircleBtn');
-      const rectBtn = document.getElementById('splitToolRectBtn');
-      const eraserBtn = document.getElementById('splitEraserModeBtn');
-
-      const btns = [
-        { key: 'pen', el: penBtn },
-        { key: 'move', el: moveBtn },
-        { key: 'line', el: lineBtn },
-        { key: 'circle', el: circleBtn },
-        { key: 'rect', el: rectBtn },
-        { key: 'eraser', el: eraserBtn }
-      ];
-
-      btns.forEach(b => {
-        if (!b.el) return;
-        if (b.key === tool) {
-          b.el.className = "px-2 py-0.5 bg-emerald-500 text-black font-black uppercase rounded shadow-sm";
-        } else {
-          b.el.className = "px-2 py-0.5 bg-neutral-700 hover:bg-neutral-600 text-white font-black uppercase rounded";
-        }
-      });
-
-      if (tool === 'move') {
-        showToast("🖐️ MOVE mode: Tap & drag any graph or shape!");
-      } else if (tool === 'pen') {
-        showToast("✏️ Smart Pen: Lines & connected shapes auto-correct!");
-      }
-      redrawSplitCanvas();
-    }
-
-    function resizeSplitScratchCanvas() {
-      if (!splitCanvas) return;
-      const rect = splitCanvas.getBoundingClientRect();
-      if (rect.width === 0 || rect.height === 0) return;
-      splitCanvas.width = rect.width;
-      splitCanvas.height = rect.height;
-      redrawSplitCanvas();
-    }
-
-    function setSplitCanvasColor(color) {
-      splitCanvasColor = color;
-      if (splitCurrentTool === 'eraser') setSplitShapeMode('pen');
-    }
-
-    function updateSplitThickness(val) {
-      const parsed = parseInt(val, 10);
-      const label = document.getElementById('splitSizeValueLabel');
-      if (label) label.textContent = `${parsed}px`;
-
-      if (splitCurrentTool === 'eraser') {
-        splitEraserThickness = parsed;
-      } else {
-        splitPenThickness = parsed;
-      }
     }
 
     /* ================= PWA & APP NAVIGATION CORE ================= */
@@ -2597,6 +2216,10 @@
       }
     }
 
+    /* ================= SPLIT SCREEN STATE & ENGINE ================= */
+    let isSplitScreenActive = false;
+    let splitRightSelectedValue = 'notepad';
+
     function toggleSplitScreenMode() {
       isSplitScreenActive = !isSplitScreenActive;
       const singlePane = document.getElementById('singlePaneControls');
@@ -2615,8 +2238,8 @@
           toggleBtn.className = "px-3 py-1.5 border-2 border-black dark:border-neutral-300 bg-black text-white dark:bg-white dark:text-black font-mono-code text-xs font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(0,0,1)] cursor-pointer flex items-center gap-1.5";
         }
         setupSplitScreenPanes();
-        setTimeout(initSplitScratchCanvas, 150);
-        showToast("Split Screen Active: Move & Draw enabled!");
+        setTimeout(() => resizeCanvasSmoothly('split'), 150);
+        showToast("Split Screen Active: Two-pane study enabled!");
       } else {
         if (splitPane) {
           splitPane.classList.add('hidden');
@@ -2716,7 +2339,7 @@
         if (canvasView) canvasView.classList.remove('hidden');
         if (undoBtn) undoBtn.classList.remove('hidden');
         if (clearBtn) clearBtn.classList.remove('hidden');
-        setTimeout(resizeSplitScratchCanvas, 100);
+        setTimeout(() => resizeCanvasSmoothly('split'), 100);
       } else {
         if (canvasView) canvasView.classList.add('hidden');
         if (undoBtn) undoBtn.classList.add('hidden');
@@ -2754,18 +2377,6 @@
           }
         }
       }
-    }
-
-    function toggleStylusOnlyMode() {
-      isStylusOnlyMode = !isStylusOnlyMode;
-      const statusText = document.getElementById('stylusOnlyStatusText');
-      const splitStatusText = document.getElementById('splitStylusOnlyStatusText');
-      const val = isStylusOnlyMode ? 'ON' : 'OFF';
-      const cls = isStylusOnlyMode ? 'text-emerald-400 font-black' : 'text-gray-400 font-black';
-
-      if (statusText) { statusText.textContent = val; statusText.className = cls; }
-      if (splitStatusText) { splitStatusText.textContent = val; splitStatusText.className = cls; }
-      showToast(isStylusOnlyMode ? "Stylus Only Enabled: Palm touches blocked!" : "Stylus Only Disabled: Finger & Stylus active.");
     }
 
     function loadHomepageGuideVideo() {
@@ -3467,7 +3078,8 @@
       renderChapterNav();
       selectHomeView();
       checkActiveStudentSession();
-      initScratchpadCanvas();
+      initUnifiedCanvas('drawer');
+      initUnifiedCanvas('split');
       checkAndUpdateDailyStreak();
       loadHomepageGuideVideo();
     }
