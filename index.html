@@ -1155,7 +1155,7 @@
           <span class="text-base">✏️</span>
           <div class="truncate">
             <h3 class="font-black text-xs uppercase tracking-tight truncate">DIGITAL WORKING CANVAS</h3>
-            <span class="text-[9px] font-bold uppercase block text-neutral-800">PRECISE BIT-BY-BIT ERASER • AUTO SHAPE CORRECTION</span>
+            <span class="text-[9px] font-bold uppercase block text-neutral-800">PRECISE BIT-BY-BIT ERASER • ACCURATE SHAPE ENGINE</span>
           </div>
         </div>
 
@@ -1543,11 +1543,12 @@
       const minDim = Math.min(w, h);
       const maxDim = Math.max(w, h);
 
-      if (totalLen < 30 || minDim < 12) return null;
+      if (totalLen < 25 || minDim < 10) return null;
 
       const cx = (minX + maxX) / 2;
       const cy = (minY + maxY) / 2;
 
+      // Angular sweep calculation around centroid
       let totalAngleSweep = 0;
       let prevAngle = Math.atan2(pts[0].y - cy, pts[0].x - cx);
       for (let i = 1; i < pts.length; i++) {
@@ -1560,6 +1561,7 @@
       }
       const absSweep = Math.abs(totalAngleSweep);
 
+      // Shoelace area
       let shoelaceArea = 0;
       for (let i = 0; i < pts.length; i++) {
         const next = pts[(i + 1) % pts.length];
@@ -1569,6 +1571,7 @@
       const bboxArea = (w * h) || 1;
       const fillRatio = shoelaceArea / bboxArea;
 
+      // Radial distribution (for circle test)
       let rSum = 0;
       for (let p of pts) {
         rSum += Math.hypot(p.x - cx, p.y - cy);
@@ -1580,44 +1583,73 @@
       }
       const normRadialDev = (rDevSum / pts.length) / (meanR || 1);
 
-      const isLoop = (absSweep >= 4.8 || directDist <= Math.max(50, minDim * 0.45)) && (minDim >= 20) && (totalLen >= 60);
+      // Distance to bounding box edges (for rectangle test)
+      let boxEdgeDevSum = 0;
+      for (let p of pts) {
+        const distToEdge = Math.min(
+          Math.abs(p.x - minX),
+          Math.abs(p.x - maxX),
+          Math.abs(p.y - minY),
+          Math.abs(p.y - maxY)
+        );
+        boxEdgeDevSum += distToEdge;
+      }
+      const normBoxErr = (boxEdgeDevSum / pts.length) / (minDim || 1);
 
-      if (isLoop) {
-        const aspect = minDim / (maxDim || 1);
-        if (aspect >= 0.65 && normRadialDev <= 0.25) {
-          return { type: 'circle', cx: cx, cy: cy, r: (w + h) / 4 };
+      // Corner proximity check: Rectangles reach close to the bounding box corners, circles never do
+      const corners = [
+        { x: minX, y: minY },
+        { x: maxX, y: minY },
+        { x: maxX, y: maxY },
+        { x: minX, y: maxY }
+      ];
+      let cornersReached = 0;
+      for (const c of corners) {
+        let minDist = Infinity;
+        for (const p of pts) {
+          const d = Math.hypot(p.x - c.x, p.y - c.y);
+          if (d < minDist) minDist = d;
         }
-
-        let boxEdgeDevSum = 0;
-        for (let p of pts) {
-          const distToEdge = Math.min(
-            Math.abs(p.x - minX),
-            Math.abs(p.x - maxX),
-            Math.abs(p.y - minY),
-            Math.abs(p.y - maxY)
-          );
-          boxEdgeDevSum += distToEdge;
-        }
-        const normBoxErr = (boxEdgeDevSum / pts.length) / (minDim || 1);
-        if (fillRatio >= 0.75 || normBoxErr <= 0.20) {
-          return { type: 'rect', x: minX, y: minY, w: w, h: h };
-        }
-
-        if (fillRatio < 0.84 && aspect >= 0.62) {
-          return { type: 'circle', cx: cx, cy: cy, r: (w + h) / 4 };
-        } else {
-          return { type: 'rect', x: minX, y: minY, w: w, h: h };
+        if (minDist <= Math.max(20, minDim * 0.28)) {
+          cornersReached++;
         }
       }
 
-      if (directDist >= 25) {
+      const isLoop = (absSweep >= 4.2 || directDist <= Math.max(50, minDim * 0.5)) && (minDim >= 18) && (totalLen >= 50);
+
+      if (isLoop) {
+        const aspect = minDim / (maxDim || 1);
+
+        // Strict criteria for circle:
+        // 1. aspect ratio must be close to 1:1 (circles don't have elongated bounding boxes)
+        // 2. normRadialDev must be very small (< 0.11)
+        // 3. fillRatio must match circle's ~0.785 (definitely < 0.83)
+        // 4. stroke must NOT reach all 4 corners (cornersReached <= 2)
+        // 5. normRadialDev must be clearly lower than normBoxErr
+        const isDefiniteCircle = 
+          (aspect >= 0.78) && 
+          (normRadialDev < 0.12) && 
+          (fillRatio < 0.83) && 
+          (cornersReached <= 2) && 
+          (normRadialDev < normBoxErr);
+
+        if (isDefiniteCircle) {
+          return { type: 'circle', cx: cx, cy: cy, r: (w + h) / 4 };
+        }
+
+        // If it's not definitely a circle, any closed loop is a RECTANGLE:
+        return { type: 'rect', x: minX, y: minY, w: w, h: h };
+      }
+
+      // Check for straight line
+      if (directDist >= 20) {
         let maxDev = 0;
         for (let p of pts) {
           const d = distToSegment(p, start, end);
           if (d > maxDev) maxDev = d;
         }
         const lengthRatio = totalLen / (directDist || 1);
-        if (lengthRatio <= 1.15 && maxDev <= Math.max(8, directDist * 0.12)) {
+        if (lengthRatio <= 1.20 && maxDev <= Math.max(10, directDist * 0.15)) {
           const snapped = snapLineCoordinates(start.x, start.y, end.x, end.y);
           return { type: 'line', x1: start.x, y1: start.y, x2: snapped.x, y2: snapped.y };
         }
@@ -2026,10 +2058,10 @@
           const snapped = snapLineCoordinates(eng.startX, eng.startY, endX, endY);
           finalShape = { type: 'line', x1: eng.startX, y1: eng.startY, x2: snapped.x, y2: snapped.y };
         } else if (eng.currentTool === 'circle') {
-          const r = Math.hypot(endX - eng.startX, endY - eng.startY) / 2;
+          const r = Math.hypot(endX - eng.startX, endY - endY) / 2;
           finalShape = { type: 'circle', cx: (eng.startX + endX) / 2, cy: (eng.startY + endY) / 2, r };
         } else if (eng.currentTool === 'rect') {
-          finalShape = { type: 'rect', x: Math.min(eng.startX, endX), y: Math.min(eng.startY, endY), w: Math.abs(endX - eng.startX), h: Math.abs(endY - eng.startY) };
+          finalShape = { type: 'rect', x: Math.min(eng.startX, endX), y: Math.min(eng.startY, endY), w: Math.abs(endX - eng.startX), h: Math.abs(endY - endY) };
         }
 
         if (finalShape) {
