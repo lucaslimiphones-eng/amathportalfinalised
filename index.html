@@ -1523,6 +1523,65 @@
       return Math.hypot(p.x - (v.x + t * (w.x - v.x)), p.y - (v.y + t * (w.y - v.y)));
     }
 
+    function resamplePath(points, totalPoints = 64) {
+      if (!points || points.length < 2) return points;
+      let pathLen = 0;
+      for (let i = 1; i < points.length; i++) {
+        pathLen += Math.hypot(points[i].x - points[i - 1].x, points[i].y - points[i - 1].y);
+      }
+      if (pathLen === 0) return points;
+      const step = pathLen / (totalPoints - 1);
+      const resampled = [{ x: points[0].x, y: points[0].y }];
+      let currentDist = 0;
+      let targetDist = step;
+      let i = 1;
+      let prevPt = points[0];
+
+      while (i < points.length && resampled.length < totalPoints) {
+        const segLen = Math.hypot(points[i].x - prevPt.x, points[i].y - prevPt.y);
+        if (currentDist + segLen >= targetDist) {
+          const t = (targetDist - currentDist) / (segLen || 1);
+          const newPt = {
+            x: prevPt.x + t * (points[i].x - prevPt.x),
+            y: prevPt.y + t * (points[i].y - prevPt.y)
+          };
+          resampled.push(newPt);
+          prevPt = newPt;
+          currentDist = targetDist;
+          targetDist += step;
+        } else {
+          currentDist += segLen;
+          prevPt = points[i];
+          i++;
+        }
+      }
+      while (resampled.length < totalPoints) {
+        resampled.push({ x: points[points.length - 1].x, y: points[points.length - 1].y });
+      }
+      return resampled;
+    }
+
+    function countSharpCorners(pts) {
+      if (!pts || pts.length < 16) return 0;
+      const k = 4;
+      let corners = 0;
+      let lastCornerIdx = -999;
+      for (let i = k; i < pts.length - k; i++) {
+        const v1 = { x: pts[i].x - pts[i - k].x, y: pts[i].y - pts[i - k].y };
+        const v2 = { x: pts[i + k].x - pts[i].x, y: pts[i + k].y - pts[i].y };
+        const m1 = Math.hypot(v1.x, v1.y);
+        const m2 = Math.hypot(v2.x, v2.y);
+        if (m1 < 2 || m2 < 2) continue;
+        const dot = (v1.x * v2.x + v1.y * v2.y) / (m1 * m2);
+        const angle = Math.acos(Math.max(-1, Math.min(1, dot))) * (180 / Math.PI);
+        if (angle > 52 && (i - lastCornerIdx) > k * 2) {
+          corners++;
+          lastCornerIdx = i;
+        }
+      }
+      return corners;
+    }
+
     function recognizeShapeFromPoints(rawPts) {
       if (!rawPts || rawPts.length < 8) return null;
       const pts = smoothPoints(rawPts, 2);
@@ -1561,84 +1620,46 @@
       }
       const absSweep = Math.abs(totalAngleSweep);
 
-      // Shoelace area
-      let shoelaceArea = 0;
-      for (let i = 0; i < pts.length; i++) {
-        const next = pts[(i + 1) % pts.length];
-        shoelaceArea += (pts[i].x * next.y - next.x * pts[i].y);
-      }
-      shoelaceArea = Math.abs(shoelaceArea) / 2;
-      const bboxArea = (w * h) || 1;
-      const fillRatio = shoelaceArea / bboxArea;
+      const isClosedLoop = (absSweep >= 4.2 || directDist <= Math.max(45, minDim * 0.45)) && (minDim >= 18) && (totalLen >= 50);
 
-      // Radial distribution (for circle test)
-      let rSum = 0;
-      for (let p of pts) {
-        rSum += Math.hypot(p.x - cx, p.y - cy);
-      }
-      const meanR = rSum / pts.length;
-      let rDevSum = 0;
-      for (let p of pts) {
-        rDevSum += Math.abs(Math.hypot(p.x - cx, p.y - cy) - meanR);
-      }
-      const normRadialDev = (rDevSum / pts.length) / (meanR || 1);
+      if (isClosedLoop) {
+        const resampled = resamplePath(pts, 64);
 
-      // Distance to bounding box edges (for rectangle test)
-      let boxEdgeDevSum = 0;
-      for (let p of pts) {
-        const distToEdge = Math.min(
-          Math.abs(p.x - minX),
-          Math.abs(p.x - maxX),
-          Math.abs(p.y - minY),
-          Math.abs(p.y - maxY)
-        );
-        boxEdgeDevSum += distToEdge;
-      }
-      const normBoxErr = (boxEdgeDevSum / pts.length) / (minDim || 1);
-
-      // Corner proximity check: Rectangles reach close to the bounding box corners, circles never do
-      const corners = [
-        { x: minX, y: minY },
-        { x: maxX, y: minY },
-        { x: maxX, y: maxY },
-        { x: minX, y: maxY }
-      ];
-      let cornersReached = 0;
-      for (const c of corners) {
-        let minDist = Infinity;
-        for (const p of pts) {
-          const d = Math.hypot(p.x - c.x, p.y - c.y);
-          if (d < minDist) minDist = d;
+        // Calculate radial distance statistics from center
+        let rSum = 0;
+        for (let p of resampled) {
+          rSum += Math.hypot(p.x - cx, p.y - cy);
         }
-        if (minDist <= Math.max(20, minDim * 0.28)) {
-          cornersReached++;
+        const meanR = rSum / resampled.length;
+        let rVariance = 0;
+        for (let p of resampled) {
+          rVariance += Math.pow(Math.hypot(p.x - cx, p.y - cy) - meanR, 2);
         }
-      }
+        const radialStdDev = Math.sqrt(rVariance / resampled.length) / (meanR || 1);
 
-      const isLoop = (absSweep >= 4.2 || directDist <= Math.max(50, minDim * 0.5)) && (minDim >= 18) && (totalLen >= 50);
+        // Calculate corner characteristics
+        const corners = countSharpCorners(resampled);
 
-      if (isLoop) {
+        // Calculate perimeter to bounding-box perimeter ratio
+        // Perfect Circle: ~3.14 / 4 = 0.785
+        // Perfect Rectangle: ~4.0 / 4 = 1.000
+        const bbPerimeter = 2 * (w + h);
+        const perimeterRatio = totalLen / (bbPerimeter || 1);
+
+        // Aspect ratio (width to height closeness)
         const aspect = minDim / (maxDim || 1);
 
-        // Strict criteria for circle:
-        // 1. aspect ratio must be close to 1:1 (circles don't have elongated bounding boxes)
-        // 2. normRadialDev must be very small (< 0.11)
-        // 3. fillRatio must match circle's ~0.785 (definitely < 0.83)
-        // 4. stroke must NOT reach all 4 corners (cornersReached <= 2)
-        // 5. normRadialDev must be clearly lower than normBoxErr
-        const isDefiniteCircle = 
-          (aspect >= 0.78) && 
-          (normRadialDev < 0.12) && 
-          (fillRatio < 0.83) && 
-          (cornersReached <= 2) && 
-          (normRadialDev < normBoxErr);
+        // Score models:
+        // A circle has low radial variance, low corner count (< 3), and perimeter ratio <= 0.88.
+        // A rectangle has higher radial variance, sharp corners (>= 3), or high perimeter ratio.
+        const circleScore = (radialStdDev < 0.18 ? 2 : 0) + (corners <= 2 ? 2 : 0) + (perimeterRatio < 0.89 ? 2 : 0) + (aspect > 0.65 ? 1 : 0);
+        const rectScore = (radialStdDev >= 0.16 ? 2 : 0) + (corners >= 3 ? 3 : 0) + (perimeterRatio >= 0.88 ? 2 : 0);
 
-        if (isDefiniteCircle) {
+        if (circleScore > rectScore) {
           return { type: 'circle', cx: cx, cy: cy, r: (w + h) / 4 };
+        } else {
+          return { type: 'rect', x: minX, y: minY, w: w, h: h };
         }
-
-        // If it's not definitely a circle, any closed loop is a RECTANGLE:
-        return { type: 'rect', x: minX, y: minY, w: w, h: h };
       }
 
       // Check for straight line
@@ -1649,7 +1670,7 @@
           if (d > maxDev) maxDev = d;
         }
         const lengthRatio = totalLen / (directDist || 1);
-        if (lengthRatio <= 1.20 && maxDev <= Math.max(10, directDist * 0.15)) {
+        if (lengthRatio <= 1.22 && maxDev <= Math.max(10, directDist * 0.15)) {
           const snapped = snapLineCoordinates(start.x, start.y, end.x, end.y);
           return { type: 'line', x1: start.x, y1: start.y, x2: snapped.x, y2: snapped.y };
         }
